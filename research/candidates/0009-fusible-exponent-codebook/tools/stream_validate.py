@@ -24,6 +24,9 @@ from __future__ import annotations
 import argparse, json, struct, mmap, re, time, os, sys
 from pathlib import Path
 import numpy as np
+# xet downloads die on connection resets with no in-flight retry; plain HTTP
+# resumes. Must be set before huggingface_hub is imported.
+os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
 from huggingface_hub import hf_hub_download, get_hf_file_metadata, hf_hub_url
 
 K = 15
@@ -127,6 +130,23 @@ def summarize(a, meta):
     }
 
 
+def dl_retry(*args, **kw):
+    """hf_hub_download with backoff: a connection reset must not kill a
+    multi-hour streamed run."""
+    for attempt in range(1, 11):
+        try:
+            return hf_hub_download(*args, **kw)
+        except KeyboardInterrupt:
+            raise
+        except Exception as ex:
+            if attempt == 10:
+                raise
+            wait = min(30 * attempt, 300)
+            print(f"[retry] download failed ({type(ex).__name__}); "
+                  f"attempt {attempt}/10, sleeping {wait}s", flush=True)
+            time.sleep(wait)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("repo", help="HF repo id, e.g. nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16")
@@ -139,8 +159,8 @@ def main():
     work = Path(args.work); work.mkdir(parents=True, exist_ok=True)
     out = work / f"stream_result_{args.repo.split('/')[-1]}.json"
 
-    idx_path = hf_hub_download(args.repo, "model.safetensors.index.json",
-                              revision=args.revision, local_dir=work)
+    idx_path = dl_retry(args.repo, "model.safetensors.index.json",
+                        revision=args.revision, local_dir=work)
     weight_map = json.loads(Path(idx_path).read_text())["weight_map"]
     shards = sorted(set(weight_map.values()))
     total = len(shards)
@@ -162,14 +182,27 @@ def main():
                expert_raw=0, expert_enc_bs=0.0, expert_enc_rg=0.0,
                other_raw=0, n_bf16=0, n_expert=0, n_esc_total=0,
                all_lossless=True, dtype_raw={})
+    ckpt = work / f"checkpoint_{args.repo.split('/')[-1]}.json"
+    done_shards: set[str] = set()
+    if ckpt.exists():
+        saved = json.loads(ckpt.read_text())
+        if saved.get("repo") == args.repo:
+            acc.update(saved["acc"])
+            done_shards = set(saved["done_shards"])
+            print(f"[resume] checkpoint: {len(done_shards)} shard(s) already processed", flush=True)
     t0 = time.time()
     for i, sh in enumerate(shards, 1):
+        if sh in done_shards:
+            continue
         td = time.time()
-        p = Path(hf_hub_download(args.repo, sh, revision=args.revision, local_dir=work))
+        p = Path(dl_retry(args.repo, sh, revision=args.revision, local_dir=work))
         dl = time.time() - td
         process_shard(p, acc)
         if not args.keep:
             p.unlink(missing_ok=True)
+        done_shards.add(sh)
+        ckpt.write_text(json.dumps({"repo": args.repo, "acc": acc,
+                                    "done_shards": sorted(done_shards)}))
         meta = {"repo": args.repo, "done": i, "total": total}
         res = summarize(acc, meta)
         res["_progress"] = {"shard": i, "of_selected": len(shards), "of_total": total,
