@@ -1,18 +1,1791 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lossless BF16 Weight Compression</title>
-<meta http-equiv="refresh" content="0; url=./research/candidates/0009-fusible-exponent-codebook/writeup/">
-<link rel="canonical" href="./research/candidates/0009-fusible-exponent-codebook/writeup/">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Lossless Compression Hunt: model weights, 30% smaller, bit-exact</title>
+<meta name="description" content="An ongoing hunt to compress LLM weights with zero change to what they compute. 30.03% smaller so far; the measured lossless limit is about 34%." />
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Archivo+Black&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  html{background:#0b0c0e;color:#e9ebee;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-  body{display:grid;place-items:center;min-height:100dvh;margin:0}
-  a{color:#34d399}
+  /* ============ GLOBAL — Technical Bulletin system ============ */
+  :root{
+    --paper:  #F2F0EA;
+    --paper2: #E9E6DE;
+    --ink:    #141412;
+    --ink2:   #57544C;
+    --red:    #D92B1C;
+    --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+    --sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+    --black: "Archivo Black", "Archivo", sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  /* paper grain — fixed, non-interactive, very low opacity */
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:60;opacity:.04;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
+  ::selection{background:var(--ink);color:var(--paper)}
+  a{color:var(--ink)}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+  h1,h2,h3{margin:0}
+  /* one display scale for all section heads — only the h1 (and the red numeral) sit above it */
+  .plate h2{font-family:var(--black);text-transform:uppercase;letter-spacing:-.02em;
+    line-height:.92;font-size:clamp(1.9rem,4.3vw,3.05rem)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+  .mono{font-family:var(--mono)}
+
+  /* micro label utility */
+  .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+
+  /* plate chrome: heavy top rule + shared header row */
+  .plate{border-top:3px solid var(--ink);padding:64px 0 88px}
+  .plate:first-of-type{border-top:0}
+  .phead{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink2);border-bottom:1px solid var(--ink);padding-bottom:10px;margin-bottom:40px}
+  .phead .fig{color:var(--ink);font-weight:700}
+  .phead .fig::before{content:"[ "}
+  .phead .fig::after{content:" ]"}
+
+  /* reveal system (global — do not redefine in plates) */
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:720px){
+    .plate{padding:44px 0 60px}
+    .phead{flex-wrap:wrap;margin-bottom:28px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    html{scroll-behavior:auto}
+  }
 </style>
+<style data-plate="0">
+  /* ============ PLATE 0 — MASTHEAD + GAUGE ============ */
+  #plate-0{padding-top:36px}
+
+  /* ---- title block (drawing header) ---- */
+  #plate-0 .p0-tblock{
+    display:grid;grid-template-columns:1.15fr 1.55fr 1.5fr 1.35fr .78fr;
+    gap:1px;background:var(--ink);border:1px solid var(--ink);margin-bottom:52px;
+  }
+  #plate-0 .p0-cell{background:var(--paper);padding:10px 14px 12px}
+  #plate-0 .p0-l{
+    display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink2);
+  }
+  #plate-0 .p0-v{
+    display:block;margin-top:6px;font-family:var(--mono);font-size:12px;
+    letter-spacing:.04em;color:var(--ink);font-weight:500;
+    font-variant-numeric:tabular-nums;overflow-wrap:break-word;
+  }
+  #plate-0 .p0-v a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+  #plate-0 .p0-v a:hover{color:var(--red)}
+  #plate-0 .p0-dot{display:inline-block;width:9px;height:9px;background:var(--red);margin-right:8px;vertical-align:baseline}
+  #plate-0 .p0-cell--status .p0-v{font-weight:700}
+
+  /* ---- headline ---- */
+  #plate-0 h1{
+    font-family:var(--black);text-transform:uppercase;
+    font-size:clamp(1.9rem,4.3vw,3.2rem);line-height:.95;letter-spacing:-.02em;
+  }
+  #plate-0 .p0-strike{position:relative;white-space:nowrap}
+  #plate-0 .p0-strike::after{
+    content:"";position:absolute;left:-1%;right:-1%;top:50%;height:.09em;
+    background:var(--red);transform:translateY(-50%);
+  }
+  #plate-0 .p0-sub{
+    margin:20px 0 0;max-width:62ch;font-family:var(--sans);font-weight:500;
+    font-size:16.5px;line-height:1.55;color:var(--ink);
+  }
+
+  /* ---- score row: giant numeral + label ---- */
+  #plate-0 .p0-hero{margin-top:52px}
+  #plate-0 .p0-score{display:flex;align-items:flex-end;gap:clamp(18px,3vw,40px);flex-wrap:wrap;margin-bottom:20px}
+  #plate-0 .p0-big{
+    margin:0;font-family:var(--black);color:var(--red);
+    font-size:clamp(4rem,12vw,9.5rem);line-height:.82;letter-spacing:-.03em;
+    font-variant-numeric:tabular-nums;
+  }
+  #plate-0 .p0-pct{font-size:.45em}
+  /* width-reserved counter: hidden "30.03" twin holds the box so the count-up never jitters */
+  #plate-0 .p0-cwrap{position:relative;display:inline-block}
+  #plate-0 .p0-ghost{visibility:hidden}
+  #plate-0 #p0-count{position:absolute;top:0;right:0;text-align:right;white-space:nowrap}
+  #plate-0 .p0-scorelbl{padding-bottom:6px}
+  #plate-0 .p0-slword{
+    font-family:var(--black);text-transform:uppercase;
+    font-size:clamp(1.3rem,2.6vw,2.1rem);line-height:.95;letter-spacing:-.01em;
+  }
+  #plate-0 .p0-ctx{
+    margin:12px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.07em;
+    color:var(--ink2);font-variant-numeric:tabular-nums;
+  }
+
+  /* ---- the gauge ---- */
+  #plate-0 .p0-gauge{
+    position:relative;margin:0;border:1px solid var(--ink);background:var(--paper);
+    padding:18px 20px 12px;
+  }
+  #plate-0 .p0-x{
+    position:absolute;font-family:var(--mono);font-size:13px;line-height:1;
+    color:var(--ink2);z-index:2;pointer-events:none;
+  }
+  #plate-0 .p0-xa{top:0;left:0;transform:translate(-50%,-50%)}
+  #plate-0 .p0-xb{top:0;right:0;transform:translate(50%,-50%)}
+  #plate-0 .p0-xc{bottom:0;left:0;transform:translate(-50%,50%)}
+  #plate-0 .p0-xd{bottom:0;right:0;transform:translate(50%,50%)}
+
+  /* annotation rows */
+  #plate-0 .p0-gtop{position:relative;height:46px;margin:0 1px}
+  #plate-0 .p0-gbot{position:relative;height:62px;margin:0 1px}
+  #plate-0 .p0-fl{
+    position:absolute;font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+    line-height:1.5;color:var(--ink);text-transform:uppercase;white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+  #plate-0 .p0-fl b{font-weight:700}
+  #plate-0 .p0-flsub{color:var(--ink2)}
+  #plate-0 .p0-fl-ach{right:69.97%;bottom:0;padding:0 9px 6px 0;border-right:2px solid var(--red);text-align:right}
+  #plate-0 .p0-fl-lim{left:34%;bottom:0;padding:0 0 6px 9px;border-left:2px solid var(--red)}
+  #plate-0 .p0-fl-zstd{right:78%;top:0;padding:4px 9px 0 0;text-align:right}
+
+  /* track */
+  #plate-0 .p0-gtrack{position:relative;height:76px;border:1px solid var(--ink);background:var(--paper)}
+  #plate-0 .p0-noise{
+    position:absolute;left:34%;right:0;top:0;bottom:0;
+    background-color:var(--paper2);
+    background-image:radial-gradient(var(--ink2) 1px,transparent 1px);
+    background-size:6px 6px;
+  }
+  /* solid red = achieved, GPU-readable (hatch is reserved for removed/storage-only zones) */
+  #plate-0 .p0-gfill{
+    position:absolute;left:0;top:0;bottom:0;width:30.03%;
+    background-color:var(--red);
+    z-index:1;
+  }
+  #plate-0 .p0-gauge.p0-armed .p0-gfill{width:0}
+  #plate-0 .p0-gauge.p0-go .p0-gfill{width:30.03%;transition:width 2.2s cubic-bezier(.16,1,.3,1)}
+  #plate-0 .p0-mark{position:absolute;top:0;bottom:0;z-index:2}
+  #plate-0 .p0-mark-zstd{left:22%;width:1px;background:var(--ink);bottom:-34px}
+  #plate-0 .p0-mark-limit{
+    left:34%;width:2px;
+    background:repeating-linear-gradient(to bottom,var(--red) 0 5px,transparent 5px 9px);
+  }
+  #plate-0 .p0-zone{
+    position:absolute;left:34%;right:0;top:0;bottom:0;z-index:3;
+    display:flex;align-items:center;justify-content:center;
+  }
+  #plate-0 .p0-zone span{
+    background:var(--paper);border:1px solid var(--ink2);padding:5px 10px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink);
+    text-transform:uppercase;white-space:nowrap;font-variant-numeric:tabular-nums;
+  }
+
+  /* graduations */
+  #plate-0 .p0-gscale{position:relative;height:18px;margin:0 1px}
+  #plate-0 .p0-tminor{
+    position:absolute;top:0;left:0;right:0;height:9px;
+    background:repeating-linear-gradient(to right,var(--ink2) 0 1px,transparent 1px 2%);
+  }
+  #plate-0 .p0-tmajor{
+    position:absolute;top:0;left:0;right:0;height:18px;
+    background:repeating-linear-gradient(to right,var(--ink) 0 2px,transparent 2px 10%);
+  }
+  #plate-0 .p0-gscale::after{
+    content:"";position:absolute;right:0;top:0;width:2px;height:18px;background:var(--ink);
+  }
+  #plate-0 .p0-gnums{position:relative;height:16px;margin:0 1px}
+  #plate-0 .p0-n{
+    position:absolute;top:2px;transform:translateX(-50%);
+    font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--ink2);
+    font-variant-numeric:tabular-nums;
+  }
+  #plate-0 .p0-n0{transform:none}
+  #plate-0 .p0-n100{transform:translateX(-100%)}
+
+  /* mobile legend (hidden on desktop) */
+  #plate-0 .p0-glegend{display:none}
+  #plate-0 .p0-glegend div{
+    display:flex;align-items:flex-start;
+    font-family:var(--mono);font-size:10px;letter-spacing:.04em;line-height:1.5;
+    color:var(--ink);text-transform:uppercase;font-variant-numeric:tabular-nums;
+  }
+  #plate-0 .p0-sw{display:inline-block;flex-shrink:0;width:10px;height:12px;margin:1px 8px 0 0}
+  #plate-0 .p0-sw-fill{background-color:var(--red)}
+  #plate-0 .p0-sw-zstd{width:2px;background:var(--ink);margin:1px 12px 0 4px}
+  #plate-0 .p0-sw-limit{
+    width:4px;margin:1px 11px 0 3px;
+    background:repeating-linear-gradient(to bottom,var(--red) 0 3px,transparent 3px 5px);
+  }
+  #plate-0 .p0-sw-noise{
+    background-color:var(--paper2);border:1px solid var(--ink2);
+    background-image:radial-gradient(var(--ink2) 1px,transparent 1px);background-size:3px 3px;
+  }
+
+  /* figure caption */
+  #plate-0 .p0-gcap{
+    margin-top:14px;padding-top:8px;border-top:1px solid var(--ink);
+    font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink2);
+  }
+
+  /* ---- stat readouts ---- */
+  #plate-0 .p0-stats{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--ink);border:1px solid var(--ink);margin-top:30px;
+  }
+  #plate-0 .p0-stat{background:var(--paper);padding:16px 18px 14px}
+  #plate-0 .p0-sid{
+    display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+    color:var(--ink2);margin-bottom:12px;
+  }
+  #plate-0 .p0-stat strong{
+    display:block;font-family:var(--mono);font-weight:700;
+    font-size:clamp(1.4rem,2.4vw,1.9rem);line-height:1.1;letter-spacing:-.01em;
+    color:var(--ink);font-variant-numeric:tabular-nums;
+  }
+  #plate-0 .p0-scap{
+    display:block;margin-top:8px;font-family:var(--mono);font-size:10px;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);line-height:1.6;
+  }
+
+  /* ---- title block steps down before the single-column collapse ---- */
+  @media(max-width:900px){
+    #plate-0 .p0-tblock{grid-template-columns:repeat(2,1fr)}
+    #plate-0 .p0-cell--status{grid-column:1/-1}
+  }
+
+  /* ---- annotations collapse before mobile (flags need room) ---- */
+  @media(max-width:960px){
+    #plate-0 .p0-gtop,#plate-0 .p0-gbot,#plate-0 .p0-zone{display:none}
+    #plate-0 .p0-mark-zstd{bottom:0}
+    #plate-0 .p0-glegend{display:flex;flex-direction:column;gap:7px;margin:14px 1px 0}
+    #plate-0 .p0-glegend div{white-space:normal}
+  }
+
+  /* ---- mobile ---- */
+  @media(max-width:720px){
+    #plate-0{padding-top:24px}
+    #plate-0 .p0-tblock{grid-template-columns:1fr;margin-bottom:36px}
+    #plate-0 h1{text-wrap:balance}
+    #plate-0 h1 br{display:none}
+    #plate-0 .p0-hero{margin-top:36px}
+    #plate-0 .p0-score{flex-direction:column;align-items:flex-start;gap:14px}
+    #plate-0 .p0-scorelbl{padding-bottom:0}
+    #plate-0 .p0-ctx{white-space:normal}
+    #plate-0 .p0-gauge{padding:14px 12px 10px}
+    #plate-0 .p0-gtrack{height:64px}
+    #plate-0 .p0-alt{display:none}
+    #plate-0 .p0-stats{grid-template-columns:1fr}
+    #plate-0 .p0-stat{padding:14px 16px 12px}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    #plate-0 .p0-gfill{width:30.03%!important;transition:none!important}
+  }
+</style>
+<style data-plate="1">
+  /* ============ PLATE 1 — ANATOMY OF A WEIGHT ============ */
+
+  #plate-1 .p1-head{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);
+    gap:24px 56px;align-items:end;margin-bottom:44px}
+  #plate-1 h2{overflow-wrap:break-word}
+  #plate-1 .p1-lead{margin:0 0 6px;font-size:16px;line-height:1.55;max-width:52ch;color:var(--ink)}
+
+  /* inline numerals in prose/captions are always mono */
+  #plate-1 .n{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.92em;letter-spacing:0}
+
+  /* ---- figure panel: bordered compartment sheet with corner registration marks ---- */
+  #plate-1 .p1-panel{position:relative;margin:0;border:1px solid var(--ink)}
+  #plate-1 .p1-x{position:absolute;transform:translate(-50%,-50%);font-family:var(--mono);
+    font-size:13px;line-height:1;color:var(--ink2);pointer-events:none;z-index:2}
+  #plate-1 .p1-x.tl{top:0;left:0}
+  #plate-1 .p1-x.tr{top:0;left:100%}
+  #plate-1 .p1-x.bl{top:100%;left:0}
+  #plate-1 .p1-x.br{top:100%;left:100%}
+
+  #plate-1 .p1-compart{display:grid;gap:1px;background:var(--ink)}
+
+  /* title block strip */
+  #plate-1 .p1-tblock{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--ink)}
+  #plate-1 .p1-tf{background:var(--paper2);padding:10px 14px 11px}
+  #plate-1 .p1-tf .k{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--ink2);margin-bottom:3px}
+  #plate-1 .p1-tf .v{font-family:var(--mono);font-size:12px;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--ink);font-variant-numeric:tabular-nums}
+
+  /* ---- main diagram cell ---- */
+  #plate-1 .p1-main{background:var(--paper);padding:26px clamp(14px,3vw,32px) 24px}
+
+  #plate-1 .p1-ruler{display:grid;grid-template-columns:repeat(16,1fr);padding:0 1px;
+    font-family:var(--mono);font-size:9px;color:var(--ink2);margin-bottom:5px;
+    font-variant-numeric:tabular-nums}
+  #plate-1 .p1-ruler span{text-align:center}
+
+  #plate-1 .p1-cells{display:grid;grid-template-columns:repeat(16,1fr);gap:1px;
+    background:var(--ink);border:1px solid var(--ink)}
+  #plate-1 .p1-b{background:var(--paper2);height:46px;display:flex;align-items:center;
+    justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink)}
+  #plate-1 .p1-b.m{background-color:var(--paper);
+    background-image:radial-gradient(var(--ink2) 1px,transparent 1px);background-size:6px 6px}
+  #plate-1 .p1-b.m span{background:var(--paper);padding:0 3px}
+
+  /* dimension lines: |---- 9 BITS ----|---- 7 BITS ----| */
+  #plate-1 .p1-dims{display:grid;grid-template-columns:9fr 7fr;margin-top:10px}
+  #plate-1 .p1-dim{position:relative;height:12px;border-left:1px solid var(--ink);
+    border-right:1px solid var(--ink);margin:0 1px}
+  #plate-1 .p1-dim::before{content:"";position:absolute;left:0;right:0;top:50%;
+    border-top:1px solid var(--ink)}
+  #plate-1 .p1-dim.ore::before{border-top:2px solid var(--red);margin-top:-1px}
+
+  #plate-1 .p1-dimlab{display:grid;grid-template-columns:9fr 7fr;margin-top:7px;
+    font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase;text-align:center}
+  #plate-1 .p1-dimlab .s1{display:block;font-size:11px;font-weight:700;color:var(--ink)}
+  #plate-1 .p1-dimlab .s2{display:block;font-size:10px;color:var(--ink2);margin-top:2px}
+
+  /* connector: field widths above -> measured information below, same 16-bit scale */
+  #plate-1 .p1-link{position:relative;min-height:36px;margin-top:16px;
+    display:flex;align-items:center;padding:6px 0 8px}
+  #plate-1 .p1-link::before{content:"";position:absolute;top:0;bottom:0;left:56.25%;
+    border-left:1px dashed var(--ink2)}
+  #plate-1 .p1-link .t{font-family:var(--mono);font-size:10px;line-height:1.5;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);max-width:54%}
+  #plate-1 .p1-link .b9{position:absolute;left:56.25%;top:50%;transform:translate(7px,-50%);
+    font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--ink2);
+    font-variant-numeric:tabular-nums}
+
+  /* measured-entropy strip: red = real, hatch = air (removable), halftone = noise */
+  #plate-1 .p1-strip{position:relative;height:52px;border:1px solid var(--ink);background:var(--paper)}
+  #plate-1 .p1-seg{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center}
+  #plate-1 .p1-seg.real{left:0;width:23.75%;background:var(--red)}
+  #plate-1 .p1-seg.air{left:23.75%;width:32.5%;border-left:1px solid var(--ink);
+    background:repeating-linear-gradient(135deg,var(--ink2) 0,var(--ink2) 1px,transparent 1px,transparent 6px)}
+  #plate-1 .p1-seg.noise{left:56.25%;width:43.75%;border-left:1px solid var(--ink);
+    background-image:radial-gradient(var(--ink2) 1px,transparent 1px);background-size:6px 6px}
+  #plate-1 .p1-seg .v{font-family:var(--mono);font-weight:700;font-size:14px;
+    font-variant-numeric:tabular-nums;color:var(--ink)}
+  #plate-1 .p1-seg.real .v{color:var(--paper);font-size:15px}
+  #plate-1 .p1-seg.air .v,#plate-1 .p1-seg.noise .v{background:var(--paper);
+    border:1px solid var(--ink);padding:1px 6px}
+
+  #plate-1 .p1-legend{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:10px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+    color:var(--ink);font-variant-numeric:tabular-nums}
+  #plate-1 .p1-legend .sw{display:inline-block;width:11px;height:11px;border:1px solid var(--ink);
+    margin-right:7px;vertical-align:-1px;background:var(--paper)}
+  #plate-1 .p1-legend .sw.real{background:var(--red)}
+  #plate-1 .p1-legend .sw.air{background:repeating-linear-gradient(135deg,var(--ink2) 0,var(--ink2) 1px,transparent 1px,transparent 4px)}
+  #plate-1 .p1-legend .sw.noise{background-image:radial-gradient(var(--ink2) 1px,transparent 1px);background-size:4px 4px}
+
+  #plate-1 .p1-cap{margin:16px 0 0;font-size:14.5px;line-height:1.55;color:var(--ink2);max-width:62ch}
+
+  /* figure caption strip (FIG numbering lives on figures, not plate headers) */
+  #plate-1 .p1-gcap{background:var(--paper2);border-top:1px solid var(--ink);padding:9px 14px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+
+  /* ---- bottom modules ---- */
+  #plate-1 .p1-duo{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--ink)}
+  #plate-1 .p1-mod{background:var(--paper);padding:22px 24px 24px;min-width:0}
+  #plate-1 .p1-mod h3{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;margin:0 0 4px;color:var(--ink)}
+  #plate-1 .p1-mod .sub{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.07em;
+    text-transform:uppercase;color:var(--ink2);margin-bottom:16px;padding-bottom:10px;
+    border-bottom:1px solid var(--ink)}
+
+  /* concentration bars */
+  #plate-1 .p1-row{display:grid;grid-template-columns:64px 1fr 74px;gap:12px;align-items:center;
+    margin-bottom:10px;font-family:var(--mono)}
+  #plate-1 .p1-row .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+  #plate-1 .p1-track{position:relative;height:15px;border:1px solid var(--ink);background:var(--paper)}
+  #plate-1 .p1-row.key .p1-track{height:19px}
+  #plate-1 .p1-fill{position:absolute;left:0;top:0;bottom:0;background:var(--red);
+    transform-origin:0 50%;transition:transform 1.5s cubic-bezier(.16,1,.3,1);transition-delay:var(--d,0s)}
+  #plate-1.p1-armed .p1-fill{transform:scaleX(0)}
+  #plate-1.p1-run .p1-fill{transform:scaleX(1)}
+  #plate-1 .p1-row .v{font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+  #plate-1 .p1-row.key .v{font-size:14px;font-weight:700;color:var(--red)}
+
+  #plate-1 .p1-point{margin-top:20px;padding:2px 0 2px 16px;border-left:3px solid var(--red);
+    font-size:15px;line-height:1.5;max-width:62ch}
+  #plate-1 .p1-point strong{font-weight:600}
+
+  /* decode procedure */
+  #plate-1 .p1-pre{margin:0;background:var(--paper2);border:1px solid var(--ink);
+    padding:14px 16px;font-family:var(--mono);font-size:12px;line-height:1.75;
+    color:var(--ink);overflow-x:auto}
+  #plate-1 .p1-pre .c{color:var(--ink2)}
+
+  @media(max-width:1020px){
+    #plate-1 .p1-duo{grid-template-columns:1fr}
+  }
+  @media(max-width:720px){
+    #plate-1 .p1-head{grid-template-columns:1fr;gap:18px;margin-bottom:30px}
+    #plate-1 .p1-tblock{grid-template-columns:1fr 1fr}
+    #plate-1 .p1-main{padding:18px 14px}
+    #plate-1 .p1-mod{padding:18px 14px}
+    #plate-1 .p1-b{height:34px;font-size:10px}
+    #plate-1 .p1-ruler{font-size:8px}
+    #plate-1 .p1-dimlab .s1{font-size:9px}
+    #plate-1 .p1-dimlab .s2{font-size:8.5px}
+    #plate-1 .p1-link .t{font-size:9px}
+    #plate-1 .p1-seg .v{font-size:12px}
+    #plate-1 .p1-seg.real .v{font-size:13px}
+    #plate-1 .p1-row{grid-template-columns:56px 1fr 64px;gap:8px}
+    #plate-1 .p1-pre{font-size:11px;padding:12px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    #plate-1 .p1-fill{transition:none}
+    #plate-1.p1-armed .p1-fill{transform:none}
+  }
+</style>
+<style data-plate="2">
+  /* ============ PLATE 2 — THE HUNT LOG ============ */
+  #plate-2{--idx:112px}
+
+  /* ---- head: H2 + lead ---- */
+  #plate-2 .p2-head{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);
+    gap:clamp(24px,4vw,64px);align-items:end;margin-bottom:52px}
+  #plate-2 h2 .p2-30{color:var(--red)}
+  #plate-2 .p2-lead p{margin:0 0 14px;max-width:62ch;font-size:15.5px;line-height:1.55}
+  #plate-2 .p2-lead p:last-child{margin-bottom:0}
+  #plate-2 .p2-rule{text-decoration:underline;text-decoration-color:var(--red);
+    text-decoration-thickness:2px;text-underline-offset:3px}
+  #plate-2 .p2-lead a{font-family:var(--mono);font-size:.9em;color:var(--ink);
+    text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+  #plate-2 .p2-lead a:hover{text-decoration-color:var(--red)}
+
+  /* ---- log table: hairline compartments ---- */
+  #plate-2 .p2-log{position:relative;display:grid;
+    grid-template-columns:var(--idx) 1fr 300px;
+    gap:1px;background:var(--ink);border:1px solid var(--ink)}
+  #plate-2 .p2-log::before,#plate-2 .p2-log::after{
+    font-family:var(--mono);font-size:13px;line-height:1;color:var(--ink2);
+    position:absolute;pointer-events:none}
+  #plate-2 .p2-log::before{content:"+";top:0;left:0;transform:translate(-50%,-50%)}
+  #plate-2 .p2-log::after{content:"+";bottom:0;right:0;transform:translate(50%,50%)}
+  #plate-2 .p2-entry{display:contents}
+  #plate-2 .p2-th{background:var(--ink);color:var(--paper);font-family:var(--mono);
+    font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:8px 16px}
+  #plate-2 .p2-idx{background:var(--paper);padding:22px 16px;
+    display:flex;flex-direction:column;gap:10px}
+  #plate-2 .p2-num{font-family:var(--black);font-size:clamp(2.1rem,3.8vw,3.1rem);
+    line-height:.85;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  #plate-2 .p2-stepname{font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink2)}
+  #plate-2 .p2-idx--hero{background:var(--red)}
+  #plate-2 .p2-idx--hero .p2-num{color:var(--paper)}
+  /* paper-on-red is ~4.3:1 — keep reversed text at bold >=13px */
+  #plate-2 .p2-idx--hero .p2-stepname{color:var(--paper);font-weight:700;font-size:13px}
+  #plate-2 .p2-bodyc{background:var(--paper);padding:24px 28px 28px}
+  #plate-2 .p2-h3{font-family:var(--black);text-transform:uppercase;
+    font-size:clamp(1.05rem,1.9vw,1.45rem);line-height:1.08;letter-spacing:-.01em;
+    margin:0 0 12px}
+  #plate-2 .p2-p{margin:0;max-width:56ch;font-size:15px;line-height:1.55}
+  #plate-2 .p2-cand{display:inline-block;margin-top:16px;font-family:var(--mono);
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
+    border:1px solid var(--ink2);padding:4px 9px;text-decoration:none}
+  #plate-2 .p2-cand:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+  /* ---- result cell: readout + instrument bar ---- */
+  #plate-2 .p2-res{background:var(--paper2);padding:20px 20px 22px;
+    display:flex;flex-direction:column;gap:8px}
+  #plate-2 .p2-stat{font-family:var(--black);font-variant-numeric:tabular-nums;
+    font-size:clamp(1.5rem,2.4vw,1.9rem);line-height:1;letter-spacing:-.01em}
+  #plate-2 .p2-stat--red{color:var(--red)}
+  #plate-2 .p2-stat--txt{font-size:clamp(.95rem,1.5vw,1.1rem);line-height:1.2;
+    text-transform:uppercase}
+  #plate-2 .p2-flag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;border:1px solid var(--ink);padding:3px 7px;
+    width:max-content;max-width:100%}
+  #plate-2 .p2-flag--solid{background:var(--ink);color:var(--paper)}
+  #plate-2 .p2-sub{font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink)}
+  #plate-2 .p2-limit{display:flex;justify-content:flex-end;align-items:center;gap:6px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink)}
+  #plate-2 .p2-limit i{width:7px;height:7px;background:var(--red)}
+  #plate-2 .p2-bar{position:relative;height:12px;margin-top:4px;
+    border:1px solid var(--ink);background:var(--paper)}
+  #plate-2 .p2-bar::before{content:"";position:absolute;inset:0;opacity:.4;
+    background-image:linear-gradient(90deg,var(--ink2) 1px,transparent 1px);
+    background-size:25% 100%}
+  #plate-2 .p2-fill{position:absolute;left:0;top:0;bottom:0;width:var(--v,0%)}
+  #plate-2 .p2-fill--hatch{background-image:repeating-linear-gradient(135deg,
+    var(--ink) 0,var(--ink) 1px,transparent 1px,transparent 4px)}
+  #plate-2 .p2-fill--red{background:var(--red)}
+  #plate-2 .p2-tick{position:absolute;top:-4px;bottom:-4px;left:85%;width:2px;
+    background:var(--red)}
+  #plate-2 .p2-scale{position:relative;height:13px;font-family:var(--mono);
+    font-size:10px;letter-spacing:.05em;color:var(--ink2);
+    font-variant-numeric:tabular-nums}
+  #plate-2 .p2-scale span{position:absolute;top:0;transform:translateX(-50%)}
+  #plate-2 .p2-scale span:first-child{transform:none}
+  #plate-2 .p2-scale span:last-child{transform:translateX(-100%)}
+  #plate-2 .p2-noise{height:26px;margin-top:4px;border:1px solid var(--ink);
+    background-image:radial-gradient(var(--ink2) 1px,transparent 1px);
+    background-size:6px 6px}
+
+  /* bar fill animation — armed by JS, final state without it */
+  #plate-2.p2-armed .p2-fill{width:0;
+    transition:width 1.6s cubic-bezier(.16,1,.3,1) .15s}
+  #plate-2.p2-armed .p2-bar.go .p2-fill{width:var(--v,0%)}
+  @media(prefers-reduced-motion:reduce){
+    #plate-2 .p2-fill{width:var(--v,0%)!important;transition:none!important}
+  }
+
+  /* ---- interlude: the graveyard ---- */
+  #plate-2 .p2-grave{margin:36px 0 36px calc(var(--idx) + 1px);
+    border:2px solid var(--ink);background:var(--paper2)}
+  #plate-2 .p2-ghead{display:flex;flex-wrap:wrap;justify-content:space-between;
+    align-items:baseline;gap:8px 24px;padding:18px 22px 16px;
+    border-bottom:2px solid var(--ink)}
+  #plate-2 .p2-ghead h3{font-family:var(--black);text-transform:uppercase;
+    font-size:clamp(1.25rem,2.6vw,1.8rem);line-height:1;letter-spacing:-.01em;
+    flex-basis:100%;order:2}
+  #plate-2 .p2-tombs{display:grid;grid-template-columns:1fr 1fr;gap:1px;
+    background:var(--ink)}
+  #plate-2 .p2-tomb{position:relative;background:var(--paper2);
+    padding:18px 112px 18px 20px}
+  #plate-2 .p2-gid{display:block;font-family:var(--mono);font-size:10px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-bottom:9px}
+  #plate-2 .p2-hyp{margin:0 0 10px;font-family:var(--black);text-transform:uppercase;
+    font-size:15px;line-height:1.3;letter-spacing:.01em;color:var(--ink2);
+    text-decoration:line-through;text-decoration-thickness:2px;
+    text-decoration-color:var(--ink)}
+  #plate-2 .p2-verd{margin:0;font-family:var(--mono);font-size:11.5px;line-height:1.6;
+    letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+  #plate-2 .p2-arr{color:var(--ink2)}
+  #plate-2 .p2-stamp{position:absolute;top:16px;right:14px;transform:rotate(-8deg);
+    font-family:var(--mono);font-weight:700;font-size:10px;line-height:1;
+    letter-spacing:.22em;color:var(--ink);border:2px solid var(--ink);
+    padding:5px 5px 4px 9px;opacity:.5;pointer-events:none}
+  #plate-2 .p2-tomb:nth-of-type(2) .p2-stamp{transform:rotate(6deg);opacity:.44}
+  #plate-2 .p2-tomb:nth-of-type(3) .p2-stamp{transform:rotate(-4deg);opacity:.56}
+  #plate-2 .p2-tomb:nth-of-type(4) .p2-stamp{transform:rotate(9deg);opacity:.47}
+  #plate-2 .p2-gfoot{padding:12px 22px;border-top:1px solid var(--ink);
+    font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink2)}
+  #plate-2 .p2-gfoot a{color:var(--ink);text-decoration:underline;
+    text-decoration-thickness:1px;text-underline-offset:3px}
+  #plate-2 .p2-gfoot a:hover{text-decoration-color:var(--red)}
+  #plate-2 .p2-resume{margin:0 0 12px;font-family:var(--mono);font-size:11px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+
+  /* ---- collapse ---- */
+  @media(max-width:960px){
+    #plate-2{--idx:88px}
+    #plate-2 .p2-log{grid-template-columns:var(--idx) 1fr 226px}
+    #plate-2 .p2-bodyc{padding:20px 20px 24px}
+    #plate-2 .p2-res{padding:18px 16px 20px}
+    #plate-2 .p2-tomb{padding-right:104px}
+  }
+  @media(max-width:720px){
+    #plate-2 .p2-head{grid-template-columns:1fr;gap:18px;align-items:start;
+      margin-bottom:34px}
+    #plate-2 .p2-log{grid-template-columns:1fr}
+    #plate-2 .p2-th{display:none}
+    #plate-2 .p2-idx{flex-direction:row;align-items:baseline;gap:12px;
+      background:var(--paper2);padding:12px 16px}
+    #plate-2 .p2-num{font-size:1.7rem}
+    #plate-2 .p2-idx--hero{background:var(--red)}
+    #plate-2 .p2-bodyc{padding:18px 16px 20px}
+    #plate-2 .p2-grave{margin-left:0}
+    #plate-2 .p2-tombs{grid-template-columns:1fr}
+    #plate-2 .p2-tomb{padding:16px 96px 16px 16px}
+    #plate-2 .p2-ghead{padding:16px 16px 14px}
+    #plate-2 .p2-gfoot{padding:12px 16px}
+  }
+</style>
+<style data-plate="3">
+  /* ============ PLATE 3 — THE RECEIPTS ============ */
+  #plate-3{font-variant-numeric:tabular-nums;--p3-tick:color-mix(in srgb,var(--ink) 12%,transparent)}
+
+  /* intro: headline left, lead right */
+  #plate-3 .p3-intro{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:24px 56px;align-items:end;margin-bottom:48px}
+  #plate-3 .p3-lead{margin:0;max-width:52ch;font-size:16px;line-height:1.55;color:var(--ink)}
+
+  /* panel chrome: micro header row + registration-marked frame */
+  #plate-3 .p3-panel{margin-bottom:64px}
+  #plate-3 .p3-panel:last-child{margin-bottom:0}
+  #plate-3 .p3-pbar{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  #plate-3 .p3-frame{position:relative}
+  #plate-3 .p3-cross{position:absolute;font-family:var(--mono);font-style:normal;font-size:13px;line-height:1;color:var(--ink2);pointer-events:none;user-select:none}
+  #plate-3 .p3-cross.tl{top:0;left:0;transform:translate(-50%,-50%)}
+  #plate-3 .p3-cross.tr{top:0;right:0;transform:translate(50%,-50%)}
+  #plate-3 .p3-cross.bl{bottom:0;left:0;transform:translate(-50%,50%)}
+  #plate-3 .p3-cross.br{bottom:0;right:0;transform:translate(50%,50%)}
+
+  /* legend */
+  #plate-3 .p3-key{display:flex;gap:18px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+  #plate-3 .p3-key span{display:inline-flex;align-items:center;gap:7px}
+  #plate-3 .p3-key i{width:16px;height:10px;flex:none}
+  #plate-3 .p3-key .k1{background:var(--ink)}
+  #plate-3 .p3-key .k2{border:1px solid var(--ink2);background-image:repeating-linear-gradient(135deg,var(--ink2) 0,var(--ink2) 1px,transparent 1px,transparent 4px)}
+
+  /* ---- A. footprint form: hairline compartments ---- */
+  #plate-3 .p3-grid{display:grid;grid-template-columns:minmax(150px,230px) minmax(0,1fr) minmax(130px,190px);gap:1px;background:var(--ink);border:1px solid var(--ink)}
+  #plate-3 .p3-grid>*{background:var(--paper);min-width:0}
+  #plate-3 .p3-hcell{background:var(--paper2);font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);display:flex;align-items:flex-end;padding:10px 18px 8px}
+  #plate-3 .p3-hcell.tot{justify-content:flex-end}
+
+  /* ruler header — same horizontal padding as bar cells so ticks align */
+  #plate-3 .p3-rul{background:var(--paper2);padding:8px 16px 0}
+  #plate-3 .p3-rulin{position:relative;height:32px}
+  #plate-3 .p3-rulin b{position:absolute;bottom:0;width:1px;height:6px;background:var(--ink2)}
+  #plate-3 .p3-rulin span{position:absolute;bottom:9px;transform:translateX(-50%);font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:var(--ink2)}
+  #plate-3 .p3-rulin span.z{transform:none}
+  #plate-3 .p3-rulin span.max{transform:translateX(-100%);color:var(--ink);font-weight:700}
+  #plate-3 .p3-rulin b.max{background:var(--ink)}
+
+  /* row cells */
+  #plate-3 .p3-lab{padding:16px 18px;display:flex;flex-direction:column;justify-content:center}
+  #plate-3 .p3-lab .v{font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  #plate-3 .p3-lab .ix{color:var(--ink2);font-weight:400}
+  #plate-3 .p3-lab .s{margin-top:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink2)}
+  /* ink-on-paper chip with red frame: keeps the red without 10px reversed-out text */
+  #plate-3 .p3-tag{background:var(--paper);color:var(--ink);border:2px solid var(--red);font-family:var(--mono);font-style:normal;font-weight:700;font-size:10px;letter-spacing:.08em;padding:1px 6px}
+  #plate-3 .r3.p3-lab{border-left:3px solid var(--red);padding-left:15px}
+
+  #plate-3 .p3-barcell{display:flex;align-items:center;padding:12px 16px}
+  #plate-3 .p3-track{position:relative;width:100%;height:52px;background-color:var(--paper2);
+    background-image:linear-gradient(var(--p3-tick),var(--p3-tick)),linear-gradient(var(--p3-tick),var(--p3-tick)),linear-gradient(var(--p3-tick),var(--p3-tick)),linear-gradient(var(--p3-tick),var(--p3-tick)),linear-gradient(var(--p3-tick),var(--p3-tick));
+    background-repeat:no-repeat;
+    background-position:17% 0,34% 0,51% 0,68% 0,85% 0;
+    background-size:1px 100%,1px 100%,1px 100%,1px 100%,1px 100%}
+  #plate-3 .p3-fill{position:absolute;top:0;bottom:0;left:0;width:var(--w);background:var(--ink)}
+  #plate-3 .p3-cut{position:absolute;top:0;bottom:0;right:0;width:calc(100% - var(--w));
+    background-image:repeating-linear-gradient(135deg,var(--ink2) 0,var(--ink2) 1px,transparent 1px,transparent 5px)}
+  #plate-3 .r3 .p3-cut{background-image:repeating-linear-gradient(135deg,var(--red) 0,var(--red) 1px,transparent 1px,transparent 5px)}
+  #plate-3 .p3-cutline{position:absolute;top:0;bottom:0;left:calc(var(--w) - 1px);width:2px;background:var(--red)}
+  #plate-3 .p3-delta{position:absolute;left:calc(var(--w) + 12px);top:50%;transform:translateY(-50%);
+    font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:.02em;color:var(--red);white-space:nowrap}
+  #plate-3 .r3 .p3-delta{font-size:19px}
+
+  #plate-3 .p3-val{padding:12px 18px;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right}
+  #plate-3 .p3-val .n{font-family:var(--black);font-size:clamp(1.35rem,2.4vw,1.8rem);letter-spacing:-0.02em;line-height:1;color:var(--ink)}
+  #plate-3 .p3-val .u{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.06em;color:var(--ink2)}
+  #plate-3 .p3-val .d{margin-top:6px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink2)}
+  #plate-3 .r3.p3-val .n{font-size:clamp(1.7rem,3.2vw,2.5rem);color:var(--red)}
+  #plate-3 .r3.p3-val .d{color:var(--ink);font-weight:700}
+
+  #plate-3 .p3-cap{grid-column:1/-1;background:var(--paper2);display:flex;justify-content:space-between;gap:10px 24px;flex-wrap:wrap;
+    padding:11px 18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink)}
+  #plate-3 .p3-cap .m{color:var(--ink2)}
+
+  /* ---- B. family scaling ---- */
+  #plate-3 .p3-famgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--ink);border:1px solid var(--ink)}
+  #plate-3 .p3-famgrid>*{background:var(--paper);min-width:0}
+  #plate-3 .p3-fam{padding:20px 22px 22px;display:flex;flex-direction:column}
+  #plate-3 .p3-fam-top{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--ink);padding-bottom:10px;margin-bottom:16px}
+  #plate-3 .p3-fam-top b{font-family:var(--black);font-size:1.1rem;letter-spacing:.01em;text-transform:uppercase}
+  #plate-3 .p3-fam-top span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ink2)}
+  #plate-3 .p3-fam-pct{font-family:var(--black);font-size:clamp(2rem,4.4vw,2.9rem);letter-spacing:-0.02em;line-height:.95;color:var(--ink)}
+  #plate-3 .p3-fam.hero .p3-fam-pct{color:var(--red)}
+  #plate-3 .p3-fam-desc{margin:14px 0 18px;font-family:var(--sans);font-weight:400;font-size:14.5px;line-height:1.55;color:var(--ink);flex:1}
+  #plate-3 .p3-fam-stamp{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+  #plate-3 .p3-fam.hero .p3-fam-stamp{color:var(--ink);font-weight:700}
+
+  /* magnified spread detail: three reductions on a 29.0–30.5 scale */
+  #plate-3 .p3-spread{grid-column:1/-1;padding:18px 22px 22px}
+  #plate-3 .p3-sp-head{display:flex;justify-content:space-between;gap:10px 24px;flex-wrap:wrap;margin-bottom:8px}
+  #plate-3 .p3-sp-track{position:relative;height:86px}
+  #plate-3 .p3-sp-track::before{content:"";position:absolute;left:0;right:0;bottom:17px;height:1px;background:var(--ink)}
+  #plate-3 .p3-sp-min{position:absolute;bottom:11px;width:1px;height:7px;background:var(--ink2)}
+  #plate-3 .p3-sp-minlab{position:absolute;bottom:0;transform:translateX(-50%);font-family:var(--mono);font-size:9.5px;color:var(--ink2)}
+  #plate-3 .p3-sp-minlab.z{transform:none}
+  #plate-3 .p3-sp-minlab.max{transform:translateX(-100%)}
+  #plate-3 .p3-sp-mark{position:absolute;bottom:17px;width:2px;height:30px;background:var(--ink);transform:translateX(-50%)}
+  #plate-3 .p3-sp-mark.hero{background:var(--red)}
+  #plate-3 .p3-sp-marklab{position:absolute;bottom:52px;transform:translateX(-50%);text-align:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+  #plate-3 .p3-sp-marklab b{display:block;margin-top:2px;font-size:14px;font-weight:700;letter-spacing:.02em;color:var(--ink)}
+  #plate-3 .p3-sp-marklab.hero b{color:var(--red)}
+  #plate-3 .p3-famnote{grid-column:1/-1;background:var(--paper2);padding:14px 22px}
+  #plate-3 .p3-famnote p{margin:0;max-width:62ch;font-size:15px;line-height:1.55;color:var(--ink)}
+
+  /* ---- fill choreography: default (no JS / reduced motion / noscript) = final state ---- */
+  #plate-3.p3-armed .p3-fill,#plate-3.p3-armed .p3-cut{width:0}
+  #plate-3.p3-armed .p3-delta,#plate-3.p3-armed .p3-cutline{opacity:0}
+  #plate-3.p3-run .p3-fill{width:var(--w);transition:width 1.5s cubic-bezier(.16,1,.3,1)}
+  #plate-3.p3-run .p3-cut{width:calc(100% - var(--w));transition:width 1.5s cubic-bezier(.16,1,.3,1)}
+  #plate-3.p3-run .r2 .p3-fill,#plate-3.p3-run .r2 .p3-cut{transition-delay:.15s}
+  #plate-3.p3-run .r3 .p3-fill,#plate-3.p3-run .r3 .p3-cut{transition-delay:.3s}
+  #plate-3.p3-run .p3-delta,#plate-3.p3-run .p3-cutline{opacity:1;transition:opacity .5s ease 1s}
+  #plate-3.p3-run .r3 .p3-delta,#plate-3.p3-run .r3 .p3-cutline{transition-delay:1.3s}
+  @media(prefers-reduced-motion:reduce){
+    #plate-3 .p3-fill{width:var(--w)!important;transition:none!important}
+    #plate-3 .p3-cut{width:calc(100% - var(--w))!important;transition:none!important}
+    #plate-3 .p3-delta,#plate-3 .p3-cutline{opacity:1!important;transition:none!important}
+  }
+
+  @media(max-width:720px){
+    #plate-3 .p3-intro{grid-template-columns:1fr;gap:18px;margin-bottom:34px}
+    #plate-3 .p3-panel{margin-bottom:48px}
+    #plate-3 .p3-grid{grid-template-columns:1fr}
+    #plate-3 .p3-hcell.lab,#plate-3 .p3-hcell.tot{display:none}
+    #plate-3 .m-hide{display:none}
+    #plate-3 .p3-lab{padding:13px 14px 11px}
+    #plate-3 .r3.p3-lab{padding-left:11px}
+    #plate-3 .p3-rul{padding:8px 14px 0}
+    #plate-3 .p3-barcell{padding:10px 14px}
+    #plate-3 .p3-track{height:38px}
+    #plate-3 .r3 .p3-delta{font-size:15px}
+    #plate-3 .p3-delta{left:calc(var(--w) + 8px)}
+    #plate-3 .p3-val{padding:9px 14px 14px;flex-direction:row;justify-content:flex-start;align-items:baseline;gap:12px;text-align:left}
+    #plate-3 .p3-val .d{margin-top:0}
+    #plate-3 .p3-cap{padding:10px 14px}
+    #plate-3 .p3-famgrid{grid-template-columns:1fr}
+    #plate-3 .p3-fam{padding:16px 16px 18px}
+    #plate-3 .p3-spread{padding:16px 16px 18px}
+    #plate-3 .p3-famnote{padding:12px 16px}
+  }
+</style>
+<style data-plate="4">
+  /* ============ PLATE 4 — OPEN ITEMS + REPRODUCTION + COLOPHON ============ */
+
+  #plate-4 .p4-intro{
+    display:grid;grid-template-columns:1fr minmax(280px,420px);
+    align-items:end;gap:24px 48px;margin-bottom:44px;
+  }
+  #plate-4 .p4-lead{
+    margin:0;font-family:var(--sans);font-size:16.5px;line-height:1.55;
+    max-width:62ch;border-left:3px solid var(--red);padding-left:16px;
+  }
+
+  /* ---- open item cards: hairline compartments, textured rails, stamps ---- */
+  #plate-4 .p4-items{
+    display:grid;grid-template-columns:1fr 1fr;gap:1px;
+    background:var(--ink);border:1px solid var(--ink);margin-bottom:64px;
+  }
+  #plate-4 .p4-item{
+    position:relative;background:var(--paper);
+    padding:22px 26px 22px 46px;display:flex;flex-direction:column;
+  }
+  #plate-4 .p4-item.reveal:nth-child(2){transition-delay:.12s}
+  #plate-4 .p4-item::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:13px;
+    border-right:1px solid var(--ink);
+  }
+  /* item 01 rail — hatch: the storage already peeled, not yet runtime-addressable */
+  #plate-4 .p4-item--gap::before{
+    background:repeating-linear-gradient(135deg,transparent 0 4px,var(--ink2) 4px 5px);
+  }
+  /* item 02 rail — halftone: the mantissa, random to every tool so far */
+  #plate-4 .p4-item--wall::before{
+    background-image:radial-gradient(var(--ink2) 1px,transparent 1px);
+    background-size:6px 6px;
+  }
+  #plate-4 .p4-item-meta{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    border-bottom:1px solid var(--ink);padding-bottom:10px;margin-bottom:16px;
+  }
+  #plate-4 .p4-stamp{
+    font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:.14em;
+    color:var(--red);border:2px solid var(--red);padding:2px 10px;
+    transform:rotate(-4deg);
+  }
+  #plate-4 .p4-item h3{
+    font-family:var(--black);text-transform:uppercase;letter-spacing:-0.01em;
+    line-height:1.05;font-size:clamp(1.15rem,2.2vw,1.4rem);margin-bottom:10px;
+  }
+  #plate-4 .p4-item p{
+    margin:0;font-size:15.5px;line-height:1.55;max-width:62ch;flex:1;
+  }
+  #plate-4 .p4-item-foot{
+    font-family:var(--mono);font-size:11px;letter-spacing:.07em;
+    text-transform:uppercase;color:var(--ink2);
+    border-top:1px solid var(--ink);padding-top:12px;margin-top:18px;
+  }
+
+  /* ---- reproduce panel ---- */
+  #plate-4 .p4-run{
+    display:grid;grid-template-columns:1.1fr .9fr;gap:1px;
+    background:var(--ink);border:1px solid var(--ink);margin-bottom:72px;
+  }
+  #plate-4 .p4-run-l{background:var(--paper);padding:30px 32px}
+  #plate-4 .p4-run-l .lbl{display:block;margin-bottom:18px}
+  #plate-4 .p4-run-l h3{
+    font-family:var(--black);text-transform:uppercase;letter-spacing:-0.02em;
+    line-height:.95;font-size:clamp(1.7rem,3.6vw,2.5rem);margin-bottom:14px;
+  }
+  #plate-4 .p4-run-l h3 em{font-style:normal;color:var(--red)}
+  #plate-4 .p4-run-l p{margin:0 0 26px;font-size:15.5px;line-height:1.55;max-width:52ch}
+  #plate-4 .p4-btn{
+    display:inline-block;background:var(--red);color:var(--paper);
+    font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:.08em;
+    text-transform:uppercase;text-decoration:none;padding:13px 22px;
+    border:2px solid var(--ink);transition:background .15s ease;
+  }
+  #plate-4 .p4-btn:hover{background:var(--ink)}
+  #plate-4 .p4-run-r{background:var(--paper2);display:flex;flex-direction:column}
+  #plate-4 .p4-cmd-head{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:12px 16px;border-bottom:1px solid var(--ink);
+  }
+  #plate-4 .p4-copy{
+    font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink);background:var(--paper);
+    border:1px solid var(--ink);padding:5px 12px;cursor:pointer;
+    transition:background .15s ease,color .15s ease;
+  }
+  #plate-4 .p4-copy:hover{background:var(--ink);color:var(--paper)}
+  #plate-4 .p4-copy.did{background:var(--ink);color:var(--paper)}
+  #plate-4 .p4-cmd{
+    margin:0;background:var(--ink);color:var(--paper);
+    font-family:var(--mono);font-size:13px;line-height:1.65;
+    padding:18px 16px;white-space:pre-wrap;overflow-wrap:anywhere;
+  }
+  /* red-on-ink is ~3.9:1 — bold 14px keeps the prompt above the large-text floor */
+  #plate-4 .p4-cmd code::before{content:"$ ";color:var(--red);font-weight:700;font-size:14px}
+  #plate-4 .p4-spec{list-style:none;margin:0;padding:0}
+  #plate-4 .p4-spec li{
+    display:flex;justify-content:space-between;gap:16px;
+    padding:10px 16px;border-top:1px solid var(--ink);
+    font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
+  }
+  #plate-4 .p4-spec li:first-child{border-top:0}
+  #plate-4 .p4-spec .k{color:var(--ink2)}
+  #plate-4 .p4-spec .v{color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+
+  /* ---- colophon: drawing title block ---- */
+  #plate-4 .p4-colophon{position:relative}
+  #plate-4 .p4-colophon::before,
+  #plate-4 .p4-colophon::after{
+    font-family:var(--mono);font-size:13px;color:var(--ink2);
+    position:absolute;line-height:1;
+  }
+  #plate-4 .p4-colophon::before{content:"+";top:0;left:0;transform:translate(-50%,-50%)}
+  #plate-4 .p4-colophon::after{content:"+";bottom:0;right:0;transform:translate(50%,50%)}
+  #plate-4 .p4-col-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--ink);border:1px solid var(--ink);
+  }
+  #plate-4 .p4-col-note{
+    grid-column:1/3;grid-row:1/3;background:var(--paper);
+    margin:0;padding:20px 24px;font-size:15px;line-height:1.55;
+    overflow-wrap:anywhere;
+  }
+  #plate-4 .p4-col-note a{color:var(--ink)}
+  #plate-4 .p4-col-note .mono{font-size:13.5px}
+  #plate-4 .p4-field{background:var(--paper);padding:14px 16px}
+  #plate-4 .p4-field .lbl{display:block;margin-bottom:6px}
+  #plate-4 .p4-field .val{
+    font-family:var(--mono);font-size:12px;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--ink);overflow-wrap:anywhere;
+  }
+  #plate-4 .p4-link{
+    background:var(--paper2);padding:14px 16px;display:block;
+    font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink);text-decoration:none;
+    transition:background .15s ease,color .15s ease;
+  }
+  #plate-4 .p4-link:hover{background:var(--ink);color:var(--paper)}
+  #plate-4 .p4-end{
+    grid-column:1/-1;background:var(--ink);color:var(--paper);
+    font-family:var(--mono);font-size:11px;letter-spacing:.3em;
+    text-transform:uppercase;text-align:center;padding:11px 8px;
+  }
+
+  @media(max-width:720px){
+    #plate-4 .p4-intro{grid-template-columns:1fr;gap:20px;margin-bottom:32px}
+    #plate-4 .p4-items{grid-template-columns:1fr;margin-bottom:44px}
+    #plate-4 .p4-item{padding:18px 18px 18px 40px}
+    #plate-4 .p4-run{grid-template-columns:1fr;margin-bottom:52px}
+    #plate-4 .p4-run-l{padding:22px 18px}
+    #plate-4 .p4-cmd{font-size:12px}
+    #plate-4 .p4-col-grid{grid-template-columns:repeat(2,1fr)}
+    #plate-4 .p4-col-note{grid-column:1/-1;grid-row:auto;padding:16px 18px}
+    #plate-4 .p4-colophon::before,
+    #plate-4 .p4-colophon::after{display:none}
+  }
+</style>
+<noscript><style>
+  .reveal{opacity:1!important;transform:none!important}
+</style></noscript>
 </head>
 <body>
-<p>Redirecting to the <a href="./research/candidates/0009-fusible-exponent-codebook/writeup/">lossless BF16 compression writeup</a>&hellip;</p>
+
+<section class="plate" id="plate-0">
+  <div class="wrap">
+
+    <header class="phead">
+      <span class="fig">PLATE 0</span>
+      <span>TECHNICAL BULLETIN — THE LOSSLESS COMPRESSION HUNT</span>
+      <span>SHEET 1 / 5</span>
+    </header>
+
+    <!-- drawing title block -->
+    <div class="p0-tblock reveal" style="transition-delay:.04s">
+      <div class="p0-cell">
+        <span class="p0-l">DOC</span>
+        <span class="p0-v">brianbell-x/weight-compression</span>
+      </div>
+      <div class="p0-cell">
+        <span class="p0-l">SUBJECT</span>
+        <span class="p0-v">LOSSLESS COMPRESSION OF LLM WEIGHTS</span>
+      </div>
+      <div class="p0-cell">
+        <span class="p0-l">SPECIMEN</span>
+        <span class="p0-v"><a href="https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16">NVIDIA NEMOTRON-3 FAMILY (BF16)</a></span>
+      </div>
+      <div class="p0-cell">
+        <span class="p0-l">METHOD</span>
+        <span class="p0-v">BIT-EXACT ROUND-TRIP (SHA-256)</span>
+      </div>
+      <div class="p0-cell p0-cell--status">
+        <span class="p0-l">STATUS</span>
+        <span class="p0-v"><span class="p0-dot" aria-hidden="true"></span>ONGOING</span>
+      </div>
+    </div>
+
+    <h1 class="reveal" style="transition-delay:.1s">Compressing a neural network,<br> one <span class="p0-strike">redundant</span> bit at a time.</h1>
+
+    <p class="p0-sub reveal" style="transition-delay:.16s">A running hunt: shrink a model&rsquo;s weights without changing a single bit of what they compute. Measured on the Nemotron-3 family. The score so far:</p>
+
+    <div class="p0-hero reveal" id="p0-hero" style="transition-delay:.22s">
+
+      <div class="p0-score">
+        <p class="p0-big"><span class="p0-cwrap"><span class="p0-ghost" aria-hidden="true">30.03</span><span id="p0-count">30.03</span></span><span class="p0-pct">%</span></p>
+        <div class="p0-scorelbl">
+          <div class="p0-slword">Smaller,<br>losslessly</div>
+          <p class="p0-ctx">NVIDIA NEMOTRON-3 NANO 30B &middot; 58.82 GiB -&gt; 41.16 GiB &middot; BIT-EXACT</p>
+        </div>
+      </div>
+
+      <figure class="p0-gauge" id="p0-gauge">
+        <span class="p0-x p0-xa" aria-hidden="true">+</span>
+        <span class="p0-x p0-xb" aria-hidden="true">+</span>
+        <span class="p0-x p0-xc" aria-hidden="true">+</span>
+        <span class="p0-x p0-xd" aria-hidden="true">+</span>
+
+        <div role="img"
+          aria-label="Compression gauge, linear scale 0 to 100 percent. Red fill to 30.03 percent: achieved, GPU-readable. Tick at about 22 percent: zstd, the baseline anyone gets for free. Mark at about 34 percent: measured limit, not proven forever. The other 66 percent: irreducible so far. The hunt continues.">
+
+          <div class="p0-gtop">
+            <div class="p0-fl p0-fl-ach"><b>FILL TO 30.03%</b><br><span class="p0-flsub">ACHIEVED, GPU-READABLE</span></div>
+            <div class="p0-fl p0-fl-lim"><b>MEASURED LIMIT ~34%</b><br><span class="p0-flsub">MEASURED, NOT PROVEN-FOREVER</span></div>
+          </div>
+
+          <div class="p0-gtrack">
+            <div class="p0-noise"></div>
+            <div class="p0-gfill"></div>
+            <div class="p0-mark p0-mark-zstd"></div>
+            <div class="p0-mark p0-mark-limit"></div>
+            <div class="p0-zone"><span>THE OTHER 66% &mdash; IRREDUCIBLE SO FAR. THE HUNT CONTINUES.</span></div>
+          </div>
+
+          <div class="p0-gscale">
+            <div class="p0-tminor"></div>
+            <div class="p0-tmajor"></div>
+          </div>
+
+          <div class="p0-gnums">
+            <span class="p0-n p0-n0" style="left:0%">0</span>
+            <span class="p0-n p0-alt" style="left:10%">10</span>
+            <span class="p0-n" style="left:20%">20</span>
+            <span class="p0-n p0-alt" style="left:30%">30</span>
+            <span class="p0-n" style="left:40%">40</span>
+            <span class="p0-n p0-alt" style="left:50%">50</span>
+            <span class="p0-n" style="left:60%">60</span>
+            <span class="p0-n p0-alt" style="left:70%">70</span>
+            <span class="p0-n" style="left:80%">80</span>
+            <span class="p0-n p0-alt" style="left:90%">90</span>
+            <span class="p0-n p0-n100" style="left:100%">100</span>
+          </div>
+
+          <div class="p0-gbot">
+            <div class="p0-fl p0-fl-zstd"><b>ZSTD ~22%</b><br><span class="p0-flsub">THE BASELINE ANYONE<br>GETS FOR FREE</span></div>
+          </div>
+        </div>
+
+        <div class="p0-glegend">
+          <div><span class="p0-sw p0-sw-fill"></span>FILL TO 30.03% &mdash; ACHIEVED, GPU-READABLE</div>
+          <div><span class="p0-sw p0-sw-zstd"></span>~22% &mdash; ZSTD, THE BASELINE ANYONE GETS FOR FREE</div>
+          <div><span class="p0-sw p0-sw-limit"></span>~34% &mdash; MEASURED LIMIT, NOT PROVEN-FOREVER</div>
+          <div><span class="p0-sw p0-sw-noise"></span>THE OTHER 66% &mdash; IRREDUCIBLE SO FAR. THE HUNT CONTINUES.</div>
+        </div>
+
+        <figcaption class="p0-gcap">[ FIG. 00 ] COMPRESSION GAUGE &mdash; LINEAR SCALE, % OF ORIGINAL SIZE REMOVED, LOSSLESSLY</figcaption>
+      </figure>
+
+      <div class="p0-stats reveal" style="transition-delay:.3s">
+        <div class="p0-stat">
+          <span class="p0-sid">R-01</span>
+          <strong>17.66 GiB</strong>
+          <span class="p0-scap">SAVED, ZERO BITS CHANGED</span>
+        </div>
+        <div class="p0-stat">
+          <span class="p0-sid">R-02</span>
+          <strong>6,174 / 6,174</strong>
+          <span class="p0-scap">BF16 TENSORS ROUND-TRIP BIT-EXACT</span>
+        </div>
+        <div class="p0-stat">
+          <span class="p0-sid">R-03</span>
+          <strong>24%</strong>
+          <span class="p0-scap">FASTER DECODE MEASURED ON AN RTX 4090</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<section class="plate" id="plate-1">
+  <div class="wrap">
+
+    <header class="phead">
+      <span class="fig">PLATE 1</span>
+      <span>ANATOMY OF A WEIGHT &middot; BF16 BIT-FIELD</span>
+      <span>SHEET 2 / 5</span>
+    </header>
+
+    <div class="p1-head reveal">
+      <h2>Half of every weight is indistinguishable from coin&nbsp;flips.</h2>
+      <p class="p1-lead">A BF16 weight is <span class="n">16</span> bits. Measured across
+        all <span class="n">31.6</span> billion of them, the information is lopsided:
+        the exponent is hyper-concentrated, the mantissa is random noise.</p>
+    </div>
+
+    <figure class="p1-panel reveal" aria-label="Figure 1: bit anatomy of a BF16 weight, measured entropy, exponent concentration, and the in-register decode">
+      <span class="p1-x tl" aria-hidden="true">+</span>
+      <span class="p1-x tr" aria-hidden="true">+</span>
+      <span class="p1-x bl" aria-hidden="true">+</span>
+      <span class="p1-x br" aria-hidden="true">+</span>
+
+      <div class="p1-compart">
+
+        <!-- title block -->
+        <div class="p1-tblock">
+          <div class="p1-tf"><span class="k">Specimen</span><span class="v">BF16 weight</span></div>
+          <div class="p1-tf"><span class="k">Sample</span><span class="v">All 31.6 billion weights</span></div>
+          <div class="p1-tf"><span class="k">Stored</span><span class="v">16 bits / weight</span></div>
+          <div class="p1-tf"><span class="k">Method</span><span class="v">Measured Shannon entropy</span></div>
+        </div>
+
+        <!-- bit anatomy + entropy strip -->
+        <div class="p1-main">
+
+          <div class="p1-ruler" aria-hidden="true">
+            <span>15</span><span>14</span><span>13</span><span>12</span><span>11</span><span>10</span><span>9</span><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span><span>0</span>
+          </div>
+
+          <div class="p1-cells">
+            <span class="p1-b"><span>S</span></span>
+            <span class="p1-b"><span>E</span></span>
+            <span class="p1-b"><span>E</span></span>
+            <span class="p1-b"><span>E</span></span>
+            <span class="p1-b"><span>E</span></span>
+            <span class="p1-b"><span>E</span></span>
+            <span class="p1-b"><span>E</span></span>
+            <span class="p1-b"><span>E</span></span>
+            <span class="p1-b"><span>E</span></span>
+            <span class="p1-b m"><span>M</span></span>
+            <span class="p1-b m"><span>M</span></span>
+            <span class="p1-b m"><span>M</span></span>
+            <span class="p1-b m"><span>M</span></span>
+            <span class="p1-b m"><span>M</span></span>
+            <span class="p1-b m"><span>M</span></span>
+            <span class="p1-b m"><span>M</span></span>
+          </div>
+
+          <div class="p1-dims" aria-hidden="true">
+            <div class="p1-dim ore"></div>
+            <div class="p1-dim"></div>
+          </div>
+          <div class="p1-dimlab">
+            <div>
+              <b class="s1">Sign + exponent &mdash; 9 bits</b>
+              <span class="s2">Structured &mdash; the ore</span>
+            </div>
+            <div>
+              <b class="s1">Mantissa &mdash; 7 bits</b>
+              <span class="s2">Noise &mdash; rides along verbatim</span>
+            </div>
+          </div>
+
+          <div class="p1-link">
+            <span class="t">Information actually present &mdash; measured Shannon entropy, same 16-bit scale</span>
+            <span class="b9" aria-hidden="true">9/16</span>
+          </div>
+
+          <div class="p1-strip">
+            <div class="p1-seg real"><span class="v">~3.8</span></div>
+            <div class="p1-seg air"><span class="v">5.2</span></div>
+            <div class="p1-seg noise"><span class="v">~7</span></div>
+          </div>
+          <div class="p1-legend">
+            <span><span class="sw real" aria-hidden="true"></span>~3.8 bits real</span>
+            <span><span class="sw air" aria-hidden="true"></span>5.2 bits of air</span>
+            <span><span class="sw noise" aria-hidden="true"></span>~7 bits pure noise</span>
+          </div>
+
+          <p class="p1-cap">The empty middle is the entire game: every point of compression
+            on this page comes from it. The mantissa carries <span class="n">6.99</span> of
+            <span class="n">7</span> bits; it rides along verbatim, and it is why the meter
+            can never reach <span class="n">50%</span>.</p>
+        </div>
+
+        <!-- concentration + decode -->
+        <div class="p1-duo">
+
+          <div class="p1-mod p1-conc">
+            <h3>&gt;&gt;&gt; Exponent concentration</h3>
+            <span class="sub">Of 512 possible sign+exponent values &mdash; share of all weights covered</span>
+
+            <div class="p1-row">
+              <span class="k">Top 4</span>
+              <span class="p1-track"><span class="p1-fill" style="width:77.7%;--d:0s"></span></span>
+              <span class="v">77.7%</span>
+            </div>
+            <div class="p1-row">
+              <span class="k">Top 8</span>
+              <span class="p1-track"><span class="p1-fill" style="width:96.1%;--d:.12s"></span></span>
+              <span class="v">96.1%</span>
+            </div>
+            <div class="p1-row key">
+              <span class="k">Top 16</span>
+              <span class="p1-track"><span class="p1-fill" style="width:99.9%;--d:.24s"></span></span>
+              <span class="v">99.9%</span>
+            </div>
+            <div class="p1-row">
+              <span class="k">Top 32</span>
+              <span class="p1-track"><span class="p1-fill" style="width:100%;--d:.36s"></span></span>
+              <span class="v">~100%</span>
+            </div>
+
+            <p class="p1-point"><strong>The whole model uses ~<span class="n">16</span> exponents.</strong>
+              <span class="n">16</span> of <span class="n">512</span> values cover
+              <span class="n">99.9%</span> of all weights.</p>
+          </div>
+
+          <div class="p1-mod p1-code">
+            <h3>&gt;&gt;&gt; Decode procedure</h3>
+            <span class="sub">Per weight &middot; at matmul time &middot; in-register</span>
+
+            <pre class="p1-pre"><code><span class="c"># per weight, at matmul time, in-register</span>
+sign_exp = codebook[idx]          <span class="c"># 4-bit index -&gt; 9-bit field</span>
+bf16     = (sign_exp &lt;&lt; 7) | mantissa
+<span class="c"># rare values ride a sparse escape stream</span>
+if is_escape: bf16 = escapes.next()</code></pre>
+
+            <p class="p1-cap">Fixed bit-offsets, so the GPU reads the compressed form in
+              place. Full BF16 exists only inside a register.</p>
+          </div>
+
+        </div>
+      </div>
+      <figcaption class="p1-gcap">[ FIG. 01 ] ANATOMY OF A WEIGHT &mdash; BF16 BIT-FIELD, MEASURED SHANNON ENTROPY, ALL 31.6 BILLION WEIGHTS</figcaption>
+    </figure>
+
+  </div>
+</section>
+<section class="plate" id="plate-2">
+  <div class="wrap">
+
+    <header class="phead">
+      <span class="fig">PLATE 2</span>
+      <span>THE HUNT LOG — FIVE STEPS, ONE INTERLUDE</span>
+      <span>SHEET 3 / 5</span>
+    </header>
+
+    <div class="p2-head reveal">
+      <h2>How the meter<br>got to <span class="p2-30">30.</span></h2>
+      <div class="p2-lead">
+        <p>One rule the whole way: <span class="p2-rule">anything you can predict
+        better than chance, you can store in fewer bits.</span> Peel off pattern
+        until what remains looks like static.</p>
+        <p>Each step is a candidate folder under
+        <a href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates">research/candidates/</a>,
+        with the scripts and artifacts that produced its numbers.</p>
+      </div>
+    </div>
+
+    <!-- log, entries 01–02 -->
+    <div class="p2-log reveal">
+      <div class="p2-th">NO.</div>
+      <div class="p2-th">PROCEDURE / OBSERVATION</div>
+      <div class="p2-th">RESULT</div>
+
+      <div class="p2-entry">
+        <div class="p2-idx">
+          <span class="p2-num">01</span>
+          <span class="p2-stepname">THE BASELINE</span>
+        </div>
+        <div class="p2-bodyc">
+          <h3 class="p2-h3">zstd the raw file. Everyone&rsquo;s first move.</h3>
+          <p class="p2-p">About 22%. Blind, though: interleaved sign, exponent, and
+          mantissa bytes camouflage each other.</p>
+        </div>
+        <div class="p2-res">
+          <span class="lbl">RESULT</span>
+          <span class="p2-stat">&minus;22%</span>
+          <span class="p2-sub">STORAGE</span>
+          <div class="p2-bar" style="--v:55%"><i class="p2-fill p2-fill--hatch"></i></div>
+          <div class="p2-scale"><span style="left:0">0</span><span style="left:25%">10</span><span style="left:50%">20</span><span style="left:75%">30</span><span style="left:100%">40</span></div>
+        </div>
+      </div>
+
+      <div class="p2-entry">
+        <div class="p2-idx">
+          <span class="p2-num">02</span>
+          <span class="p2-stepname">THE SPLIT</span>
+        </div>
+        <div class="p2-bodyc">
+          <h3 class="p2-h3">Separate the ore from the static.</h3>
+          <p class="p2-p">Split each tensor into an exponent plane and a mantissa
+          plane; entropy-code the first, ship the second verbatim. 32%, exact
+          round-trip. One problem: a variable-length stream has no fixed offset per
+          weight, so a GPU can&rsquo;t read it in place. Great archive, useless at
+          runtime.</p>
+          <a class="p2-cand" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates/0001-bf16-exponent-plane">CANDIDATE 0001 -&gt;</a>
+        </div>
+        <div class="p2-res">
+          <span class="lbl">RESULT</span>
+          <span class="p2-stat">&minus;32%</span>
+          <span class="p2-sub">STORAGE</span>
+          <span class="p2-flag">RANDOM ACCESS: NONE</span>
+          <div class="p2-bar" style="--v:80%"><i class="p2-fill p2-fill--hatch"></i></div>
+          <div class="p2-scale"><span style="left:0">0</span><span style="left:25%">10</span><span style="left:50%">20</span><span style="left:75%">30</span><span style="left:100%">40</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- interlude: the graveyard -->
+    <aside class="p2-grave reveal" aria-label="Interlude: the graveyard — falsified hypotheses">
+      <div class="p2-ghead">
+        <span class="lbl">INTERLUDE &middot; THE GRAVEYARD</span>
+        <span class="lbl">4 ENTRIES &middot; ALL FALSIFIED</span>
+        <h3>Things the model refused to be.</h3>
+      </div>
+      <div class="p2-tombs">
+        <div class="p2-tomb">
+          <span class="p2-stamp" aria-hidden="true">FALSIFIED</span>
+          <span class="p2-gid">ENTRY G-01</span>
+          <p class="p2-hyp">&ldquo;The 128 experts must be similar.&rdquo;</p>
+          <p class="p2-verd"><span class="p2-arr">-&gt;</span> Correlation 0.03.
+          They share a distribution, not values.</p>
+        </div>
+        <div class="p2-tomb">
+          <span class="p2-stamp" aria-hidden="true">FALSIFIED</span>
+          <span class="p2-gid">ENTRY G-02</span>
+          <p class="p2-hyp">&ldquo;Fold the sign bit into the exponent.&rdquo;</p>
+          <p class="p2-verd"><span class="p2-arr">-&gt;</span> Entropy went UP.</p>
+        </div>
+        <div class="p2-tomb">
+          <span class="p2-stamp" aria-hidden="true">FALSIFIED</span>
+          <span class="p2-gid">ENTRY G-03</span>
+          <p class="p2-hyp">&ldquo;The vocab tail must be untrained.&rdquo;</p>
+          <p class="p2-verd"><span class="p2-arr">-&gt;</span> All 131,072 tokens
+          are real. Zero dead rows.</p>
+        </div>
+        <div class="p2-tomb">
+          <span class="p2-stamp" aria-hidden="true">FALSIFIED</span>
+          <span class="p2-gid">ENTRY G-04</span>
+          <p class="p2-hyp">&ldquo;Some mantissa bits must be stuck.&rdquo;</p>
+          <p class="p2-verd"><span class="p2-arr">-&gt;</span> Zero dead mantissa
+          bits in any tensor.</p>
+        </div>
+      </div>
+      <div class="p2-gfoot">THE FULL GRAVEYARD LIVES IN THE
+        <a href="https://github.com/brianbell-x/weight-compression/blob/main/research/notes/findings-ledger.md">FINDINGS LEDGER</a>.
+      </div>
+    </aside>
+
+    <!-- log resumes, entries 03–05 -->
+    <p class="p2-resume">&gt;&gt;&gt; LOG RESUMES</p>
+    <div class="p2-log reveal">
+      <div class="p2-th">NO.</div>
+      <div class="p2-th">PROCEDURE / OBSERVATION</div>
+      <div class="p2-th">RESULT</div>
+
+      <div class="p2-entry">
+        <div class="p2-idx p2-idx--hero">
+          <span class="p2-num">03</span>
+          <span class="p2-stepname">THE BRIDGE</span>
+        </div>
+        <div class="p2-bodyc">
+          <h3 class="p2-h3">Trade 2 points of storage for random access.</h3>
+          <p class="p2-p">Replace the variable-length code with a fixed-width 4-bit
+          index into a per-tensor codebook, plus a sparse escape stream. Same
+          structure, re-expressed so the matmul can address it. On an RTX 4090, in
+          the memory-bound regime where MoE decode lives, the fused kernel runs 24%
+          faster than BF16: smaller AND faster, losslessly.</p>
+          <a class="p2-cand" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates/0009-fusible-exponent-codebook">CANDIDATE 0009 -&gt;</a>
+        </div>
+        <div class="p2-res">
+          <span class="lbl">RESULT</span>
+          <span class="p2-stat p2-stat--red">&minus;30.03%</span>
+          <span class="p2-flag p2-flag--solid">GPU-READABLE</span>
+          <span class="p2-sub">0.756x DECODE TIME</span>
+          <div class="p2-bar" style="--v:75.1%"><i class="p2-fill p2-fill--red"></i></div>
+          <div class="p2-scale"><span style="left:0">0</span><span style="left:25%">10</span><span style="left:50%">20</span><span style="left:75%">30</span><span style="left:100%">40</span></div>
+        </div>
+      </div>
+
+      <div class="p2-entry">
+        <div class="p2-idx">
+          <span class="p2-num">04</span>
+          <span class="p2-stepname">THE SWEEP</span>
+        </div>
+        <div class="p2-bodyc">
+          <h3 class="p2-h3">Interrogate all 6,243 tensors for anything left.</h3>
+          <p class="p2-p">An adversarial survey re-derived everything from raw
+          bytes. No duplicate tensors, no near-duplicates that survive scrutiny,
+          mantissa wall triple-confirmed.</p>
+          <a class="p2-cand" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates/0010-similarity-survey">CANDIDATE 0010 -&gt;</a>
+        </div>
+        <div class="p2-res">
+          <span class="lbl">RESULT</span>
+          <span class="p2-stat p2-stat--txt">NO HIDDEN STRUCTURE</span>
+          <div class="p2-noise" role="img" aria-label="Halftone texture: what remains reads as noise"></div>
+        </div>
+      </div>
+
+      <div class="p2-entry">
+        <div class="p2-idx">
+          <span class="p2-num">05</span>
+          <span class="p2-stepname">THE CEILING</span>
+        </div>
+        <div class="p2-bodyc">
+          <h3 class="p2-h3">Find the wall on purpose.</h3>
+          <p class="p2-p">Exponents have 2-D spatial structure worth ~4 more
+          points; a working codec reaches 33.7% bit-exact. Add up what is provably
+          random and the lossless limit is ~34% storage, ~30% GPU-readable. The
+          meter sits a half-step from the wall.</p>
+          <a class="p2-cand" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates/0012-lossless-ceiling">CANDIDATE 0012 -&gt;</a>
+        </div>
+        <div class="p2-res">
+          <span class="lbl">RESULT</span>
+          <span class="p2-stat">&minus;33.7%</span>
+          <span class="p2-sub">CODEC</span>
+          <span class="p2-limit"><i aria-hidden="true"></i>LIMIT ~34%</span>
+          <div class="p2-bar" style="--v:84.25%">
+            <i class="p2-fill p2-fill--hatch"></i>
+            <span class="p2-tick" aria-hidden="true"></span>
+          </div>
+          <div class="p2-scale"><span style="left:0">0</span><span style="left:25%">10</span><span style="left:50%">20</span><span style="left:75%">30</span><span style="left:100%">40</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<section class="plate" id="plate-3">
+  <div class="wrap">
+
+    <header class="phead">
+      <span class="fig">PLATE 3</span>
+      <span>THE RECEIPTS — MEASURED RESULTS · EXACT ROUND-TRIP</span>
+      <span>SHEET 4 / 5</span>
+    </header>
+
+    <div class="p3-intro reveal">
+      <h2>The receipts.</h2>
+      <p class="p3-lead">Every number is an exact round-trip on the real checkpoint. Identical bits compute identical logits; there is nothing to eval.</p>
+    </div>
+
+    <!-- A · FOOTPRINT — three variants, hatched = removed -->
+    <div class="p3-panel reveal">
+      <div class="p3-pbar">
+        <span class="lbl">&gt;&gt;&gt; FOOTPRINT · THREE VARIANTS · NEMOTRON-3 NANO 30B</span>
+        <div class="p3-key">
+          <span><i class="k1" aria-hidden="true"></i>STORED</span>
+          <span><i class="k2" aria-hidden="true"></i>REMOVED (LOSSLESS)</span>
+        </div>
+      </div>
+
+      <div class="p3-frame">
+        <i class="p3-cross tl" aria-hidden="true">+</i><i class="p3-cross tr" aria-hidden="true">+</i>
+        <i class="p3-cross bl" aria-hidden="true">+</i><i class="p3-cross br" aria-hidden="true">+</i>
+
+        <div class="p3-grid">
+          <!-- header row -->
+          <div class="p3-hcell lab">VARIANT</div>
+          <div class="p3-rul" aria-hidden="true">
+            <div class="p3-rulin">
+              <span class="z" style="left:0">0</span><b style="left:0"></b>
+              <span class="m-hide" style="left:17%">10</span><b class="m-hide" style="left:17%"></b>
+              <span style="left:34%">20</span><b style="left:34%"></b>
+              <span class="m-hide" style="left:51%">30</span><b class="m-hide" style="left:51%"></b>
+              <span style="left:68%">40</span><b style="left:68%"></b>
+              <span class="m-hide" style="left:85%">50</span><b class="m-hide" style="left:85%"></b>
+              <span class="max" style="left:100%">58.82</span><b class="max" style="left:calc(100% - 1px)"></b>
+            </div>
+          </div>
+          <div class="p3-hcell tot">FOOTPRINT</div>
+
+          <!-- row 1 · original -->
+          <div class="p3-lab r1">
+            <div class="v"><span class="ix">01</span>ORIGINAL BF16</div>
+            <div class="s">16.0 BITS/WEIGHT</div>
+          </div>
+          <div class="p3-barcell r1">
+            <div class="p3-track" style="--w:100%">
+              <i class="p3-fill" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="p3-val r1">
+            <div class="n">58.82 <span class="u">GiB</span></div>
+          </div>
+
+          <!-- row 2 · conservative -->
+          <div class="p3-lab r2">
+            <div class="v"><span class="ix">02</span>CONSERVATIVE VARIANT</div>
+            <div class="s">12.0 B/W · 0.06% ESCAPES</div>
+          </div>
+          <div class="p3-barcell r2">
+            <div class="p3-track" style="--w:75.04%">
+              <i class="p3-fill" aria-hidden="true"></i>
+              <i class="p3-cut" aria-hidden="true"></i>
+              <span class="p3-delta">&minus;24.95%</span>
+            </div>
+          </div>
+          <div class="p3-val r2">
+            <div class="n"><span class="p3-count" data-from="58.82" data-to="44.14">44.14</span> <span class="u">GiB</span></div>
+            <div class="d">&minus;14.68 GiB</div>
+          </div>
+
+          <!-- row 3 · bit-regrouped (the headline) -->
+          <div class="p3-lab r3">
+            <div class="v"><span class="ix">03</span>BIT-REGROUPED <em class="p3-tag">THE HEADLINE</em></div>
+            <div class="s">11.3 B/W</div>
+          </div>
+          <div class="p3-barcell r3">
+            <div class="p3-track" style="--w:69.98%">
+              <i class="p3-fill" aria-hidden="true"></i>
+              <i class="p3-cut" aria-hidden="true"></i>
+              <i class="p3-cutline" aria-hidden="true"></i>
+              <span class="p3-delta">&minus;30.03%</span>
+            </div>
+          </div>
+          <div class="p3-val r3">
+            <div class="n"><span class="p3-count" data-from="58.82" data-to="41.16">41.16</span> <span class="u">GiB</span></div>
+            <div class="d">&minus;17.66 GiB</div>
+          </div>
+
+          <!-- caption row -->
+          <div class="p3-cap">
+            <span>/// ALL 6,174 BF16 TENSORS ROUND-TRIP BIT-EXACT. NOT A SAMPLED SUBSET.</span>
+            <span class="m">METHOD: BIT-EXACT ROUND-TRIP (SHA-256)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B · FAMILY SCALING -->
+    <div class="p3-panel reveal">
+      <div class="p3-pbar">
+        <span class="lbl">&gt;&gt;&gt; FAMILY SCALING</span>
+        <span class="lbl">SAME CODE, NO RETUNING</span>
+      </div>
+
+      <div class="p3-frame">
+        <i class="p3-cross tl" aria-hidden="true">+</i><i class="p3-cross tr" aria-hidden="true">+</i>
+        <i class="p3-cross bl" aria-hidden="true">+</i><i class="p3-cross br" aria-hidden="true">+</i>
+
+        <div class="p3-famgrid">
+          <div class="p3-fam hero">
+            <div class="p3-fam-top"><b>NANO</b><span>30B</span></div>
+            <div class="p3-fam-pct">&minus;30.03%</div>
+            <p class="p3-fam-desc">Every shard, every tensor, bit-for-bit.</p>
+            <div class="p3-fam-stamp">[ WHOLE MODEL, BIT-EXACT ]</div>
+          </div>
+
+          <div class="p3-fam">
+            <div class="p3-fam-top"><b>SUPER</b><span>120B</span></div>
+            <div class="p3-fam-pct">&minus;29.63%</div>
+            <p class="p3-fam-desc">~230 -&gt; ~162 GiB projected.</p>
+            <div class="p3-fam-stamp">[ 684 / 684 TENSORS IN PROBE ]</div>
+          </div>
+
+          <div class="p3-fam">
+            <div class="p3-fam-top"><b>ULTRA</b><span>550B</span></div>
+            <div class="p3-fam-pct">&minus;29.29%</div>
+            <p class="p3-fam-desc">~1,044 -&gt; ~738 GiB projected: 306 GiB off one checkpoint.</p>
+            <div class="p3-fam-stamp">[ 106 / 106 TENSORS IN PROBE ]</div>
+          </div>
+
+          <!-- magnified spread: the three reductions on one zoomed scale -->
+          <div class="p3-spread">
+            <div class="p3-sp-head">
+              <span class="lbl">DETAIL · REDUCTION ACROSS THE FAMILY</span>
+              <span class="lbl">SCALE MAGNIFIED · 29.0 – 30.5 %</span>
+            </div>
+            <div class="p3-sp-track">
+              <i class="p3-sp-min" style="left:0" aria-hidden="true"></i>
+              <span class="p3-sp-minlab z" style="left:0" aria-hidden="true">29.0</span>
+              <i class="p3-sp-min" style="left:33.33%" aria-hidden="true"></i>
+              <span class="p3-sp-minlab" style="left:33.33%" aria-hidden="true">29.5</span>
+              <i class="p3-sp-min" style="left:66.67%" aria-hidden="true"></i>
+              <span class="p3-sp-minlab" style="left:66.67%" aria-hidden="true">30.0</span>
+              <i class="p3-sp-min" style="left:calc(100% - 1px)" aria-hidden="true"></i>
+              <span class="p3-sp-minlab max" style="left:100%" aria-hidden="true">30.5</span>
+
+              <i class="p3-sp-mark" style="left:19.33%" aria-hidden="true"></i>
+              <span class="p3-sp-marklab" style="left:19.33%">ULTRA<b>29.29</b></span>
+              <i class="p3-sp-mark" style="left:42%" aria-hidden="true"></i>
+              <span class="p3-sp-marklab" style="left:42%">SUPER<b>29.63</b></span>
+              <i class="p3-sp-mark hero" style="left:68.67%" aria-hidden="true"></i>
+              <span class="p3-sp-marklab hero" style="left:68.67%">NANO<b>30.03</b></span>
+            </div>
+          </div>
+
+          <div class="p3-famnote">
+            <p>Flat within a point across an 18x size span: the win comes from how the family stores BF16, not from any one model.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<section class="plate" id="plate-4">
+  <div class="wrap">
+    <header class="phead">
+      <span class="fig">PLATE 4</span>
+      <span>OPEN ITEMS &middot; REPRODUCTION &middot; COLOPHON</span>
+      <span>SHEET 5 / 5</span>
+    </header>
+
+    <div class="p4-intro reveal">
+      <h2>What&rsquo;s still open.</h2>
+      <p class="p4-lead">30 is where the easy structure ran out, not where the project ends.</p>
+    </div>
+
+    <div class="p4-items">
+      <article class="p4-item p4-item--gap reveal">
+        <div class="p4-item-meta">
+          <span class="lbl">Open item 01 &middot; Layout</span>
+          <span class="p4-stamp">OPEN</span>
+        </div>
+        <h3>The gap we can see</h3>
+        <p>The 33.7% codec exists but isn&rsquo;t GPU-readable yet. Closing that is a layout problem, and a layout problem is exactly what step&nbsp;3 solved.</p>
+        <div class="p4-item-foot">Status: layout problem &middot; Precedent: step 3</div>
+      </article>
+
+      <article class="p4-item p4-item--wall reveal">
+        <div class="p4-item-meta">
+          <span class="lbl">Open item 02 &middot; Hypothesis</span>
+          <span class="p4-stamp">OPEN</span>
+        </div>
+        <h3>The wall we might be wrong about</h3>
+        <p>&ldquo;The mantissa is random&rdquo; means &ldquo;random to every tool we aimed at it.&rdquo; A new hypothesis about how training sculpts those 7 bits would reopen the hunt past 34%.</p>
+        <div class="p4-item-foot">Status: awaiting hypothesis &middot; Stakes: past 34%</div>
+      </article>
+    </div>
+
+    <div class="p4-run reveal">
+      <div class="p4-run-l">
+        <span class="lbl">&gt;&gt;&gt; Reproduction protocol</span>
+        <h3>Don&rsquo;t trust it. <em>Run it.</em></h3>
+        <p>One script, numpy only, no GPU. Everything on this page is reproducible from the repo.</p>
+        <a class="p4-btn" href="https://github.com/brianbell-x/weight-compression/blob/main/research/candidates/0009-fusible-exponent-codebook/REPRODUCE.md">Open REPRODUCE.md -&gt;</a>
+      </div>
+      <div class="p4-run-r">
+        <div class="p4-cmd-head">
+          <span class="lbl">One command</span>
+          <button class="p4-copy" type="button" hidden>Copy</button>
+        </div>
+        <pre class="p4-cmd"><code>uv run python research/candidates/0009-fusible-exponent-codebook/tools/reproduce.py --model &lt;path&gt;</code></pre>
+        <ul class="p4-spec">
+          <li><span class="k">Deps</span><span class="v">numpy only</span></li>
+          <li><span class="k">GPU</span><span class="v">not required</span></li>
+          <li><span class="k">Method</span><span class="v">bit-exact round-trip (SHA-256)</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <footer class="p4-colophon reveal">
+      <div class="p4-col-grid">
+        <p class="p4-col-note">All figures are measured on the NVIDIA Nemotron-3 family, anchored by <a href="https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16">nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16</a>. Methods and artifacts live in this repository under <span class="mono">research/</span>.</p>
+        <div class="p4-field">
+          <span class="lbl">Doc</span>
+          <span class="val">brianbell-x/weight-compression</span>
+        </div>
+        <div class="p4-field">
+          <span class="lbl">Status</span>
+          <span class="val">Ongoing</span>
+        </div>
+        <div class="p4-field">
+          <span class="lbl">Subject</span>
+          <span class="val">Lossless compression of LLM weights</span>
+        </div>
+        <div class="p4-field">
+          <span class="lbl">Specimen</span>
+          <span class="val">NVIDIA Nemotron-3 family (BF16)</span>
+        </div>
+        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates">Candidates -&gt;</a>
+        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/blob/main/research/notes/findings-ledger.md">Findings ledger -&gt;</a>
+        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/blob/main/research/candidates/0009-fusible-exponent-codebook/REPRODUCE.md">Reproduce -&gt;</a>
+        <a class="p4-link" href="https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16">Model card -&gt;</a>
+        <div class="p4-end">/// End of bulletin ///</div>
+      </div>
+    </footer>
+  </div>
+</section>
+
+<script>
+/* global reveal observer — plates only add class="reveal" */
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window) || reduce){
+    els.forEach(function(e){ e.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      io.unobserve(en.target);
+    });
+  }, {threshold:.15, rootMargin:'0px 0px -8% 0px'});
+  els.forEach(function(e){ io.observe(e); });
+})();
+</script>
+<script data-plate="0">
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hero  = document.getElementById('p0-hero');
+  var count = document.getElementById('p0-count');
+  var gauge = document.getElementById('p0-gauge');
+  if (reduce || !('IntersectionObserver' in window) || !hero || !count || !gauge) return;
+
+  gauge.classList.add('p0-armed');
+  count.textContent = '00.00';
+
+  var fired = false;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting || fired) return;
+      fired = true;
+      io.disconnect();
+      gauge.classList.add('p0-go');            /* fill sweeps 0 -> 30.03% (CSS transition) */
+      var D = 2200, t0 = performance.now();
+      var step = function(now){
+        var t = Math.min((now - t0) / D, 1);
+        var e = 1 - Math.pow(1 - t, 4);        /* easeOutQuart */
+        var v = 30.03 * e;
+        count.textContent = (v < 10 ? '0' : '') + v.toFixed(2);
+        if (t < 1) requestAnimationFrame(step);
+        else count.textContent = '30.03';
+      };
+      requestAnimationFrame(step);
+    });
+  }, {threshold:.3});
+  /* observe the gauge itself — the tall hero can make a ratio threshold unreachable */
+  io.observe(gauge);
+})();
+</script>
+<script data-plate="1">
+(function(){
+  var root = document.getElementById('plate-1');
+  if (!root || !window.matchMedia) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var fills = root.querySelectorAll('.p1-fill');
+  if (!fills.length || !('IntersectionObserver' in window)) return;
+  root.classList.add('p1-armed');
+  var target = root.querySelector('.p1-conc') || root;
+  var io = new IntersectionObserver(function(entries){
+    for (var i = 0; i < entries.length; i++){
+      if (entries[i].isIntersecting){
+        root.classList.add('p1-run');
+        io.disconnect();
+        break;
+      }
+    }
+  }, {threshold:.3});
+  io.observe(target);
+})();
+</script>
+<script data-plate="2">
+(function(){
+  var root = document.getElementById('plate-2');
+  if (!root) return;
+  var bars = root.querySelectorAll('.p2-bar');
+  if (!bars.length) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!('IntersectionObserver' in window)) return;
+  /* arm: fills collapse to 0, then transition to var(--v) on entry */
+  root.classList.add('p2-armed');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      en.target.classList.add('go');
+      io.unobserve(en.target);
+    });
+  }, {threshold:.6});
+  bars.forEach(function(b){ io.observe(b); });
+})();
+</script>
+<script data-plate="3">
+(function(){
+  var plate = document.getElementById('plate-3');
+  if (!plate) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!('IntersectionObserver' in window)) return;
+  var grid = plate.querySelector('.p3-grid');
+  if (!grid) return;
+
+  plate.classList.add('p3-armed');
+  /* show the from-values while armed so empty bars never sit beside final numbers */
+  Array.prototype.forEach.call(plate.querySelectorAll('.p3-count'), function(el){
+    var f = parseFloat(el.getAttribute('data-from'));
+    if (!isNaN(f)) el.textContent = f.toFixed(2);
+  });
+
+  var DUR = 1500;
+  function ease(t){ return 1 - Math.pow(1 - t, 4); }
+  function countTo(el){
+    var from = parseFloat(el.getAttribute('data-from'));
+    var to = parseFloat(el.getAttribute('data-to'));
+    if (isNaN(from) || isNaN(to)) return;
+    var t0 = null;
+    function step(ts){
+      if (t0 === null) t0 = ts;
+      var p = Math.min((ts - t0) / DUR, 1);
+      el.textContent = (from + (to - from) * ease(p)).toFixed(2);
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = to.toFixed(2);
+    }
+    requestAnimationFrame(step);
+  }
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      io.disconnect();
+      plate.classList.add('p3-run');
+      Array.prototype.forEach.call(plate.querySelectorAll('.p3-count'), countTo);
+    });
+  }, {threshold:.25, rootMargin:'0px 0px -8% 0px'});
+  io.observe(grid);
+})();
+</script>
+<script data-plate="4">
+(function(){
+  var btn = document.querySelector('#plate-4 .p4-copy');
+  var cmd = document.querySelector('#plate-4 .p4-cmd code');
+  if (!btn || !cmd || !navigator.clipboard) return;
+  btn.hidden = false;
+  var t;
+  btn.addEventListener('click', function(){
+    navigator.clipboard.writeText(cmd.textContent).then(function(){
+      btn.textContent = 'Copied';
+      btn.classList.add('did');
+      clearTimeout(t);
+      t = setTimeout(function(){
+        btn.textContent = 'Copy';
+        btn.classList.remove('did');
+      }, 1600);
+    }).catch(function(){});
+  });
+})();
+</script>
 </body>
 </html>
