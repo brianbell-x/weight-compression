@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 import numpy as np
 
-SAMPLE = Path("C:/dev/compression/research/candidates/0009-fusible-exponent-codebook/tests/artifacts/gpu_sample.npz")
+SAMPLE = Path(__file__).resolve().parent / "gpu_sample.npz"
 
 
 def bf16_to_f32(u16):

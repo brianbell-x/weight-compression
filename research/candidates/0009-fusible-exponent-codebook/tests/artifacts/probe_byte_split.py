@@ -21,7 +21,7 @@ import struct, json, re, mmap, hashlib, math
 from pathlib import Path
 import numpy as np
 
-SHARD = Path("C:/dev/compression/models/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16/hf_snapshot/model-00001-of-00013.safetensors")
+SHARD = Path("models/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16/hf_snapshot/model-00001-of-00013.safetensors")
 N_EXPERTS = 8
 
 

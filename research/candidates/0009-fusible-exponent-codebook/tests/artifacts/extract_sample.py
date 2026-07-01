@@ -17,7 +17,7 @@ import struct, json, re, mmap, hashlib
 from pathlib import Path
 import numpy as np
 
-SHARD = Path("C:/dev/compression/models/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16/hf_snapshot/model-00001-of-00013.safetensors")
+SHARD = Path("models/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16/hf_snapshot/model-00001-of-00013.safetensors")
 OUT = Path(__file__).resolve().parent / "gpu_sample.npz"
 K = 15  # codebook size; 15 codes + 1 escape -> 4-bit index
 

@@ -173,6 +173,14 @@
   .vs li{margin:8px 0}
   .vs .kk{color:var(--acc);font-weight:600}
 
+  /* reproduce CTA */
+  .repro-cta{text-align:center}
+  .repro{display:inline-block;font-family:var(--mono);font-size:15px;color:#06170f;
+    background:linear-gradient(90deg,#1ea97c,var(--acc));padding:13px 26px;border-radius:999px;
+    text-decoration:none;font-weight:600;transition:filter .2s ease}
+  .repro:hover{filter:brightness(1.07)}
+  .repro-cta .cmd{color:var(--fg)}
+
   footer{padding:52px 0 80px;color:var(--faint);font-size:13px}
   footer a{color:var(--muted)}
   .srcs{font-family:var(--mono);font-size:12px;color:var(--faint);margin-top:10px;line-height:1.9}
@@ -538,6 +546,15 @@ bf16     = (sign_exp &lt;&lt; <span class="s">7</span>) | mantissa   <span class
         </ul>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- REPRODUCE CTA -->
+<section class="repro-cta">
+  <div class="wrap">
+    <a class="repro" href="https://github.com/brianbell-x/weight-compression/blob/main/REPRODUCE.md">Reproduce it yourself &rarr;</a>
+    <p class="note" style="margin-top:14px">Run it on any BF16 model. numpy only, no GPU:
+      <span class="cmd">uv run python reproduce.py --model &lt;path&gt;</span></p>
   </div>
 </section>
 
