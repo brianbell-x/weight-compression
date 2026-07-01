@@ -11,6 +11,11 @@ https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16
 
 Treat the direction as a learning loop. Evidence can change the path.
 
+Scope is strictly **lossless-only**. Do not propose, run, or keep lossy work
+(quantization, QAT, pruning, distillation, capability evals). The lossy tracks
+were explored, closed, and purged from the repo on 2026-07-01 (recoverable from
+git history); do not re-open them.
+
 ## The Goal
 
 Find more lossless compression. We have proven the weights can be made smaller
@@ -70,12 +75,18 @@ If no, it's a real runtime win — that is what we are hunting.
 - Before scouting, read what previous experiments already settled
   (`research/notes/findings-ledger.md` and the `research/candidates/*/` statuses).
   Do not re-propose a falsified idea; build on confirmed ones.
-- Read `NOTES.md` for the shared vocabulary and mental model — tensor anatomy
+- Compound rather than pivot. The output of the current best codec is the next
+  object of study: after a win (e.g. 0009's ~30% fusible form), analyze the
+  emitted representation itself — index plane, escape stream, side tables — for
+  residual structure before proposing fresh directions on the raw weights. The
+  "peel until random" diagnostic applies recursively to whatever we emit, not
+  just to the original BF16.
+- Read `research/notes/mental-model.md` for the shared vocabulary and mental model — tensor anatomy
   (name/shape/dtype/bytes/bits, expert/projection/row/column structure) and the
   compression principle that repeated patterns and byte layouts matter more than
   exact duplicates. It's the reference for the concepts this work leans on — keep
   it current: when you learn something that belongs in the shared vocabulary or
-  mental model, update `NOTES.md` so it stays the source of truth.
+  mental model, update `research/notes/mental-model.md` so it stays the source of truth.
 - Favor reproducible scripts, deterministic outputs, and clear checkpoints.
 - Don't quit an idea too early. One failed attempt falsifies *that attempt*, not
   the idea. Separate "this specific approach didn't work" from "this direction is
@@ -92,6 +103,13 @@ If no, it's a real runtime win — that is what we are hunting.
 - Run tasks/agents in the background by default (e.g. `run_in_background`, spawned
   Agent calls) rather than blocking in the foreground, unless the next step
   genuinely depends on the result before proceeding.
+
+## Tool Placement
+
+- Scripts belonging to one candidate live in that candidate's folder:
+  `research/candidates/<id>/tools/`. Only genuinely cross-candidate tools
+  (inspectors, synthetic-model generator, scouting workflows) go in
+  `research/tools/`. There is no top-level `tools/` directory.
 
 ## Python Tooling
 

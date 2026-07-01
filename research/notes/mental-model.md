@@ -85,42 +85,14 @@ For lossless compression, the final test is whether we can rebuild the tensor ex
 - exact same bytes, if preserving the original file representation
 - exact same tensor values, if repacking into a new format
 
-## The Two Compression Walls (why the numbers stop where they do)
+## The Lossless Wall (why the numbers stop where they do)
 
-Compression ratios **compound** (multiply) across stages that remove *different*
-structure — this is the real lever and how we reach 71–78% combined (lossless exponent ×
-lossy experts). But compounding is bounded by two hard floors, both now measured on the
-true weights:
-
-1. **Lossless wall ≈ 34%.** A stage can only be lossless down to the source's entropy.
-   The BF16 exponent byte is concentrated (~2.7 bits) but the **mantissa is genuinely
-   random** — order-0 entropy 7.96/8 bits, and a real compressor (lzma, byte-delta) gets
-   no further. So no lossless stack beats ~11 b/w fixed (~31%) / ~10.5 entropy-coded
-   (~34%), and it is essentially all exponent. Truly random bits cannot be shrunk
-   losslessly — pigeonhole, no exceptions.
-
-2. **Lossy (post-hoc) wall ≈ 3–4 bits/weight.** After a randomized-Hadamard *incoherence*
-   rotation (absorbed losslessly into the matmul), the structureless experts are
-   near-**Gaussian i.i.d.**, so their lossy compressibility obeys the rate-distortion law
-   `D(R) ≈ 2⁻²ᴿ` (per-weight rel-error ≈ `2⁻ᴿ`). Measured errors track it: 4-bit 3.35%,
-   3-bit 7.8%, 2-bit 16.9%. Vector quantization recovers only the small scalar-vs-lattice
-   "space-filling gain"; error feedback lowers *output* error below per-weight distortion;
-   neither beats the bound. This is the information-theoretic form of "the experts are
-   dense."
-
-**Compression axes.** Lossless (bit-exact) → capped ~34%, storage/VRAM only. Lossy
-quantization (fewer bits/weight) → post-hoc capped ~3–4 b/w at good quality. Sparsity/MoE
-(fewer weights active/token) → runtime only, already exploited. Restructuring/superposing
-weights → does not help (dense is ~optimal per-param, train-time exp1–4).
-
-## The weight manifold (the only way past the post-hoc wall)
-
-The rate-distortion wall bounds compression of the **fixed** weights training happened to
-produce. But a model's *function* does not uniquely determine its weights — there is a
-manifold of function-equivalent weight sets, and only some points on it are
-low-bit-representable. Post-hoc quantization is stuck at the dense-Gaussian point;
-**quantization-aware training / distillation searches the manifold** for a low-bit-friendly
-point that computes the same function, with downstream layers co-adapting to the
-quantization error. This is why a model trained low-bit (e.g. BitNet-1.58) works where
-post-hoc 2-bit does not. Going below ~78% combined requires *changing* the weights
-(training), not re-encoding them.
+A stage can only be lossless down to the source's entropy, and that floor is now
+measured on the true weights. The BF16 exponent byte is concentrated (~2.7 bits) but
+the **mantissa is genuinely random** — order-0 entropy 7.96/8 bits, and a real
+compressor (lzma, byte-delta) gets no further. So no lossless stack beats ~11 b/w
+fixed-width (~31%) / ~10.5 entropy-coded (~34%), and it is essentially all exponent.
+Truly random bits cannot be shrunk losslessly — pigeonhole, no exceptions. With the
+sign bit also fully live (1.0 b), 8 of the 16 bits per weight are provably random,
+which is why gains much beyond ~34–35% storage / ~30% fusible are
+information-theoretically impossible losslessly.

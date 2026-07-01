@@ -15,7 +15,7 @@ const common = `
 PURE LOSSLESS ONLY — every weight must reconstruct BIT-EXACT (SHA-256 / bit-equality). No
 quantization, no lossy, no "combination" with lossy. Model: NVIDIA-Nemotron-3-Nano-30B-A3B
 (BF16, 6174 tensors, ~31.6B weights) at ${MODEL}. A BF16 weight = 1 sign + 8 exp + 7 mantissa.
-Read raw bytes at header offsets (idiom in C:/dev/compression/tools/survey.py: read_header,
+Read raw bytes at header offsets (idiom in C:/dev/compression/research/candidates/0010-similarity-survey/tools/survey.py: read_header,
 data_offsets; u16 = frombuffer(dtype=uint16); exp8=(u16>>7)&0xFF, sign=u16>>15, mant=u16&0x7F).
 Use uv run python, numpy + stdlib compressors (zlib, bz2, lzma). Report bits/weight and % vs 16.
 

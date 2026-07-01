@@ -16,7 +16,12 @@ Tool: `research/candidates/0012-lossless-ceiling/tests/artifacts/predictive_whol
 - Baseline fusible: 11.2072 bpw → 29.95% smaller
 - Predictive vs baseline: **−0.0096 bpw / +0.06 pt**
 - Predictive vs 0009's stated floor (11.30 bpw / 29.37%): **+0.64 pt**
-- **Round-trip: all 13 shards bit-exact (SHA-256 / bit-equality), roundtrip_ok = true for every shard.**
+- **Exactness: the reconstruction identity `pred + resid == exp` was verified
+  elementwise for every tensor (roundtrip_ok = true on all 13 shards).**
+  *Wording correction (2026-07-01): this is an in-memory identity check on the
+  cost model — no bitstream was serialized and no SHA-256 was run by this tool.
+  The serialized, SHA-256-verified whole-model artifact is candidate 0009's
+  `.stz` container (test-006), which realizes the non-predictive fusible layout.*
 
 The headline "+0.67 pt" is a **shard-1-only** result. Model-wide the predictor
 essentially ties the separable baseline: it wins decisively only on shard 1
@@ -96,13 +101,14 @@ gain a fixed-width, random-access, register-decodable form can hold; the remaini
 ~4 pt lives only in variable-length codes, which are not fusible and re-inflate to
 full width, so they stay a storage-only tool.
 
-## Proposed findings-ledger addendum (not yet applied)
+## Findings-ledger addendum (applied 2026-07-01)
 
 > **Runtime-real lossless ceiling ≈ 30.0% (candidate 0012).** The separable
 > exponent predictor (`exp_residual = exp − round(row_base[i] + col_base[j] −
 > grand)`, O(R+C) int8 side vectors) was measured whole-model, numel-weighted over
 > all 13 Nemotron-30B shards: **11.1976 fusible bpw = 30.01% smaller than BF16**,
-> with every shard round-tripping bit-exact (SHA-256). It is genuinely fusible —
+> with the reconstruction identity verified elementwise on every tensor (in-memory
+> accounting, not a serialized bitstream). It is genuinely fusible —
 > reconstruction is register-only (2 int adds + tile-cached base loads), the kernel
 > stays bandwidth-bound (~4–6 ops/byte vs ~10 threshold), and it preserves 0009's
 > coalesced fixed-width random access. But the predictor's whole-model edge over the

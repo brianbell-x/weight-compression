@@ -17,6 +17,13 @@ models/
 *.npy
 *.npz
 
+# Serialized codec payloads (regenerable; small manifests/stats stay tracked)
+*.stz
+
+# Streaming/scratch work dirs (HF cache, per-shard temporaries)
+_stream_work/
+_stz_synth/
+
 # Logs & scratch
 logs/
 *.log

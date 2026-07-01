@@ -137,7 +137,8 @@ mantissa is a hard random wall; 90% lossless is inconceivable for this BF16 mode
 
 (The only path past ~35% is to stop being lossless: lossy quant — INT8 = 50% at KL~3e-4,
 4-bit incoherent+GPTQ = ~71% combined at near-INT4 quality, sub-2-bit only via QAT/training.
-Those are documented in candidates 0005/0008/0011 and are explicitly out of scope here.)
+Those were explored in the since-removed lossy candidates 0005/0008/0011 — available in git
+history only — and are explicitly out of scope here.)
 
 ---
 
@@ -161,9 +162,9 @@ Those are documented in candidates 0005/0008/0011 and are explicitly out of scop
 ## Provenance
 - `tests/artifacts/predictive_exp_codec.py` + `_result.json` — N2, fixed-width separable exponent
   predictor, bit-exact round-trip verified on real shard-1 tensors.
-- 0011 shared harness: `lossless_battery.py` (N1 exponent 2-D context), `lossless_crosstensor.py`
-  (N3), `lossless_ceiling.py` (plane entropies + lzma mantissa wall).
+- `tests/artifacts/lossless_battery.py` (N1 exponent 2-D context), `tests/artifacts/lossless_crosstensor.py`
+  (N3), `tests/artifacts/lossless_ceiling.py` (plane entropies + lzma mantissa wall).
 - Whole-model figures (mantissa marginal 6.966, H(mant|exp) 6.903, bz2 exp-sorted 6.9396,
   value entropy 10.50) independently reproduced from raw safetensors bytes and cross-checked
   against the adversarial verdicts (which corrected the mantissa claims from 0.8%→0.38% and
-  1.4%→0.42%). Ledger context: candidates 0001, 0002, 0009, 0010, 0011.
+  1.4%→0.42%). Ledger context: candidates 0001, 0002, 0009, 0010.

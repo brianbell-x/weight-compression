@@ -13,8 +13,8 @@ Pure numpy. BF16 is decoded losslessly as (u16 << 16).view(f32); the raw 16-bit
 pattern is the exact stored value, so every count here is exact, not sampled.
 
 Usage:
-  uv run python tools/survey.py fingerprint --shard <path.safetensors> --out <dir>
-  uv run python tools/survey.py merge --in <dir> --out <dir>/report
+  uv run python research/candidates/0010-similarity-survey/tools/survey.py fingerprint --shard <path.safetensors> --out <dir>
+  uv run python research/candidates/0010-similarity-survey/tools/survey.py merge --in <dir> --out <dir>/report
 A whole model = one fingerprint call per shard (parallelisable) + one merge.
 """
 

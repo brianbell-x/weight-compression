@@ -24,7 +24,7 @@ The fingerprint data (already computed, exact — not sampled) lives in ${DATA}:
   - report.global.npz    : global_u16[65536] (exact BF16 value histogram over ALL ~29B weights), global_byte[256]
   - *.fp.json            : per-shard; records also carry sig[256] (block-mean value signature) if you need it
 Raw model shards (for verifying claims against actual bytes): ${MODEL} (safetensors; header idiom in
-C:/dev/compression/tools/survey.py -> read_header, offset math, (u16<<16).view(f32) decodes BF16 exactly).
+C:/dev/compression/research/candidates/0010-similarity-survey/tools/survey.py -> read_header, offset math, (u16<<16).view(f32) decodes BF16 exactly).
 Use uv run python. Pure numpy is enough.
 
 BEFORE concluding, read ${LEDGER} and label each finding NOVEL (not previously established) or KNOWN

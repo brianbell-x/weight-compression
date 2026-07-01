@@ -85,7 +85,7 @@ See tests/test-001.md.)
 - Position-wise cross-expert base+delta falsified — see
   [[0003-cross-expert-base-delta]].
 
-Strategic framing (per research/notes/compression-vs-compute-payoff): this is a
-Regime-C lossless method. Honest payoff = storage / transfer / resident-VRAM, not
+Strategic framing: this is a variable-length (storage-only, Regime-C) lossless
+method. Honest payoff = storage / transfer / resident-VRAM, not
 decode speed; keep it off the per-token critical path or expect a ~1.4-2x batch-1
 slowdown.

@@ -83,7 +83,7 @@ tail to exploit.
 **0 shared rows** between `backbone.embeddings.weight` and `lm_head.weight` (consistent with
 `tie_word_embeddings = False`). No cross-tensor dedup opportunity.
 
-## Payoff regime (per `research/notes/compression-vs-compute-payoff.md`)
+## Payoff regime
 
 Even in its best case (lm_head, 0.50%) this is a **lossless STORAGE win only — Regime A/B**. It is
 **not** a per-token-bandwidth or decode win, and it is **negative on the embeddings tensor**. A

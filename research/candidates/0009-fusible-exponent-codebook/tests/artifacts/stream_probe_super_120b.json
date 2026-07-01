@@ -1,0 +1,29 @@
+{
+  "repo": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16",
+  "shards_processed": 1,
+  "shards_total": 50,
+  "is_partial_estimate": true,
+  "ALL_BF16_TENSORS_LOSSLESS": true,
+  "n_bf16_tensors": 684,
+  "n_expert_tensors": 673,
+  "total_escapes": 14094159,
+  "seen_GB": {
+    "total_raw": 4.655,
+    "bf16": 4.655,
+    "experts": 3.45,
+    "non_bf16_other": 0.0
+  },
+  "non_bf16_by_dtype_GB": {},
+  "bf16_share_of_seen_pct": 100.0,
+  "expert_share_of_seen_pct": 74.1,
+  "byte_split_K15_12bw": {
+    "compressed_GB": 3.506,
+    "reduction_pct": 24.67,
+    "expert_only_reduction_pct": 24.59
+  },
+  "regroup_K15_11p3bw": {
+    "compressed_GB": 3.275,
+    "reduction_pct": 29.63,
+    "expert_only_reduction_pct": 29.59
+  }
+}

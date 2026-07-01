@@ -1,0 +1,29 @@
+{
+  "repo": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+  "shards_processed": 1,
+  "shards_total": 225,
+  "is_partial_estimate": true,
+  "ALL_BF16_TENSORS_LOSSLESS": true,
+  "n_bf16_tensors": 106,
+  "n_expert_tensors": 95,
+  "total_escapes": 8133960,
+  "seen_GB": {
+    "total_raw": 4.641,
+    "bf16": 4.641,
+    "experts": 1.855,
+    "non_bf16_other": 0.0
+  },
+  "non_bf16_by_dtype_GB": {},
+  "bf16_share_of_seen_pct": 100.0,
+  "expert_share_of_seen_pct": 40.0,
+  "byte_split_K15_12bw": {
+    "compressed_GB": 3.489,
+    "reduction_pct": 24.81,
+    "expert_only_reduction_pct": 24.67
+  },
+  "regroup_K15_11p3bw": {
+    "compressed_GB": 3.282,
+    "reduction_pct": 29.29,
+    "expert_only_reduction_pct": 28.87
+  }
+}

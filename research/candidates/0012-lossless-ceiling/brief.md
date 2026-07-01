@@ -1,7 +1,7 @@
 # Candidate 0012 — Lossless ceiling & the exponent-context lever
 
 **Status:** in progress (adversarial whole-model verification running: workflow
-`tools/lossless_exhaustion.workflow.js` → this dir's `RESULTS.md`).
+`research/tools/lossless_exhaustion.workflow.js` → this dir's `RESULTS.md`).
 
 **Constraint:** pure lossless, bit-exact reconstruction only. No lossy, no quantization,
 no combination with lossy.
@@ -69,7 +69,7 @@ mantissa across 11 tensors spanning roles/layers, with brotli-11 (strongest tool
 - Working codec: 32.9–33.7% bit-exact round-trip (`lossless_codec.py`), at/above SOTA (DFloat11 ~30%).
 - 90% lossless is information-theoretically impossible (8 random bits/weight). Every field peeled.
 
-## Artifacts (under 0011/tests/artifacts/ and this dir, shared harness)
+## Artifacts (under tests/artifacts/ in this dir)
 - `lossless_battery.py` / `_result.json` — exponent order-0 vs 2-D context vs real compressors, per role.
 - `lossless_crosstensor.py` / `_result.json` — cross-expert column-profile correlation + conditional entropy.
 - `lossless_ceiling.py` / `_result.json` — plane entropies + lzma on mantissa (the random wall).

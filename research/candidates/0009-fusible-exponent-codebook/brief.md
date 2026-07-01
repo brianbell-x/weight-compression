@@ -68,7 +68,6 @@ slightly larger codebook. Net: byte-split tops out ~27.5%; regroup reaches **~29
 | regroup codebook **K=15** (4-bit idx) | **11.30** | **29.4%** | 3.25% | **YES** | exact ✓ |
 | regroup codebook **K=31** (5-bit idx) | 12.01 | 24.9% | **0.06%** | **YES** | exact ✓ |
 | byte-split codebook K=7 (3-bit idx) | 11.59 | 27.5% | 7.3% | YES | exact ✓ |
-| INT8 (lossy, candidate 0005) | 8.0 | 50% | — | YES | **NO** |
 
 - **K=15 is the headline** (best ratio at a minority escape).
 - **K=31 is the conservative choice**: its 0.06% escape sits inside SqueezeLLM's proven
@@ -88,7 +87,7 @@ slightly larger codebook. Net: byte-split tops out ~27.5%; regroup reaches **~29
   dominant decode traffic). Real, by construction.
 - **Storage/load:** −~29% (slightly below 0001's 32% — the price of random access).
 - **Compute:** a tiny table lookup per weight; hidden under decode's idle compute
-  (decode is memory-bandwidth bound, see compression-vs-compute-payoff.md).
+  (decode is memory-bandwidth bound).
 
 ## What is proven — now including real GPU (test-002, RTX 4090)
 **CPU (test-001):** exact losslessness; fixed-width bit budget (~11.3–12 b/w); addressability.
@@ -105,10 +104,9 @@ main kernel (one launch) so the tiny single-matvec case also wins; move 12→11.
 ## Ceiling (honest bound)
 Lossless ⇒ the random mantissa moves verbatim (~7 b/w floor) + an exponent index (~3–5 b).
 So the **lossless-fusible ceiling is ~29–31%**; we are essentially at it. Going below
-requires discarding mantissa bits = lossy quantization (INT8 = 50%, candidate 0005) —
-which is exactly the path the user has chosen to avoid. So this is the best *runtime* win
-obtainable **without any quality change at all** — the lossless runtime option, distinct
-from (and lighter-quality-risk than) INT8.
+requires discarding mantissa bits = lossy quantization, which is out of scope
+(lossless-only). So this is the best *runtime* win obtainable **without any quality
+change at all** — the lossless runtime option.
 
 ## Tensor group
 Primary: `backbone.layers.*.mixer.experts.*.{up,down}_proj.weight` (BF16, 128 experts/
@@ -142,8 +140,7 @@ provably identical outputs.** Decode SPEEDUP: real on GPUs ≤~2.3 TB/s; on H100
 tie (free VRAM, no speed tax). See `tests/test-001..005.md`.
 
 ## Sources
-Inference cost model / Regime C vs D and the litmus test:
-- `research/notes/compression-vs-compute-payoff.md` (this project)
+Inference cost model / Regime C vs D and the litmus test (see AGENTS.md "The Goal"):
 - DFloat11 (Regime-C contrast: variable-length, decodes full-width to VRAM) —
   https://arxiv.org/html/2504.11651v3
 Fused fixed-width / LUT dequant matmul with no VRAM materialization (the fusibility basis):
@@ -157,5 +154,4 @@ Sparse-outlier ("escape") decomposition, fused dense+sparse kernels:
 Prior internal results this builds on:
 - candidate 0001 (BF16 exponent-plane: 32% lossless, high-byte entropy ~2.9, mantissa
   ~7.95, the variable-length storage-only floor)
-- candidate 0005 / 0008 (INT8 lossy floor, the lossy alternative)
 ```

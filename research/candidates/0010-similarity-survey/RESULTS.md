@@ -167,7 +167,7 @@ was order-0 / block-mean / whole-vector; the following are structurally distinct
    catch structured mantissas that look random marginally.
 6. **Sub-block value quantization residual (VQ / k-means codebook over full BF16 values).**
    The value codebook here was per-symbol; a *vector* codebook over 2- or 4-weight groups was
-   not measured (candidate 0011 territory). Order-0 says the joint value space is too spread
+   not measured. Order-0 says the joint value space is too spread
    (top-256 = 33.6%), so prior is low, but grouped VQ is a different statistic.
 7. **Cross-shard / file-level byte redundancy** (zstd-dictionary across shard boundaries) —
    almost certainly nil given 0 exact dups and random mantissa, listed for completeness.
