@@ -1,0 +1,9 @@
+{
+  "n_experts": 32,
+  "exp_per_tensor_H0": 2.8194,
+  "exp_H_given_shared_col": 2.6226,
+  "exp_H_given_shared_rowcol": 2.6842,
+  "col_profile_saving_bits": 0.1968,
+  "cross_expert_colmean_corr_mean": 0.9965,
+  "cross_expert_colmean_corr_max": 0.9985
+}

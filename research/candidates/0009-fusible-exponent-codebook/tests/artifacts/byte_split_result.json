@@ -1,0 +1,134 @@
+{
+  "shard": "model-00001-of-00013.safetensors",
+  "n_experts": 8,
+  "reference_bits_per_weight": {
+    "raw_bf16": 16,
+    "int8_lossy": 8
+  },
+  "results": {
+    "up": {
+      "support_high_mean": 31.1,
+      "support_high_max": 45,
+      "support_mag7_mean": 16.1,
+      "H_high_mean": 2.9026,
+      "rANS_floor_bits_per_weight": 10.9026,
+      "topk_high_cum_mass": {
+        "top4": 0.776918,
+        "top8": 0.94466,
+        "top16": 0.999101,
+        "top32": 0.999998,
+        "top64": 1.0
+      },
+      "fixed_width_variants": {
+        "K3": {
+          "K": 3,
+          "idx_width": 2,
+          "mean_escape_rate": 0.35254,
+          "mean_bits_per_weight": 12.8281,
+          "reduction_vs_bf16": 0.1982
+        },
+        "K7": {
+          "K": 7,
+          "idx_width": 3,
+          "mean_escape_rate": 0.094443,
+          "mean_bits_per_weight": 11.7627,
+          "reduction_vs_bf16": 0.2648
+        },
+        "K15": {
+          "K": 15,
+          "idx_width": 4,
+          "mean_escape_rate": 0.001589,
+          "mean_bits_per_weight": 12.0177,
+          "reduction_vs_bf16": 0.2489
+        },
+        "K31": {
+          "K": 31,
+          "idx_width": 5,
+          "mean_escape_rate": 4e-06,
+          "mean_bits_per_weight": 13.0008,
+          "reduction_vs_bf16": 0.1875
+        },
+        "K63": {
+          "K": 63,
+          "idx_width": 6,
+          "mean_escape_rate": 0.0,
+          "mean_bits_per_weight": 14.0005,
+          "reduction_vs_bf16": 0.125
+        }
+      },
+      "exact_roundtrip_check": {
+        "tensor": "backbone.layers.1.mixer.experts.0.up_proj.weight",
+        "K": 15,
+        "exact_roundtrip": true,
+        "n_escape": 15312,
+        "shape": [
+          1856,
+          2688
+        ],
+        "numel": 4988928
+      }
+    },
+    "down": {
+      "support_high_mean": 30.8,
+      "support_high_max": 42,
+      "support_mag7_mean": 16.0,
+      "H_high_mean": 2.7154,
+      "rANS_floor_bits_per_weight": 10.7154,
+      "topk_high_cum_mass": {
+        "top4": 0.790408,
+        "top8": 0.976713,
+        "top16": 0.999594,
+        "top32": 0.999999,
+        "top64": 1.0
+      },
+      "fixed_width_variants": {
+        "K3": {
+          "K": 3,
+          "idx_width": 2,
+          "mean_escape_rate": 0.319117,
+          "mean_bits_per_weight": 12.5643,
+          "reduction_vs_bf16": 0.2147
+        },
+        "K7": {
+          "K": 7,
+          "idx_width": 3,
+          "mean_escape_rate": 0.051448,
+          "mean_bits_per_weight": 11.4214,
+          "reduction_vs_bf16": 0.2862
+        },
+        "K15": {
+          "K": 15,
+          "idx_width": 4,
+          "mean_escape_rate": 0.000737,
+          "mean_bits_per_weight": 12.0124,
+          "reduction_vs_bf16": 0.2492
+        },
+        "K31": {
+          "K": 31,
+          "idx_width": 5,
+          "mean_escape_rate": 2e-06,
+          "mean_bits_per_weight": 13.001,
+          "reduction_vs_bf16": 0.1874
+        },
+        "K63": {
+          "K": 63,
+          "idx_width": 6,
+          "mean_escape_rate": 0.0,
+          "mean_bits_per_weight": 14.0006,
+          "reduction_vs_bf16": 0.125
+        }
+      },
+      "exact_roundtrip_check": {
+        "tensor": "backbone.layers.1.mixer.experts.0.down_proj.weight",
+        "K": 15,
+        "exact_roundtrip": true,
+        "n_escape": 8926,
+        "shape": [
+          2688,
+          1856
+        ],
+        "numel": 4988928
+      }
+    }
+  }
+}

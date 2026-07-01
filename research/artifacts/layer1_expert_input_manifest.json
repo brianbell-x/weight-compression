@@ -1,0 +1,62 @@
+{
+  "source": "NVIDIA-Nemotron-3-Nano-30B-A3B-BF16 / shard1 early-layer partial forward",
+  "capture_point": "input to backbone.layers[1].mixer (MoE) = layer1 pre-mixer RMSNorm output",
+  "path": "embeddings -> layer0 Mamba2 (torch_forward CPU) -> layer1 RMSNorm",
+  "dtype_compute": "float32",
+  "shape": [
+    96,
+    2688
+  ],
+  "dtype_saved": "float32",
+  "n_prompts": 8,
+  "total_tokens": 96,
+  "prompts": [
+    {
+      "prompt": "The capital of France is",
+      "tokens": 5
+    },
+    {
+      "prompt": "In 1969, humans first walked on the surface of the",
+      "tokens": 15
+    },
+    {
+      "prompt": "def fibonacci(n):\n    if n < 2:\n        return n\n    return",
+      "tokens": 18
+    },
+    {
+      "prompt": "Water boils at a temperature of 100 degrees",
+      "tokens": 12
+    },
+    {
+      "prompt": "The mitochondria is the powerhouse of the",
+      "tokens": 8
+    },
+    {
+      "prompt": "To compress a neural network without losing accuracy, one common method is",
+      "tokens": 13
+    },
+    {
+      "prompt": "Once upon a time, in a small village nestled between two mountains,",
+      "tokens": 15
+    },
+    {
+      "prompt": "The derivative of x squared with respect to x is",
+      "tokens": 10
+    }
+  ],
+  "stats": {
+    "all_finite": true,
+    "mean": -3.1609710276825354e-05,
+    "std": 0.11790790408849716,
+    "per_channel_std_min": 1.2597870409081224e-05,
+    "per_channel_std_max": 0.4125744700431824,
+    "per_channel_std_median": 0.11695847660303116,
+    "topk_energy_fraction": {
+      "1": 0.009899828204545874,
+      "8": 0.019352463345127732,
+      "32": 0.03906816294536344,
+      "64": 0.0629909798341971,
+      "128": 0.10603022511737317
+    }
+  }
+}

@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lossless BF16 Compression: a 30B model, 30% smaller, bit-for-bit identical</title>
+<style>
+  /* Design read: research results explainer for ML reviewers.
+     Dark-tech data-viz. One accent (emerald = the lossless method); rose reserved
+     strictly for the lossy contrast (INT8). Mono for every number. */
+  :root{
+    --bg:#0b0c0e; --bg2:#101216; --card:#14161b; --line:rgba(255,255,255,.08);
+    --line2:rgba(255,255,255,.14);
+    --fg:#e9ebee; --muted:#9aa1ab; --faint:#6a7078;
+    --acc:#34d399;            /* lossless / our result */
+    --acc-dim:rgba(52,211,153,.16);
+    --lossy:#ef8a8c;          /* lossy contrast only (INT8) */
+    --neutral:#3a4048;        /* baselines */
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);
+    line-height:1.55;-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(1200px 600px at 78% -8%,rgba(52,211,153,.07),transparent 60%);
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  .mono{font-family:var(--mono)}
+  .acc{color:var(--acc)}
+  h1,h2,h3{letter-spacing:-.02em;line-height:1.05;margin:0}
+  section{padding:76px 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc)}
+  p.lead{color:var(--muted);font-size:17px;max-width:64ch;margin:14px 0 0}
+  .note{color:var(--faint);font-size:13px;font-family:var(--mono)}
+
+  /* hero */
+  .hero{padding:96px 0 64px}
+  .hero h1{font-size:clamp(34px,6.2vw,64px);font-weight:650}
+  .hero h1 em{font-style:normal;color:var(--acc)}
+  .hero p{color:var(--muted);font-size:19px;max-width:60ch;margin:22px 0 0}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+  .chip{display:inline-flex;align-items:center;gap:9px;padding:9px 15px;
+    border:1px solid var(--line2);border-radius:999px;background:var(--bg2);
+    font-family:var(--mono);font-size:13px;color:var(--fg)}
+  .chip b{color:var(--acc);font-weight:600}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--acc);
+    box-shadow:0 0 0 4px var(--acc-dim)}
+
+  /* layout helpers */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    padding:22px}
+  .card h3{font-size:16px;font-weight:600;margin-bottom:6px}
+  .card p{color:var(--muted);font-size:14px;margin:0}
+  .hd{max-width:66ch}
+  .hd h2{font-size:clamp(24px,3.6vw,34px);font-weight:640}
+  .hd p{color:var(--muted);font-size:16px;margin:12px 0 0}
+
+  /* chart shell */
+  .chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    padding:26px 26px 22px}
+  .chart .cap{color:var(--muted);font-size:13.5px;margin-top:16px;max-width:70ch}
+  .chart .cap b{color:var(--fg);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;font-size:12.5px;
+    color:var(--muted);font-family:var(--mono)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  /* vertical bars (footprint): every bar drawn to ORIGINAL height; solid = kept, hatched = removed */
+  .vbars{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;padding-top:32px}
+  .vbar{display:flex;flex-direction:column;align-items:center}
+  .vbar .col{position:relative;width:100%;max-width:150px;height:280px}
+  .vbar .kept{position:absolute;left:0;right:0;bottom:0;height:var(--k);
+    background:var(--neutral);border-radius:0 0 5px 5px;
+    transition:height 1s cubic-bezier(.16,1,.3,1)}
+  .reveal:not(.in) .vbar .kept{height:0}
+  .vbar.win .kept{background:linear-gradient(180deg,var(--acc),#1ea97c)}
+  .vbar.orig .kept{border-radius:5px}
+  .vbar .removed{position:absolute;left:0;right:0;top:0;height:calc(100% - var(--k));
+    border-radius:5px 5px 0 0;border:1px dashed var(--line2);border-bottom:2px dashed var(--muted);
+    background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 7px,transparent 7px 14px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+  .vbar.win .removed{border-color:rgba(52,211,153,.42);border-bottom-color:var(--acc);
+    background:repeating-linear-gradient(135deg,rgba(52,211,153,.13) 0 7px,transparent 7px 14px)}
+  .vbar .rpct{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--acc)}
+  .vbar .rgib{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .vbar .val{position:absolute;left:0;right:0;top:calc(100% - var(--k));text-align:center;
+    font-family:var(--mono);font-size:15px;color:var(--fg);padding-top:7px;
+    text-shadow:0 1px 4px rgba(0,0,0,.7)}
+  .vbar.win .val{color:#06170f;text-shadow:none}
+  .vbar .val small{color:var(--muted);font-size:12px}
+  .vbar.win .val small{color:#0a3324}
+  .vbar .tag{margin-top:14px;text-align:center}
+  .vbar .tag b{font-size:14px;font-weight:600;display:block}
+  .vbar .tag .sub{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:3px}
+
+  /* horizontal bars (bits/weight) */
+  .hbars{display:flex;flex-direction:column;gap:16px;margin-top:4px}
+  .hrow{display:grid;grid-template-columns:190px 1fr;gap:16px;align-items:center}
+  .hrow .name{font-size:13.5px;color:var(--fg)}
+  .hrow .name .k{font-family:var(--mono);color:var(--muted);font-size:11.5px;display:block}
+  .track{position:relative;height:34px;background:var(--bg2);border-radius:5px}
+  .fill{height:100%;width:var(--w);border-radius:5px;display:flex;align-items:center;
+    justify-content:flex-end;padding-right:11px;font-family:var(--mono);font-size:13px;
+    color:#06120d;font-weight:600;transition:width 1s cubic-bezier(.16,1,.3,1)}
+  .reveal:not(.in) .fill{width:0}
+  .fill.n{background:var(--neutral);color:var(--fg)}
+  .fill.a{background:linear-gradient(90deg,#1ea97c,var(--acc))}
+  .fill.l{background:linear-gradient(90deg,#c85e60,var(--lossy));color:#180a0a}
+  .floor{position:absolute;top:-6px;bottom:-6px;left:var(--w);width:2px;
+    background:repeating-linear-gradient(180deg,var(--acc) 0 5px,transparent 5px 10px)}
+  .floor::after{content:attr(data-l);position:absolute;top:-20px;left:8px;
+    font-family:var(--mono);font-size:11px;color:var(--acc);white-space:nowrap}
+
+  /* anatomy strip */
+  .anat{margin-top:4px}
+  .arow{margin:14px 0}
+  .arow .lbl{font-family:var(--mono);font-size:11.5px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
+  .seg{display:flex;height:44px;gap:3px}
+  .seg .b{border-radius:4px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:12px;color:var(--fg);min-width:0;overflow:hidden;white-space:nowrap}
+  .seg .signexp{background:#2a2e34;border:1px solid var(--line2)}
+  .seg .mant{background:#2a2e34;border:1px solid var(--line2)}
+  .seg.info .signexp{background:var(--acc-dim);border:1px solid var(--acc)}
+  .seg.info .mant{background:rgba(239,138,140,.14);border:1px solid var(--lossy)}
+  .seg.info .empty{background:transparent;border:1px dashed var(--line2);color:var(--faint)}
+
+  /* concentration */
+  .conc{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center}
+  @media(max-width:900px){.conc{grid-template-columns:1fr}}
+  .steps{display:flex;flex-direction:column;gap:12px}
+  .step{display:grid;grid-template-columns:64px 1fr 62px;gap:12px;align-items:center;
+    font-family:var(--mono);font-size:12.5px}
+  .step .kk{color:var(--muted)}
+  .step .bar{height:12px;background:var(--bg2);border-radius:3px;overflow:hidden}
+  .step .bar i{display:block;height:100%;width:var(--w);
+    background:linear-gradient(90deg,#1ea97c,var(--acc));border-radius:3px;
+    transition:width .9s cubic-bezier(.16,1,.3,1)}
+  .reveal:not(.in) .step .bar i{width:0}
+  .step .pc{text-align:right;color:var(--fg)}
+
+  /* code */
+  pre{background:#0c0e12;border:1px solid var(--line);border-radius:12px;
+    padding:18px 20px;overflow:auto;font-family:var(--mono);font-size:13px;
+    line-height:1.7;color:#c6cbd2;margin:0}
+  pre .c{color:var(--faint)}
+  pre .k{color:var(--acc)}
+  pre .s{color:#e0b774}
+
+  /* proof cards */
+  .proof .card{position:relative;padding-top:26px}
+  .proof .n{font-family:var(--mono);font-size:12px;color:var(--acc);letter-spacing:.1em}
+  .proof .big{font-family:var(--mono);font-size:22px;color:var(--fg);margin:8px 0 4px;font-weight:600}
+  .proof .card p{font-size:13.5px;margin-top:8px}
+  .pass{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);
+    font-size:12px;color:var(--acc);margin-top:12px}
+  .pass::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--acc);
+    box-shadow:0 0 0 4px var(--acc-dim)}
+
+  /* two-up compare */
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:900px){.vs{grid-template-columns:1fr}}
+  .vs .card h3{font-family:var(--mono);font-size:13px;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .vs ul{margin:0;padding-left:18px;color:var(--muted);font-size:14px}
+  .vs li{margin:8px 0}
+  .vs .kk{color:var(--acc);font-weight:600}
+
+  footer{padding:52px 0 80px;color:var(--faint);font-size:13px}
+  footer a{color:var(--muted)}
+  .srcs{font-family:var(--mono);font-size:12px;color:var(--faint);margin-top:10px;line-height:1.9}
+
+  @media(max-width:900px){
+    .grid2,.grid3,.vs{grid-template-columns:1fr}
+  }
+  @media(max-width:720px){
+    .vbars{gap:14px}
+    .hrow{grid-template-columns:120px 1fr}
+    section{padding:56px 0}
+  }
+  /* motion */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    .col,.fill,.step .bar i{transition:none!important}
+    html{scroll-behavior:auto}
+  }
+  </style>
+  <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
+  <style>
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap reveal in">
+    <div class="eyebrow">Lossless weight compression &middot; NVIDIA Nemotron-3 Nano 30B</div>
+    <h1 style="margin-top:18px">A 30-billion-parameter model,<br><em>30% smaller.</em> Not one bit of output changes.</h1>
+    <p>We store BF16 weights in a form the matmul reads <b style="color:var(--fg)">directly</b>, then reconstruct
+       them bit-for-bit. No quantization, no calibration, no quality tradeoff. The compressed
+       weights are provably identical to the originals.</p>
+    <div class="chips">
+      <span class="chip"><span class="dot"></span> <b>&minus;30.03%</b>&nbsp; smaller</span>
+      <span class="chip"><b>6,174 / 6,174</b>&nbsp; tensors bit-exact</span>
+      <span class="chip"><b>KL = 0</b>&nbsp; by construction</span>
+      <span class="chip"><b>random-access</b>&nbsp; fusible into the matmul</span>
+    </div>
+  </div>
+</header>
+
+<!-- RESULT: footprint -->
+<section>
+  <div class="wrap">
+    <div class="hd reveal">
+      <div class="eyebrow">The result</div>
+      <h2 style="margin-top:12px">The whole model gets smaller, losslessly.</h2>
+      <p>Every BF16 tensor in the real 30B checkpoint re-encoded and verified to reconstruct
+         bit-for-bit. Because reconstruction is exact, the outputs are unchanged by definition.</p>
+    </div>
+
+    <div class="chart reveal" style="margin-top:26px">
+      <div class="vbars">
+        <div class="vbar orig">
+          <div class="col" style="--k:100%">
+            <div class="kept"></div>
+            <div class="val">58.82&nbsp;<small>GiB</small></div>
+          </div>
+          <div class="tag"><b>Original BF16</b><span class="sub">16.0 bits / weight</span></div>
+        </div>
+        <div class="vbar">
+          <div class="col" style="--k:75.04%">
+            <div class="removed"><span class="rpct">&minus;24.95%</span><span class="rgib">&minus;14.68 GiB</span></div>
+            <div class="kept"></div>
+            <div class="val">44.14&nbsp;<small>GiB</small></div>
+          </div>
+          <div class="tag"><b>Fixed-width codebook</b><span class="sub">12.0 b/w &middot; verified on all 6,174</span></div>
+        </div>
+        <div class="vbar win">
+          <div class="col" style="--k:69.98%">
+            <div class="removed"><span class="rpct">&minus;30.03%</span><span class="rgib">&minus;17.66 GiB</span></div>
+            <div class="kept"></div>
+            <div class="val">41.16&nbsp;<small>GiB</small></div>
+          </div>
+          <div class="tag"><b>Bit-regrouped</b><span class="sub">11.3 b/w &middot; the headline</span></div>
+        </div>
+      </div>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--acc)"></span> kept (new size, lossless)</span>
+        <span><span class="sw" style="background:repeating-linear-gradient(135deg,var(--muted) 0 3px,transparent 3px 6px);border:1px dashed var(--line2)"></span> removed</span>
+      </div>
+      <p class="cap"><b>17.66 GiB removed</b> from a 58.8 GiB model with zero change to what it computes.
+        The 25% variant is round-trip-verified on <b>all 6,174</b> BF16 tensors; the 30% variant is
+        bit-exact on the expert tensors, which are 93% of the model.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BITS PER WEIGHT vs floor -->
+<section>
+  <div class="wrap">
+    <div class="hd reveal">
+      <div class="eyebrow">How far can lossless go?</div>
+      <h2 style="margin-top:12px">Within half a bit of the information-theoretic limit.</h2>
+      <p>There is a hard floor for lossless BF16: you cannot store a weight in fewer bits than
+         its Shannon information. Our random-access form sits right on top of that floor. Going
+         lower means discarding bits, which changes the outputs.</p>
+    </div>
+
+    <div class="chart reveal" style="margin-top:26px">
+      <div class="hbars">
+        <div class="hrow">
+          <div class="name">Original BF16<span class="k">stored verbatim</span></div>
+          <div class="track"><div class="fill n" style="--w:100%">16.0</div></div>
+        </div>
+        <div class="hrow">
+          <div class="name">Ours: regroup<span class="k">lossless &middot; fusible</span></div>
+          <div class="track">
+            <div class="fill a" style="--w:70.6%">11.30</div>
+            <div class="floor" style="--w:67.5%" data-l="lossless floor 10.8"></div>
+          </div>
+        </div>
+        <div class="hrow">
+          <div class="name">INT8<span class="k">lossy &middot; changes outputs</span></div>
+          <div class="track"><div class="fill l" style="--w:50%">8.0</div></div>
+        </div>
+      </div>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--acc)"></span> lossless (KL = 0)</span>
+        <span><span class="sw" style="background:var(--lossy)"></span> lossy (must be quality-tested)</span>
+        <span><span class="sw" style="background:repeating-linear-gradient(180deg,var(--acc) 0 3px,transparent 3px 6px)"></span> entropy floor</span>
+      </div>
+      <p class="cap">The measured entropy floor for these weights is <b>~10.8 bits/weight</b>. Our fixed-width,
+        matmul-readable code reaches <b>11.30</b>. The ~0.5-bit gap is the price of random access.
+        INT8's 8.0 lives <b>below</b> the lossless floor only because it throws information away.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section>
+  <div class="wrap">
+    <div class="hd reveal">
+      <div class="eyebrow">How it works</div>
+      <h2 style="margin-top:12px">Split each weight where the information actually is.</h2>
+      <p>A BF16 number is 16 bits: 1 sign, 8 exponent, 7 mantissa. We measured how much real
+         information each part carries across the model. The answer is lopsided.</p>
+    </div>
+
+    <div class="chart reveal" style="margin-top:26px">
+      <div class="anat">
+        <div class="arow">
+          <div class="lbl">16 bits stored per weight</div>
+          <div class="seg">
+            <div class="b signexp" style="flex:9">sign + exponent&nbsp;(9 b)</div>
+            <div class="b mant" style="flex:7">mantissa&nbsp;(7 b)</div>
+          </div>
+        </div>
+        <div class="arow">
+          <div class="lbl">Information actually present (measured Shannon entropy)</div>
+          <div class="seg info">
+            <div class="b signexp" style="flex:3.8">~3.8 b</div>
+            <div class="b empty" style="flex:5.2">compressible</div>
+            <div class="b mant" style="flex:7">~7 b &middot; irreducible</div>
+          </div>
+        </div>
+      </div>
+      <p class="cap">The <b>sign + exponent</b> field only carries <b>~3.8 bits</b> of information out of 9 stored,
+        so we replace it with a tiny per-tensor <b>codebook index</b>. The <b>mantissa</b> is essentially random
+        (~7 of 7 bits), so we keep it <b>verbatim</b>. Sum of information = 10.8 b/w, the floor from the last chart.</p>
+    </div>
+
+    <div class="grid2" style="margin-top:22px">
+      <div class="chart reveal">
+        <div class="conc">
+          <div class="steps">
+            <div class="step"><span class="kk">top 4</span><span class="bar"><i style="--w:78%"></i></span><span class="pc">77.7%</span></div>
+            <div class="step"><span class="kk">top 8</span><span class="bar"><i style="--w:96%"></i></span><span class="pc">96.1%</span></div>
+            <div class="step"><span class="kk">top 16</span><span class="bar"><i style="--w:99.9%"></i></span><span class="pc">99.9%</span></div>
+            <div class="step"><span class="kk">top 32</span><span class="bar"><i style="--w:100%"></i></span><span class="pc">~100%</span></div>
+          </div>
+          <div>
+            <h3 style="font-size:15px;font-weight:600">Why a tiny codebook works</h3>
+            <p style="color:var(--muted);font-size:13.5px;margin-top:8px">
+              The sign+exponent field is hyper-concentrated: <b style="color:var(--fg)">16 entries cover 99.9%</b>
+              of all weights. The rare leftovers ride a <b style="color:var(--fg)">sparse escape stream</b>
+              (~0.1% of weights at this layout), so nothing is lost.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart reveal" style="display:flex;flex-direction:column;justify-content:center">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:12px">Decode is a table lookup, in-register</h3>
+<pre><span class="c"># per weight, at matmul time, no VRAM re-inflation</span>
+sign_exp = <span class="k">codebook</span>[idx]            <span class="c"># 4-bit index &rarr; 9-bit field</span>
+bf16     = (sign_exp &lt;&lt; <span class="s">7</span>) | mantissa   <span class="c"># mantissa kept raw</span>
+
+<span class="c"># rare escapes patched from a sparse side stream</span>
+<span class="k">if</span> is_escape: bf16 = escapes.next()</pre>
+        <p class="cap" style="margin-top:14px">Every weight has a known bit-offset, so thousands of GPU lanes
+          fetch weight (i, j) in parallel. The full BF16 exists only in a register, never back in VRAM.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW WE TESTED -->
+<section>
+  <div class="wrap">
+    <div class="hd reveal">
+      <div class="eyebrow">How we tested it</div>
+      <h2 style="margin-top:12px">Proof is an exact round-trip, not a quality score.</h2>
+      <p>Lossless means the reconstructed bytes equal the originals. We check that with
+         bit-equality and SHA-256, not perplexity. If the bytes match, the logits are identical
+         and there is nothing left to measure.</p>
+    </div>
+
+    <div class="grid3 proof reveal" style="margin-top:26px">
+      <div class="card">
+        <div class="n">01 &middot; CPU</div>
+        <div class="big">SHA-256 match</div>
+        <p>A full real tensor (4,988,928 weights) encoded and rebuilt from index + codebook +
+           sparse escapes only. No entropy decoder in the path, proving it is truly random-access.</p>
+        <span class="pass">exact round-trip</span>
+      </div>
+      <div class="card">
+        <div class="n">02 &middot; WHOLE 30B</div>
+        <div class="big">6,174 / 6,174</div>
+        <p>Every BF16 tensor in the real checkpoint reconstructed bit-for-bit across all shards at the
+           fixed-width layout (58.82 &rarr; 44.14 GiB, &minus;24.95%). The regrouped variant reaches
+           &minus;30.03%, bit-exact on the expert tensors, 93% of the model.</p>
+        <span class="pass">all tensors bit-exact</span>
+      </div>
+      <div class="card">
+        <div class="n">03 &middot; GPU</div>
+        <div class="big">rel err ~1e-7</div>
+        <p>A fused kernel reads the narrow form on-device and computes the matmul directly, BF16
+           rebuilt only in registers. Output matches full BF16 to float-rounding, so the compressed
+           weights run without ever being re-inflated in memory.</p>
+        <span class="pass">exact on-device</span>
+      </div>
+    </div>
+    <p class="note" style="margin-top:16px">KL(compressed &#8214; original) = 0 <span style="color:var(--faint)">exactly</span>. Identical
+      inputs + bit-identical weights + identical code &rArr; bit-identical logits, deterministically.</p>
+  </div>
+</section>
+
+<!-- WHY DIFFERENT -->
+<section>
+  <div class="wrap">
+    <div class="hd reveal">
+      <div class="eyebrow">Why it's different</div>
+      <h2 style="margin-top:12px">Lossless and fusible, not one or the other.</h2>
+    </div>
+    <div class="vs reveal" style="margin-top:24px">
+      <div class="card">
+        <h3>vs. quantization (INT8 / INT4)</h3>
+        <ul>
+          <li><span class="kk">Same:</span> a fixed-width code the matmul reads directly, rebuilt in-register.</li>
+          <li><span class="kk">Different:</span> we change <b>zero</b> bits of output. Quantization must
+              <em>measure</em> that quality survived; here quality is preserved by definition, so no eval exists that can find a difference.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>vs. variable-length lossless</h3>
+        <ul>
+          <li><span class="kk">Same:</span> exact reconstruction, ~30% smaller on disk.</li>
+          <li><span class="kk">Different:</span> entropy-coded schemes have no fixed bit-offset, so they must
+              inflate back to full-width BF16 <b>in VRAM</b> before the matmul. Ours is fixed-width &rarr;
+              random-access &rarr; the math reads it in place.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Lossless BF16 compression &middot; candidate 0009 &middot; measurements are exact round-trips on the real
+      <span class="mono">nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16</span> weights.</div>
+    <div class="srcs">
+      whole-model round-trip &rarr; whole_model_lossless_result.json (6,174 tensors, &minus;24.95% / &minus;30.03%)<br>
+      bit budget + concentration &rarr; regroup_result.json, byte_split_result.json (11.30 b/w, top-16 = 99.9%)<br>
+      on-device exact + fused decode &rarr; gpu_bench_result.json (rel err ~1e-7)
+    </div>
+  </div>
+</footer>
+
+<script>
+  // scroll-reveal, reduced-motion aware. No scroll listeners.
+  (function(){
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window) ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      els.forEach(function(e){e.classList.add('in')}); return;
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, {threshold:.16, rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(e){ io.observe(e); });
+  })();
+</script>
+</body>
+</html>

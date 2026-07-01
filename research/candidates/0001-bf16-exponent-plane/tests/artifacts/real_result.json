@@ -1,0 +1,79 @@
+{
+  "shard": "model-00001-of-00013.safetensors",
+  "n_experts_sampled": 16,
+  "per_tensor_entropy_means": {
+    "up": {
+      "H_low": 7.9554,
+      "H_high": 2.9196,
+      "H_mag7": 1.9196,
+      "H_sign": 1.0
+    },
+    "down": {
+      "H_low": 7.954,
+      "H_high": 2.7308,
+      "H_mag7": 1.7308,
+      "H_sign": 1.0
+    }
+  },
+  "cross_expert_KL_bits": {
+    "up": {
+      "vs_expert0_mean_bits": 0.027268,
+      "vs_expert0_max_bits": 0.038054,
+      "vs_meanhist_max_bits": 0.091749
+    },
+    "down": {
+      "vs_expert0_mean_bits": 0.024483,
+      "vs_expert0_max_bits": 0.035395,
+      "vs_meanhist_max_bits": 0.091321
+    }
+  },
+  "rans_real_expert": {
+    "tensor": "backbone.layers.1.mixer.experts.0.up_proj.weight",
+    "numel": 4988928,
+    "mag7_roundtrip_exact": true,
+    "full_tensor_bytes_exact": true,
+    "rans_realized_bits_per_sym": 2.0164,
+    "mag7_entropy_bits": 1.9929,
+    "encode_sec": 1.0,
+    "decode_sec": 0.8,
+    "table_built_from_experts": 4
+  },
+  "headline_method": {
+    "up": {
+      "numel": 79822848,
+      "raw_bytes": 159645696,
+      "method_high_bytes(rANS-floor)": 29131286,
+      "method_low_bytes(raw)": 79822848,
+      "method_total_bytes": 108954134,
+      "method_ratio": 0.6825,
+      "fold_total_bytes": 108954170,
+      "nofold_total_bytes": 108954134
+    },
+    "down": {
+      "numel": 79822848,
+      "raw_bytes": 159645696,
+      "method_high_bytes(rANS-floor)": 27247087,
+      "method_low_bytes(raw)": 79822848,
+      "method_total_bytes": 107069935,
+      "method_ratio": 0.6707,
+      "fold_total_bytes": 107069959,
+      "nofold_total_bytes": 107069935
+    }
+  },
+  "zstd_baselines": {
+    "up": {
+      "zstd19_raw_interleaved_bytes": 124942259,
+      "zstd19_planes_bytes": 110288257,
+      "raw_bytes": 159645696,
+      "zstd19_raw_ratio": 0.7826,
+      "zstd19_planes_ratio": 0.6908
+    },
+    "down": {
+      "zstd19_raw_interleaved_bytes": 122670644,
+      "zstd19_planes_bytes": 107337618,
+      "raw_bytes": 159645696,
+      "zstd19_raw_ratio": 0.7684,
+      "zstd19_planes_ratio": 0.6723
+    }
+  }
+}

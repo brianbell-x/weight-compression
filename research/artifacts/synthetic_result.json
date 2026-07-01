@@ -1,0 +1,8 @@
+{
+  "tensors_checked": 38,
+  "all_exact": true,
+  "failures": [],
+  "rans_roundtrip_exact": true,
+  "rans_entropy_bits": 1.9194,
+  "rans_realized_bits_per_sym": 1.9196
+}

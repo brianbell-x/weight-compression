@@ -1,0 +1,67 @@
+{
+  "device": "NVIDIA GeForce RTX 4090",
+  "torch": "2.4.1+cu124",
+  "triton": "3.0.0",
+  "runs": [
+    {
+      "proj": "up",
+      "shape": [
+        1856,
+        2688
+      ],
+      "n_escape": 15312,
+      "lossless_on_gpu": true,
+      "fused_vs_ref_rel": 1.072e-07,
+      "latency_us": {
+        "fused_dense_kernel_only": 18.004,
+        "fused_total_incl_escape": 27.463,
+        "triton_bf16_twin_16b": 16.066,
+        "cublas_bf16": 14.961
+      },
+      "best_fused_cfg": {
+        "BLOCK": 256,
+        "num_warps": 1
+      },
+      "fused_total_over_twin": 1.709,
+      "fused_total_over_cublas": 1.836,
+      "ideal_bandwidth_ratio_12_over_16": 0.75
+    },
+    {
+      "proj": "down",
+      "shape": [
+        2688,
+        1856
+      ],
+      "n_escape": 8926,
+      "lossless_on_gpu": true,
+      "fused_vs_ref_rel": 1.642e-07,
+      "latency_us": {
+        "fused_dense_kernel_only": 17.835,
+        "fused_total_incl_escape": 27.264,
+        "triton_bf16_twin_16b": 15.294,
+        "cublas_bf16": 15.063
+      },
+      "best_fused_cfg": {
+        "BLOCK": 512,
+        "num_warps": 4
+      },
+      "fused_total_over_twin": 1.783,
+      "fused_total_over_cublas": 1.81,
+      "ideal_bandwidth_ratio_12_over_16": 0.75
+    }
+  ],
+  "bandwidth_bound_regime": {
+    "K": 64,
+    "weight_rows": 118784,
+    "read_MB_fused_12b": 478.9,
+    "read_MB_twin_16b": 638.6,
+    "us_fused": 507.56,
+    "us_twin": 671.39,
+    "us_cublas": 670.65,
+    "GBps_fused": 0.9,
+    "GBps_twin": 1.0,
+    "fused_over_twin": 0.756,
+    "fused_over_cublas": 0.757,
+    "ideal_ratio_12_over_16": 0.75
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "summary": {
+    "f32_tensor_count": 5,
+    "clean_tensor_count": 4,
+    "clean_fraction": 0.8,
+    "worst_nonzero_low16": 128,
+    "total_f32_bytes": 1536,
+    "bytes_saved_truncation": 512,
+    "all_clean_roundtrips_exact": true,
+    "any_clean_roundtrip_failed": false
+  },
+  "tensors": [
+    {
+      "shard": "model-00001-of-00013.safetensors",
+      "name": "backbone.layers.0.mixer.A_log",
+      "shape": [
+        64
+      ],
+      "numel": 64,
+      "bytes": 256,
+      "nonzero_low16": 0,
+      "clean": true,
+      "roundtrip_exact": true
+    },
+    {
+      "shard": "model-00001-of-00013.safetensors",
+      "name": "backbone.layers.0.mixer.D",
+      "shape": [
+        64
+      ],
+      "numel": 64,
+      "bytes": 256,
+      "nonzero_low16": 0,
+      "clean": true,
+      "roundtrip_exact": true
+    },
+    {
+      "shard": "model-00001-of-00013.safetensors",
+      "name": "backbone.layers.1.mixer.gate.e_score_correction_bias",
+      "shape": [
+        128
+      ],
+      "numel": 128,
+      "bytes": 512,
+      "nonzero_low16": 128,
+      "clean": false,
+      "roundtrip_exact": null
+    },
+    {
+      "shard": "model-00001-of-00013.safetensors",
+      "name": "backbone.layers.2.mixer.A_log",
+      "shape": [
+        64
+      ],
+      "numel": 64,
+      "bytes": 256,
+      "nonzero_low16": 0,
+      "clean": true,
+      "roundtrip_exact": true
+    },
+    {
+      "shard": "model-00001-of-00013.safetensors",
+      "name": "backbone.layers.2.mixer.D",
+      "shape": [
+        64
+      ],
+      "numel": 64,
+      "bytes": 256,
+      "nonzero_low16": 0,
+      "clean": true,
+      "roundtrip_exact": true
+    }
+  ]
+}

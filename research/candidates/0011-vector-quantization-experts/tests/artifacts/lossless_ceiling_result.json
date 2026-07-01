@@ -1,0 +1,50 @@
+[
+  {
+    "name": "expert_up",
+    "n": 4988928,
+    "H_value16": 10.6377,
+    "H_hi": 2.9929,
+    "H_lo": 7.9279,
+    "H_lo_given_hi": 7.6447,
+    "mutual_info_hi_lo": 0.2831,
+    "plane_sum": 10.9208,
+    "lzma_bpw_raw16": 11.4818,
+    "lzma_bpw_hi": 3.1364,
+    "lzma_bpw_lo": 7.8518,
+    "lzma_bpw_lo_delta": 7.8606,
+    "compounded_floor_bpw": 10.9882,
+    "pct_vs_16": 31.32
+  },
+  {
+    "name": "expert_down",
+    "n": 4988928,
+    "H_value16": 10.425,
+    "H_hi": 2.8196,
+    "H_lo": 7.9271,
+    "H_lo_given_hi": 7.6054,
+    "mutual_info_hi_lo": 0.3217,
+    "plane_sum": 10.7467,
+    "lzma_bpw_raw16": 11.3346,
+    "lzma_bpw_hi": 3.1239,
+    "lzma_bpw_lo": 8.0005,
+    "lzma_bpw_lo_delta": 8.0005,
+    "compounded_floor_bpw": 11.1239,
+    "pct_vs_16": 30.48
+  },
+  {
+    "name": "embeddings",
+    "n": 352321536,
+    "H_value16": 10.5621,
+    "H_hi": 2.7222,
+    "H_lo": 7.9712,
+    "H_lo_given_hi": 7.8399,
+    "mutual_info_hi_lo": 0.1313,
+    "plane_sum": 10.6934,
+    "lzma_bpw_raw16": 11.3367,
+    "lzma_bpw_hi": 2.9605,
+    "lzma_bpw_lo": 7.9993,
+    "lzma_bpw_lo_delta": 7.9995,
+    "compounded_floor_bpw": 10.9598,
+    "pct_vs_16": 31.5
+  }
+]

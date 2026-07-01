@@ -1,0 +1,8 @@
+budget=  90000 K=1 params=  66436 val[s0]=1.8566 val[s1]=1.8242 mean=1.8404 wall=79.7s
+budget=  90000 K=2 params=  88968 val[s0]=1.7527 val[s1]=1.8031 mean=1.7779 wall=87.6s
+budget=  90000 K=3 params= 111500 val[s0]=1.6531 val[s1]=1.8136 mean=1.7334 wall=111.6s
+budget=  90000 K=4 params= 134032 val[s0]=1.7552 val[s1]=1.7149 mean=1.7351 wall=110.1s
+budget=  90000 K=6 params= 179096 val[s0]=1.6340 val[s1]=1.6992 mean=1.6666 wall=115.6s
+budget=  90000 K=8 params= 224160 val[s0]=1.6769 val[s1]=1.6700 mean=1.6734 wall=134.0s
+budget= 180000 K=1 params=  88900 val[s0]=1.9172 val[s1]=1.8144 mean=1.8658 wall=144.5s
+budget= 180000 K=2 params= 133896 val[s0]=1.7265 val[s1]=1.7936 mean=1.7600 wall=134.9s

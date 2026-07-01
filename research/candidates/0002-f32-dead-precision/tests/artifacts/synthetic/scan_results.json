@@ -1,0 +1,98 @@
+{
+  "summary": {
+    "f32_tensor_count": 7,
+    "clean_tensor_count": 0,
+    "clean_fraction": 0.0,
+    "worst_nonzero_low16": 94,
+    "total_f32_bytes": 2336,
+    "bytes_saved_truncation": 0,
+    "all_clean_roundtrips_exact": true,
+    "any_clean_roundtrip_failed": false
+  },
+  "tensors": [
+    {
+      "shard": "model-00001-of-00002.safetensors",
+      "name": "backbone.layers.0.mixer.A_log",
+      "shape": [
+        96
+      ],
+      "numel": 96,
+      "bytes": 384,
+      "nonzero_low16": 90,
+      "clean": false,
+      "roundtrip_exact": null
+    },
+    {
+      "shard": "model-00001-of-00002.safetensors",
+      "name": "backbone.layers.0.mixer.D",
+      "shape": [
+        96
+      ],
+      "numel": 96,
+      "bytes": 384,
+      "nonzero_low16": 94,
+      "clean": false,
+      "roundtrip_exact": null
+    },
+    {
+      "shard": "model-00001-of-00002.safetensors",
+      "name": "backbone.layers.0.mixer.dt_bias",
+      "shape": [
+        96
+      ],
+      "numel": 96,
+      "bytes": 384,
+      "nonzero_low16": 94,
+      "clean": false,
+      "roundtrip_exact": null
+    },
+    {
+      "shard": "model-00001-of-00002.safetensors",
+      "name": "backbone.layers.1.mixer.gate.e_score_correction_bias",
+      "shape": [
+        8
+      ],
+      "numel": 8,
+      "bytes": 32,
+      "nonzero_low16": 6,
+      "clean": false,
+      "roundtrip_exact": null
+    },
+    {
+      "shard": "model-00002-of-00002.safetensors",
+      "name": "backbone.layers.3.mixer.A_log",
+      "shape": [
+        96
+      ],
+      "numel": 96,
+      "bytes": 384,
+      "nonzero_low16": 90,
+      "clean": false,
+      "roundtrip_exact": null
+    },
+    {
+      "shard": "model-00002-of-00002.safetensors",
+      "name": "backbone.layers.3.mixer.D",
+      "shape": [
+        96
+      ],
+      "numel": 96,
+      "bytes": 384,
+      "nonzero_low16": 94,
+      "clean": false,
+      "roundtrip_exact": null
+    },
+    {
+      "shard": "model-00002-of-00002.safetensors",
+      "name": "backbone.layers.3.mixer.dt_bias",
+      "shape": [
+        96
+      ],
+      "numel": 96,
+      "bytes": 384,
+      "nonzero_low16": 94,
+      "clean": false,
+      "roundtrip_exact": null
+    }
+  ]
+}

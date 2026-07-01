@@ -1,0 +1,26 @@
+# Python virtual env & caches
+.venv/
+.uv-cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Model weights & large binary artifacts (regenerable / exceed GitHub file limits)
+models/
+*.safetensors
+*.gguf
+*.bin
+*.pt
+*.pth
+*.npy
+*.npz
+
+# Logs & scratch
+logs/
+*.log
+
+# OS cruft
+.DS_Store
+Thumbs.db

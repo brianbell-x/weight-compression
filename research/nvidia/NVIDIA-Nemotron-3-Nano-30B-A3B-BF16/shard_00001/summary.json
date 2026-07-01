@@ -1,0 +1,57 @@
+{
+  "shard": "models\\nvidia\\NVIDIA-Nemotron-3-Nano-30B-A3B-BF16\\hf_snapshot\\model-00001-of-00013.safetensors",
+  "file_size": 4991205008,
+  "header_length": 55432,
+  "data_start": 55440,
+  "tensor_count": 434,
+  "dtype_counts": {
+    "F32": 5,
+    "BF16": 429
+  },
+  "group_bytes": {
+    "moe_routed_expert_down_proj": 2045460480,
+    "moe_routed_expert_up_proj": 2045460480,
+    "embedding": 704643072,
+    "mamba_in_proj": 110788608,
+    "mamba_out_proj": 44040192,
+    "moe_shared_expert_down_proj": 19955712,
+    "moe_shared_expert_up_proj": 19955712,
+    "moe_gate": 688640,
+    "mamba_conv1d": 122880,
+    "mamba_norm": 27136,
+    "moe_norm": 5376,
+    "mamba_A_log": 512,
+    "mamba_D": 512,
+    "mamba_dt_bias": 256
+  },
+  "block_bytes": {
+    "moe": 4131526400,
+    "global": 704643072,
+    "mamba": 154980096
+  },
+  "layer_bytes": {
+    "1": 2594936576,
+    "3": 1536589824,
+    "": 704643072,
+    "0": 77490048,
+    "2": 77490048
+  },
+  "same_shape_counts": {
+    "BF16 2688x1856": 205,
+    "BF16 1856x2688": 205,
+    "F32 64": 4,
+    "BF16 2688": 3,
+    "BF16 6144": 2,
+    "BF16 6144x1x4": 2,
+    "BF16 64": 2,
+    "BF16 10304x2688": 2,
+    "BF16 4096": 2,
+    "BF16 2688x4096": 2,
+    "F32 128": 1,
+    "BF16 131072x2688": 1,
+    "BF16 128x2688": 1,
+    "BF16 2688x3712": 1,
+    "BF16 3712x2688": 1
+  },
+  "exact_duplicate_tensor_groups": []
+}

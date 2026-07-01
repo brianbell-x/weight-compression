@@ -1,0 +1,373 @@
+{
+  "aggregate": {
+    "shard": "model-00001-of-00013.safetensors",
+    "tensors": 424,
+    "weights": 2495565824,
+    "baseline_fusible_bpw": 11.3,
+    "predictive_fusible_bpw": 11.1934,
+    "baseline_pct_vs16": 29.37,
+    "predictive_pct_vs16": 30.04
+  },
+  "per_tensor": [
+    {
+      "name": "backbone.embeddings.weight",
+      "sep_weight_bpw": 11.2042,
+      "base_weight_bpw": 11.2234,
+      "sep_esc": 0.0251
+    },
+    {
+      "name": "backbone.layers.0.mixer.conv1d.bias",
+      "sep_weight_bpw": 18.0013,
+      "base_weight_bpw": 12.0664,
+      "sep_esc": 0.0
+    },
+    {
+      "name": "backbone.layers.0.mixer.conv1d.weight",
+      "sep_weight_bpw": 13.3757,
+      "base_weight_bpw": 12.0264,
+      "sep_esc": 0.0468
+    },
+    {
+      "name": "backbone.layers.0.mixer.in_proj.weight",
+      "sep_weight_bpw": 11.2397,
+      "base_weight_bpw": 11.2803,
+      "sep_esc": 0.0295
+    },
+    {
+      "name": "backbone.layers.0.mixer.norm.weight",
+      "sep_weight_bpw": 18.002,
+      "base_weight_bpw": 12.0332,
+      "sep_esc": 0.0
+    },
+    {
+      "name": "backbone.layers.0.mixer.out_proj.weight",
+      "sep_weight_bpw": 11.2933,
+      "base_weight_bpw": 11.2778,
+      "sep_esc": 0.036
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.0.down_proj.weight",
+      "sep_weight_bpw": 11.1788,
+      "base_weight_bpw": 11.3274,
+      "sep_esc": 0.0214
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.0.up_proj.weight",
+      "sep_weight_bpw": 11.2078,
+      "base_weight_bpw": 11.5743,
+      "sep_esc": 0.0251
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.1.down_proj.weight",
+      "sep_weight_bpw": 11.182,
+      "base_weight_bpw": 11.1747,
+      "sep_esc": 0.0218
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.1.up_proj.weight",
+      "sep_weight_bpw": 11.2047,
+      "base_weight_bpw": 11.4207,
+      "sep_esc": 0.0247
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.10.down_proj.weight",
+      "sep_weight_bpw": 11.1811,
+      "base_weight_bpw": 11.1781,
+      "sep_esc": 0.0217
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.10.up_proj.weight",
+      "sep_weight_bpw": 11.2109,
+      "base_weight_bpw": 11.4046,
+      "sep_esc": 0.0255
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.100.down_proj.weight",
+      "sep_weight_bpw": 11.1807,
+      "base_weight_bpw": 11.2725,
+      "sep_esc": 0.0217
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.100.up_proj.weight",
+      "sep_weight_bpw": 11.2175,
+      "base_weight_bpw": 11.5051,
+      "sep_esc": 0.0263
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.101.down_proj.weight",
+      "sep_weight_bpw": 11.1808,
+      "base_weight_bpw": 11.1819,
+      "sep_esc": 0.0217
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.101.up_proj.weight",
+      "sep_weight_bpw": 11.2083,
+      "base_weight_bpw": 11.4324,
+      "sep_esc": 0.0251
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.102.down_proj.weight",
+      "sep_weight_bpw": 11.1816,
+      "base_weight_bpw": 11.2001,
+      "sep_esc": 0.0218
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.102.up_proj.weight",
+      "sep_weight_bpw": 11.2047,
+      "base_weight_bpw": 11.4272,
+      "sep_esc": 0.0247
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.103.down_proj.weight",
+      "sep_weight_bpw": 11.1815,
+      "base_weight_bpw": 11.1742,
+      "sep_esc": 0.0218
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.103.up_proj.weight",
+      "sep_weight_bpw": 11.2067,
+      "base_weight_bpw": 11.4279,
+      "sep_esc": 0.0249
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.104.down_proj.weight",
+      "sep_weight_bpw": 11.1812,
+      "base_weight_bpw": 11.1739,
+      "sep_esc": 0.0217
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.104.up_proj.weight",
+      "sep_weight_bpw": 11.1992,
+      "base_weight_bpw": 11.4202,
+      "sep_esc": 0.024
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.105.down_proj.weight",
+      "sep_weight_bpw": 11.1806,
+      "base_weight_bpw": 11.1777,
+      "sep_esc": 0.0217
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.105.up_proj.weight",
+      "sep_weight_bpw": 11.2076,
+      "base_weight_bpw": 11.428,
+      "sep_esc": 0.025
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.106.down_proj.weight",
+      "sep_weight_bpw": 11.1837,
+      "base_weight_bpw": 11.1934,
+      "sep_esc": 0.022
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.106.up_proj.weight",
+      "sep_weight_bpw": 11.209,
+      "base_weight_bpw": 11.4156,
+      "sep_esc": 0.0252
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.107.down_proj.weight",
+      "sep_weight_bpw": 11.1816,
+      "base_weight_bpw": 11.2045,
+      "sep_esc": 0.0218
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.107.up_proj.weight",
+      "sep_weight_bpw": 11.2094,
+      "base_weight_bpw": 11.4312,
+      "sep_esc": 0.0253
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.108.down_proj.weight",
+      "sep_weight_bpw": 11.1805,
+      "base_weight_bpw": 11.1732,
+      "sep_esc": 0.0217
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.108.up_proj.weight",
+      "sep_weight_bpw": 11.2033,
+      "base_weight_bpw": 11.4299,
+      "sep_esc": 0.0245
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.109.down_proj.weight",
+      "sep_weight_bpw": 11.1804,
+      "base_weight_bpw": 11.1774,
+      "sep_esc": 0.0216
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.109.up_proj.weight",
+      "sep_weight_bpw": 11.2088,
+      "base_weight_bpw": 11.4255,
+      "sep_esc": 0.0252
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.11.down_proj.weight",
+      "sep_weight_bpw": 11.18,
+      "base_weight_bpw": 11.2115,
+      "sep_esc": 0.0216
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.11.up_proj.weight",
+      "sep_weight_bpw": 11.2092,
+      "base_weight_bpw": 11.4559,
+      "sep_esc": 0.0252
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.110.down_proj.weight",
+      "sep_weight_bpw": 11.1816,
+      "base_weight_bpw": 11.2605,
+      "sep_esc": 0.0218
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.110.up_proj.weight",
+      "sep_weight_bpw": 11.2099,
+      "base_weight_bpw": 11.5086,
+      "sep_esc": 0.0253
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.111.down_proj.weight",
+      "sep_weight_bpw": 11.1823,
+      "base_weight_bpw": 11.1793,
+      "sep_esc": 0.0219
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.111.up_proj.weight",
+      "sep_weight_bpw": 11.2075,
+      "base_weight_bpw": 11.4276,
+      "sep_esc": 0.025
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.112.down_proj.weight",
+      "sep_weight_bpw": 11.1813,
+      "base_weight_bpw": 11.1913,
+      "sep_esc": 0.0218
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.112.up_proj.weight",
+      "sep_weight_bpw": 11.2053,
+      "base_weight_bpw": 11.441,
+      "sep_esc": 0.0247
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.113.down_proj.weight",
+      "sep_weight_bpw": 11.1821,
+      "base_weight_bpw": 11.1748,
+      "sep_esc": 0.0218
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.113.up_proj.weight",
+      "sep_weight_bpw": 11.2068,
+      "base_weight_bpw": 11.4183,
+      "sep_esc": 0.0249
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.114.down_proj.weight",
+      "sep_weight_bpw": 11.1823,
+      "base_weight_bpw": 11.2612,
+      "sep_esc": 0.0219
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.114.up_proj.weight",
+      "sep_weight_bpw": 11.2084,
+      "base_weight_bpw": 11.4895,
+      "sep_esc": 0.0251
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.115.down_proj.weight",
+      "sep_weight_bpw": 11.1805,
+      "base_weight_bpw": 11.1861,
+      "sep_esc": 0.0217
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.115.up_proj.weight",
+      "sep_weight_bpw": 11.2032,
+      "base_weight_bpw": 11.4439,
+      "sep_esc": 0.0245
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.116.down_proj.weight",
+      "sep_weight_bpw": 11.1742,
+      "base_weight_bpw": 11.3129,
+      "sep_esc": 0.0209
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.116.up_proj.weight",
+      "sep_weight_bpw": 11.2171,
+      "base_weight_bpw": 11.6808,
+      "sep_esc": 0.0262
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.117.down_proj.weight",
+      "sep_weight_bpw": 11.1814,
+      "base_weight_bpw": 11.2,
+      "sep_esc": 0.0218
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.117.up_proj.weight",
+      "sep_weight_bpw": 11.2111,
+      "base_weight_bpw": 11.4273,
+      "sep_esc": 0.0255
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.118.down_proj.weight",
+      "sep_weight_bpw": 11.1805,
+      "base_weight_bpw": 11.1732,
+      "sep_esc": 0.0216
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.118.up_proj.weight",
+      "sep_weight_bpw": 11.2023,
+      "base_weight_bpw": 11.4222,
+      "sep_esc": 0.0244
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.119.down_proj.weight",
+      "sep_weight_bpw": 11.182,
+      "base_weight_bpw": 11.1876,
+      "sep_esc": 0.0218
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.119.up_proj.weight",
+      "sep_weight_bpw": 11.2049,
+      "base_weight_bpw": 11.4347,
+      "sep_esc": 0.0247
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.12.down_proj.weight",
+      "sep_weight_bpw": 11.1818,
+      "base_weight_bpw": 11.1874,
+      "sep_esc": 0.0218
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.12.up_proj.weight",
+      "sep_weight_bpw": 11.2038,
+      "base_weight_bpw": 11.4261,
+      "sep_esc": 0.0246
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.120.down_proj.weight",
+      "sep_weight_bpw": 11.1805,
+      "base_weight_bpw": 11.2206,
+      "sep_esc": 0.0216
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.120.up_proj.weight",
+      "sep_weight_bpw": 11.2109,
+      "base_weight_bpw": 11.4727,
+      "sep_esc": 0.0255
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.121.down_proj.weight",
+      "sep_weight_bpw": 11.1826,
+      "base_weight_bpw": 11.1839,
+      "sep_esc": 0.0219
+    },
+    {
+      "name": "backbone.layers.1.mixer.experts.121.up_proj.weight",
+      "sep_weight_bpw": 11.2077,
+      "base_weight_bpw": 11.4268,
+      "sep_esc": 0.025
+    }
+  ]
+}

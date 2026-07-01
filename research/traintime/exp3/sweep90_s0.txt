@@ -1,0 +1,9 @@
+b=  90000 K=16 w2r=None H=  542(1.54x) kact= 542 sp=1.00 params= 133884 val=1.8183 (1.8183) dense=1.6832 gap=+0.1351 48s
+b=  90000 K=16 w2r=None H=  542(1.54x) kact= 271 sp=0.50 params= 133884 val=1.8212 (1.8212) dense=1.6832 gap=+0.1380 60s
+b=  90000 K=16 w2r=None H=  542(1.54x) kact=  65 sp=0.12 params= 133884 val=1.7588 (1.7588) dense=1.6832 gap=+0.0756 48s
+b=  90000 K=16 w2r=None H=  542(1.54x) kact=  16 sp=0.03 params= 133884 val=1.7876 (1.7876) dense=1.6832 gap=+0.1044 45s
+b=  90000 K=16 w2r=   8 H= 1736(4.93x) kact=1736 sp=1.00 params= 133904 val=1.9471 (1.9471) dense=1.6832 gap=+0.2639 44s
+b=  90000 K=16 w2r=   8 H= 1736(4.93x) kact= 868 sp=0.50 params= 133904 val=1.9511 (1.9511) dense=1.6832 gap=+0.2679 134s
+b=  90000 K=16 w2r=   8 H= 1736(4.93x) kact= 208 sp=0.12 params= 133904 val=1.9028 (1.9028) dense=1.6832 gap=+0.2196 88s
+b=  90000 K=16 w2r=   8 H= 1736(4.93x) kact=  52 sp=0.03 params= 133904 val=1.9119 (1.9119) dense=1.6832 gap=+0.2287 83s
+b=  90000 K= 8 w2r=   4 H= 3398(9.65x) kact=3398 sp=1.00 params= 133916 val=2.0591 (2.0591) dense=1.6832 gap=+0.3759 63s

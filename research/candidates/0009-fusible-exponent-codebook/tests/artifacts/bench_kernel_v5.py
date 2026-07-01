@@ -1,0 +1,102 @@
+"""H100 kernel fix v5: WIDE coalesced loads (8 cols/lane: idx uint32, low int64).
+Probe whether wide loads restore near-peak bandwidth on the fused 1.5-b/w read.
+k_load_wide isolates load throughput (no LUT); k_oct is the full dequant matvec."""
+import json, numpy as np, torch, triton
+import triton.language as tl
+DEV = "cuda"; SAMPLE = "/workspace/gpu_sample.npz"
+
+
+@triton.jit
+def k_bf16(y, w, x, R, C, BLOCK: tl.constexpr):
+    r = tl.program_id(0); base = r.to(tl.int64)*C; acc = 0.0
+    for t in range(tl.cdiv(C, BLOCK)):
+        c = t*BLOCK + tl.arange(0, BLOCK); m = c < C
+        wv = tl.load(w+base+c, mask=m, other=0.0).to(tl.float32)
+        acc += tl.sum(tl.where(m, wv*tl.load(x+c, mask=m, other=0.0), 0.0))
+    tl.store(y+r, acc)
+
+
+@triton.jit
+def k_load_wide(y, idx32, low64, x, R, C, BLOCK: tl.constexpr):
+    # 8 cols/lane, wide coalesced loads, NO LUT (value = low byte). Throughput probe.
+    r = tl.program_id(0); Q = C // 8; b = r.to(tl.int64)*Q; acc = 0.0
+    for t in range(tl.cdiv(Q, BLOCK)):
+        j = t*BLOCK + tl.arange(0, BLOCK); mj = j < Q
+        pw = tl.load(idx32+b+j, mask=mj, other=0).to(tl.int64)
+        lw = tl.load(low64+b+j, mask=mj, other=0)
+        for s in tl.static_range(8):
+            lo = ((lw >> (8*s)) & 0xFF).to(tl.float32) + ((pw >> (4*s)) & 0xF).to(tl.float32)
+            cc = 8*j + s
+            acc += tl.sum(tl.where(cc < C, lo*tl.load(x+cc, mask=cc < C, other=0.0), 0.0))
+    tl.store(y+r, acc)
+
+
+@triton.jit
+def k_oct(y, idx32, low64, cb, x, R, C, BLOCK: tl.constexpr):
+    r = tl.program_id(0); Q = C // 8; b = r.to(tl.int64)*Q; acc = 0.0
+    for t in range(tl.cdiv(Q, BLOCK)):
+        j = t*BLOCK + tl.arange(0, BLOCK); mj = j < Q
+        pw = tl.load(idx32+b+j, mask=mj, other=0).to(tl.int64)
+        lw = tl.load(low64+b+j, mask=mj, other=0)
+        for s in tl.static_range(8):
+            nib = ((pw >> (4*s)) & 0xF).to(tl.int32)
+            lo = ((lw >> (8*s)) & 0xFF).to(tl.int32)
+            hi = tl.load(cb+nib, mask=mj, other=0).to(tl.int32)
+            w = ((hi << 8) | lo).to(tl.uint16).to(tl.bfloat16, bitcast=True).to(tl.float32)
+            cc = 8*j + s
+            acc += tl.sum(tl.where(cc < C, w*tl.load(x+cc, mask=cc < C, other=0.0), 0.0))
+    tl.store(y+r, acc)
+
+
+def cuda_time(fn, iters=80, warm=20):
+    for _ in range(warm): fn()
+    torch.cuda.synchronize(); s = torch.cuda.Event(True); e = torch.cuda.Event(True)
+    s.record()
+    for _ in range(iters): fn()
+    e.record(); torch.cuda.synchronize(); return s.elapsed_time(e)/iters
+
+
+def best(mk, cfgs):
+    b = 1e9; bc = None
+    for B, w in cfgs:
+        try:
+            t = cuda_time(mk(B, w))
+            if t < b: b, bc = t, (B, w)
+        except Exception:
+            pass
+    return b, bc
+
+
+def main(K=370):
+    npz = np.load(SAMPLE); g = lambda k: npz["up__"+k]
+    R0, C = [int(v) for v in g("shape")]; R = R0*K
+    assert C % 8 == 0
+    cb16 = np.zeros(16, np.uint8); cbk = g("codebook").astype(np.uint8); cb16[:15] = cbk; cb16[15] = cbk[0]
+    idxp_np = np.tile(g("idx_packed").astype(np.uint8), K)     # C/2 bytes/row
+    low_np = np.tile(g("low").astype(np.uint8), K)             # C bytes/row
+    idx32 = torch.from_numpy(idxp_np.view(np.uint32)).to(DEV)  # C/8 u32/row
+    low64 = torch.from_numpy(low_np.view(np.int64)).to(DEV)    # C/8 i64/row
+    cb = torch.from_numpy(cb16).to(DEV)
+    W = torch.from_numpy(g("raw_u16").view(np.int16)).to(DEV).view(torch.bfloat16).reshape(R0, C).repeat(K, 1)
+    x = torch.randn(C, device=DEV, dtype=torch.float32)
+    y = torch.empty(R, device=DEV, dtype=torch.float32); grid = (R,)
+    cfgs = [(128, 2), (256, 4), (512, 8), (256, 2), (512, 4), (1024, 8)]
+    wbytes = R*C
+    tb, cbb = best(lambda B, w: (lambda: k_bf16[grid](y, W, x, R, C, BLOCK=B, num_warps=w)), cfgs)
+    tl_, cl = best(lambda B, w: (lambda: k_load_wide[grid](y, idx32, low64, x, R, C, BLOCK=B, num_warps=w)), cfgs)
+    to, co = best(lambda B, w: (lambda: k_oct[grid](y, idx32, low64, cb, x, R, C, BLOCK=B, num_warps=w)), cfgs)
+    yo = torch.empty(R, device=DEV, dtype=torch.float32); yb = torch.empty(R, device=DEV, dtype=torch.float32)
+    k_oct[grid](yo, idx32, low64, cb, x, R, C, BLOCK=256, num_warps=4)
+    k_bf16[grid](yb, W, x, R, C, BLOCK=256, num_warps=4)
+    rel = ((yo-yb).abs().max()/(yb.abs().max()+1e-9)).item()
+    out = {"gpu": torch.cuda.get_device_name(0), "K": K,
+           "us": {"bf16": round(tb*1000, 1), "load_wide": round(tl_*1000, 1), "oct": round(to*1000, 1)},
+           "GBps": {"bf16": round(2*wbytes/(tb*1e9), 2), "load_wide": round(1.5*wbytes/(tl_*1e9), 2), "oct": round(1.5*wbytes/(to*1e9), 2)},
+           "ratio_vs_bf16": {"load_wide": round(tl_/tb, 3), "oct": round(to/tb, 3), "ideal": 0.75},
+           "best_cfg": {"bf16": cbb, "load_wide": cl, "oct": co},
+           "oct_rel_err": float(f"{rel:.2e}")}
+    print(json.dumps(out, indent=2)); open("/workspace/kernel_v5_result.json", "w").write(json.dumps(out, indent=2))
+
+
+if __name__ == "__main__":
+    import sys; main(int(sys.argv[1]) if len(sys.argv) > 1 else 370)

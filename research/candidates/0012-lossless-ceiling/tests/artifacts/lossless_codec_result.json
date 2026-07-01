@@ -1,0 +1,56 @@
+[
+  {
+    "n": 4988928,
+    "orig_bytes": 9977856,
+    "comp_bytes": 6691121,
+    "ratio_pct": 32.94,
+    "roundtrip_exact": true,
+    "exp_compressor": "brotli11",
+    "exp_bpw": 2.7296,
+    "exp_all_bpw": {
+      "lzma9e": 2.9682,
+      "brotli11": 2.7296,
+      "bz2": 3.1257
+    },
+    "sign_bpw": 1.0,
+    "mant_bpw_packed7": 7.0,
+    "mant_strongest_bpw": 6.8402,
+    "name": "expert_up"
+  },
+  {
+    "n": 4988928,
+    "orig_bytes": 9977856,
+    "comp_bytes": 6674294,
+    "ratio_pct": 33.11,
+    "roundtrip_exact": true,
+    "exp_compressor": "brotli11",
+    "exp_bpw": 2.7026,
+    "exp_all_bpw": {
+      "lzma9e": 2.9297,
+      "brotli11": 2.7026,
+      "bz2": 3.118
+    },
+    "sign_bpw": 1.0,
+    "mant_bpw_packed7": 7.0,
+    "mant_strongest_bpw": 6.9702,
+    "name": "expert_down"
+  },
+  {
+    "n": 352321536,
+    "orig_bytes": 704643072,
+    "comp_bytes": 466928350,
+    "ratio_pct": 33.74,
+    "roundtrip_exact": true,
+    "exp_compressor": "brotli11",
+    "exp_bpw": 2.6023,
+    "exp_all_bpw": {
+      "lzma9e": 2.8324,
+      "brotli11": 2.6023,
+      "bz2": 3.0313
+    },
+    "sign_bpw": 1.0,
+    "mant_bpw_packed7": 7.0,
+    "mant_strongest_bpw": 6.9989,
+    "name": "embeddings"
+  }
+]

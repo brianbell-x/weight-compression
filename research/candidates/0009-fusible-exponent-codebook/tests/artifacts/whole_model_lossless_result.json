@@ -1,0 +1,23 @@
+{
+  "ALL_BF16_TENSORS_LOSSLESS": true,
+  "n_bf16_tensors": 6174,
+  "n_expert_tensors": 5888,
+  "total_escapes": 11655479,
+  "model_GB": {
+    "total_raw": 58.819,
+    "bf16": 58.818,
+    "experts": 54.715,
+    "non_bf16_other": 0.0
+  },
+  "expert_share_of_model_pct": 93.0,
+  "byte_split_K15_12bw": {
+    "compressed_model_GB": 44.143,
+    "whole_model_reduction_pct": 24.95,
+    "expert_only_reduction_pct": 24.95
+  },
+  "regroup_K15_11p3bw": {
+    "compressed_model_GB": 41.155,
+    "whole_model_reduction_pct": 30.03,
+    "expert_only_reduction_pct": 30.04
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "agg": {
+    "sampled_tensors": 11,
+    "numel_wt_mant_brotli_bpw": 6.9875,
+    "vs_raw7_saving_pct_of_model": 0.078
+  },
+  "per_tensor": [
+    {
+      "n": 8000000,
+      "mant_brotli_bpw": 7.0003,
+      "H_mant": 6.9721,
+      "H_mant_given_exp": 6.9326,
+      "cond_saving_b": 0.0395,
+      "H_mant_small_mag": 6.9989,
+      "H_mant_large_mag": 6.9269,
+      "small_frac": 0.4234,
+      "name": "backbone.embeddings.weight"
+    },
+    {
+      "n": 8000000,
+      "mant_brotli_bpw": 7.0003,
+      "H_mant": 6.9724,
+      "H_mant_given_exp": 6.9243,
+      "cond_saving_b": 0.0481,
+      "H_mant_small_mag": 6.9995,
+      "H_mant_large_mag": 6.9493,
+      "small_frac": 0.2667,
+      "name": "backbone.layers.0.mixer.in_proj.weight"
+    },
+    {
+      "n": 8000000,
+      "mant_brotli_bpw": 7.0002,
+      "H_mant": 6.9723,
+      "H_mant_given_exp": 6.9336,
+      "cond_saving_b": 0.0387,
+      "H_mant_small_mag": 6.9994,
+      "H_mant_large_mag": 6.9457,
+      "small_frac": 0.3004,
+      "name": "backbone.layers.0.mixer.out_proj.weight"
+    },
+    {
+      "n": 4988928,
+      "mant_brotli_bpw": 6.9702,
+      "H_mant": 6.9424,
+      "H_mant_given_exp": 6.7623,
+      "cond_saving_b": 0.1801,
+      "H_mant_small_mag": 6.8287,
+      "H_mant_large_mag": 6.9443,
+      "small_frac": 0.3127,
+      "name": "backbone.layers.1.mixer.experts.0.down_proj.weight"
+    },
+    {
+      "n": 4988928,
+      "mant_brotli_bpw": 6.8402,
+      "H_mant": 6.9422,
+      "H_mant_given_exp": 6.7681,
+      "cond_saving_b": 0.1741,
+      "H_mant_small_mag": 6.876,
+      "H_mant_large_mag": 6.9377,
+      "small_frac": 0.3937,
+      "name": "backbone.layers.1.mixer.experts.0.up_proj.weight"
+    },
+    {
+      "n": 4988928,
+      "mant_brotli_bpw": 7.0002,
+      "H_mant": 6.972,
+      "H_mant_given_exp": 6.9195,
+      "cond_saving_b": 0.0525,
+      "H_mant_small_mag": 6.9993,
+      "H_mant_large_mag": 6.9444,
+      "small_frac": 0.2954,
+      "name": "backbone.layers.1.mixer.experts.1.down_proj.weight"
+    },
+    {
+      "n": 4988928,
+      "mant_brotli_bpw": 7.0003,
+      "H_mant": 6.9722,
+      "H_mant_given_exp": 6.9292,
+      "cond_saving_b": 0.043,
+      "H_mant_small_mag": 6.9983,
+      "H_mant_large_mag": 6.9352,
+      "small_frac": 0.4023,
+      "name": "backbone.layers.1.mixer.experts.1.up_proj.weight"
+    },
+    {
+      "n": 8000000,
+      "mant_brotli_bpw": 7.0002,
+      "H_mant": 6.9722,
+      "H_mant_given_exp": 6.9217,
+      "cond_saving_b": 0.0505,
+      "H_mant_small_mag": 6.9994,
+      "H_mant_large_mag": 6.9442,
+      "small_frac": 0.3024,
+      "name": "backbone.layers.1.mixer.shared_experts.down_proj.weight"
+    },
+    {
+      "n": 8000000,
+      "mant_brotli_bpw": 6.9979,
+      "H_mant": 6.9724,
+      "H_mant_given_exp": 6.9269,
+      "cond_saving_b": 0.0455,
+      "H_mant_small_mag": 6.9988,
+      "H_mant_large_mag": 6.9354,
+      "small_frac": 0.3882,
+      "name": "backbone.layers.1.mixer.shared_experts.up_proj.weight"
+    },
+    {
+      "n": 8000000,
+      "mant_brotli_bpw": 7.0003,
+      "H_mant": 6.9722,
+      "H_mant_given_exp": 6.926,
+      "cond_saving_b": 0.0463,
+      "H_mant_small_mag": 6.9995,
+      "H_mant_large_mag": 6.9484,
+      "small_frac": 0.2716,
+      "name": "backbone.layers.2.mixer.in_proj.weight"
+    },
+    {
+      "n": 8000000,
+      "mant_brotli_bpw": 7.0002,
+      "H_mant": 6.9725,
+      "H_mant_given_exp": 6.9313,
+      "cond_saving_b": 0.0411,
+      "H_mant_small_mag": 6.9994,
+      "H_mant_large_mag": 6.9477,
+      "small_frac": 0.2878,
+      "name": "backbone.layers.2.mixer.out_proj.weight"
+    }
+  ]
+}

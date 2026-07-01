@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nemotron Compression Breakdown</title>
+  <style>
+    :root{--bg:#11110f;--paper:#191916;--ink:#efeee8;--muted:#aaa89f;--line:#302f2a;--focus:#e6bd63;--related:#83bdd8;--watch:#94c283;--info:#b7a5d8;--code:#22221f}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 Inter,"SF Pro Text","Segoe UI",Arial,sans-serif}body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='52' viewBox='0 0 52 52'%3E%3Cpath d='M52 0H0v52' fill='none' stroke='%23302f2a'/%3E%3C/svg%3E");opacity:.35}
+    main{position:relative;max-width:1180px;margin:auto;padding:32px 22px 80px}h1,h2,h3{letter-spacing:0;margin:0;color:var(--ink)}h1{max-width:980px;font:650 clamp(3rem,8vw,7.8rem)/.92 Georgia,serif}h2{font:650 clamp(1.9rem,4vw,3.6rem)/1 Georgia,serif;margin-bottom:18px}h3{font-size:1.05rem;margin:24px 0 8px}p{margin:0 0 14px}.lead{max-width:760px;color:#d2d0c8;font-size:1.18rem}code{font-family:"SF Mono",Consolas,monospace;background:var(--code);border:1px solid var(--line);border-radius:4px;padding:.12rem .3rem}pre{overflow:auto;background:#050505;border:1px solid var(--line);border-radius:8px;padding:16px;color:#efeee8}table{width:100%;border-collapse:collapse;margin:14px 0 22px}th,td{padding:11px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--muted);font-size:.76rem;text-transform:uppercase;letter-spacing:.06em}
+    .hero{min-height:86vh;display:grid;align-content:center;gap:30px}.section{padding:78px 0;border-top:1px solid var(--line)}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card,.toc{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:22px}.span-3{grid-column:span 3}.span-4{grid-column:span 4}.span-6{grid-column:span 6}.span-8{grid-column:span 8}.span-9{grid-column:span 9}.span-12{grid-column:span 12}.metric{font:650 2.2rem/1 Georgia,serif}.label{color:var(--muted);font-size:.88rem;margin-top:6px}.toc{position:sticky;top:18px;align-self:start}.toc a{display:block;color:var(--muted);text-decoration:none;padding:8px 0;border-bottom:1px solid var(--line)}.toc a:hover{color:var(--ink)}
+    .tag{display:inline-flex;width:max-content;border-radius:999px;padding:7px 10px;font:750 .72rem/1 "SF Mono",Consolas,monospace;text-transform:uppercase;letter-spacing:.06em}.focus{background:#35280f;color:var(--focus)}.related{background:#112b36;color:var(--related)}.watch{background:#172c16;color:var(--watch)}.info{background:#251d35;color:var(--info)}.pillrow{display:flex;gap:10px;flex-wrap:wrap}.callout{border-left:3px solid var(--focus);padding:4px 0 4px 18px;color:#d2d0c8}.layers{display:grid;grid-template-columns:repeat(26,1fr);gap:4px;margin:16px 0}.layer{height:34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:4px;font:750 .72rem "SF Mono",Consolas,monospace}.m{background:#112b36;color:var(--related)}.e{background:#172c16;color:var(--watch)}.a{background:#35280f;color:var(--focus)}
+    @media(max-width:860px){main{padding:22px 15px 58px}.hero{min-height:auto;padding:70px 0}.grid{display:block}.card,.toc{margin:12px 0}.toc{position:static}.layers{grid-template-columns:repeat(13,1fr)}table{font-size:.86rem}th,td{padding:8px 6px}}
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <span class="tag focus">This is your area of focus</span>
+    <h1>Nemotron, explained only for compression work.</h1>
+    <p class="lead">This page filters the model down to what we need for lossless parameter compression: how weights are stored, shaped, typed, grouped, loaded, and eventually used.</p>
+    <div class="pillrow">
+      <span class="tag focus">MoE experts matter most</span>
+      <span class="tag related">Mamba explains structure</span>
+      <span class="tag watch">Attention matters later</span>
+      <span class="tag info">Prompting is background</span>
+    </div>
+    <div class="grid">
+      <div class="card span-3"><div class="metric">6,243</div><div class="label">tensors in the index</div></div>
+      <div class="card span-3"><div class="metric">13</div><div class="label">full weight shards</div></div>
+      <div class="card span-3"><div class="metric">63.16 GB</div><div class="label">reported tensor payload</div></div>
+      <div class="card span-3"><div class="metric">1 / 13</div><div class="label">local shards available</div></div>
+    </div>
+  </section>
+
+  <section class="section grid" id="map">
+    <aside class="toc span-3">
+      <a href="#labels">Labels</a><a href="#terms">Terms</a><a href="#files">Files</a><a href="#architecture">Architecture</a><a href="#moe">MoE</a><a href="#mamba">Mamba</a><a href="#attention">Attention</a><a href="#loading">Loading</a><a href="#next">Next</a>
+    </aside>
+    <div class="span-9">
+      <h2 id="labels">The filter</h2>
+      <table>
+        <tr><th>Label</th><th>Meaning</th></tr>
+        <tr><td><span class="tag focus">Area of focus</span></td><td>Directly affects compression, exact reconstruction, loading, or measurement.</td></tr>
+        <tr><td><span class="tag related">Related because</span></td><td>Explains why the weights have a certain shape or usage pattern.</td></tr>
+        <tr><td><span class="tag watch">Keep an eye on this</span></td><td>Could matter when moving from file compression to runtime memory or compute.</td></tr>
+        <tr><td><span class="tag info">Informational</span></td><td>Good context, but not worth deep study yet.</td></tr>
+      </table>
+      <p class="callout">The job is not to learn every LLM concept. The job is to understand enough structure to make exact, reversible compression decisions.</p>
+    </div>
+  </section>
+
+  <section class="section" id="terms">
+    <span class="tag focus">This is your area of focus</span>
+    <h2>Terms you actually need</h2>
+    <div class="grid">
+      <div class="card span-4"><h3>Parameter</h3><p>One learned number. Most are <code>BF16</code>, so usually 2 bytes each. Compression must preserve these exactly.</p></div>
+      <div class="card span-4"><h3>Tensor</h3><p>A named block of parameters with shape and dtype, like <code>backbone.embeddings.weight</code>.</p></div>
+      <div class="card span-4"><h3>Shape</h3><p>The dimensions of a tensor. Shape decides whether row, column, tile, or expert-level transforms make sense.</p></div>
+      <div class="card span-4"><h3>Dtype</h3><p>The storage format. <code>BF16</code> has two bytes per value, and each byte may compress differently.</p></div>
+      <div class="card span-4"><h3>Hidden size</h3><p>The internal token-vector width. Here it is <code>2688</code>, so many matrices connect to 2,688-wide vectors.</p></div>
+      <div class="card span-4"><h3>Expert</h3><p>A feed-forward block inside MoE. Experts dominate storage and are the first serious compression surface.</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="files">
+    <span class="tag focus">This is your area of focus</span>
+    <h2>Files that matter</h2>
+    <table>
+      <tr><th>File</th><th>Why we care</th></tr>
+      <tr><td><code>config.json</code></td><td>Dimensions, layer count, layer pattern, dtype, and MoE settings.</td></tr>
+      <tr><td><code>modeling_nemotron_h.py</code></td><td>Shows how tensors are used by Mamba, MoE, attention, and the LM head.</td></tr>
+      <tr><td><code>model.safetensors.index.json</code></td><td>Maps every tensor name to a shard. This is our first manifest source.</td></tr>
+      <tr><td><code>model-00001-of-00013.safetensors</code></td><td>First real shard. Lets us inspect actual tensor bytes, shapes, and dtypes.</td></tr>
+      <tr><td><code>tokenizer.json</code></td><td>Needed to run the model; not central to weight compression.</td></tr>
+    </table>
+    <p class="callout">Safetensors is useful because it exposes named tensors and metadata without forcing the whole model into memory.</p>
+  </section>
+
+  <section class="section" id="architecture">
+    <span class="tag focus">This is your area of focus</span>
+    <h2>Architecture numbers</h2>
+    <table>
+      <tr><th>Setting</th><th>Value</th><th>Why it matters</th></tr>
+      <tr><td>Stored dtype</td><td><code>bfloat16</code></td><td>Most values are 2 bytes.</td></tr>
+      <tr><td>Hidden size</td><td><code>2688</code></td><td>Main internal vector width.</td></tr>
+      <tr><td>Vocabulary size</td><td><code>131072</code></td><td>Drives embedding and LM head size.</td></tr>
+      <tr><td>Layers</td><td><code>52</code></td><td>Repeated structure to compare.</td></tr>
+      <tr><td>MoE layers</td><td><code>23</code></td><td>Main storage cost.</td></tr>
+      <tr><td>Mamba layers</td><td><code>23</code></td><td>Dense regular tensors.</td></tr>
+      <tr><td>Attention layers</td><td><code>6</code></td><td>Lower file priority, higher runtime-cache relevance.</td></tr>
+      <tr><td>Routed experts per MoE layer</td><td><code>128</code></td><td>Huge repeated expert population.</td></tr>
+      <tr><td>Experts active per token</td><td><code>6</code></td><td>Explains active-vs-stored size gap.</td></tr>
+    </table>
+    <pre>MEMEM*EMEMEM*EMEMEM*EMEMEM*EMEMEM*EMEMEMEM*EMEMEMEME</pre>
+    <div class="layers">
+      <div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer a">A</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer a">A</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer a">A</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer a">A</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer a">A</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer a">A</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div><div class="layer m">M</div><div class="layer e">E</div>
+    </div>
+  </section>
+
+  <section class="section" id="moe">
+    <span class="tag focus">This is your area of focus</span>
+    <h2>MoE is the main target</h2>
+    <p>MoE means Mixture of Experts. Each MoE layer has 128 routed experts, 1 shared expert, a router gate, and a norm. The router chooses 6 routed experts per token, but every expert still has to be stored exactly.</p>
+    <table>
+      <tr><th>Tensor pattern</th><th>Dtype</th><th>Shape</th></tr>
+      <tr><td><code>mixer.experts.N.up_proj.weight</code></td><td>BF16</td><td><code>[1856, 2688]</code></td></tr>
+      <tr><td><code>mixer.experts.N.down_proj.weight</code></td><td>BF16</td><td><code>[2688, 1856]</code></td></tr>
+      <tr><td><code>mixer.shared_experts.up_proj.weight</code></td><td>BF16</td><td><code>[3712, 2688]</code></td></tr>
+      <tr><td><code>mixer.shared_experts.down_proj.weight</code></td><td>BF16</td><td><code>[2688, 3712]</code></td></tr>
+      <tr><td><code>mixer.gate.weight</code></td><td>BF16</td><td><code>[128, 2688]</code></td></tr>
+    </table>
+    <p class="callout">Layer 1 alone takes <code>2,594,936,576</code> bytes. This is why MoE experts are the first serious compression surface.</p>
+  </section>
+
+  <section class="section grid" id="mamba">
+    <div class="span-6">
+      <span class="tag related">Related because</span>
+      <h2>Mamba explains regular dense structure</h2>
+      <p>Mamba2 layers are much smaller than MoE layers, but they are clean dense matrices. They are good early probes for BF16 byte statistics, row deltas, column deltas, and exact chunk compression.</p>
+    </div>
+    <div class="card span-6">
+      <h3>Verified layer 0</h3>
+      <p><code>in_proj.weight</code>: <code>[10304, 2688]</code></p>
+      <p><code>conv1d.weight</code>: <code>[6144, 1, 4]</code></p>
+      <p><code>out_proj.weight</code>: <code>[2688, 4096]</code></p>
+      <p>Total with norm: <code>77,490,048</code> bytes.</p>
+    </div>
+  </section>
+
+  <section class="section grid" id="attention">
+    <div class="span-6">
+      <span class="tag watch">Keep an eye on this</span>
+      <h2>Attention matters more later</h2>
+      <p>Attention is not the storage bottleneck here. It matters for runtime memory because generation stores a key/value cache that grows with context length.</p>
+    </div>
+    <div class="card span-6">
+      <h3>Expected shapes</h3>
+      <p><code>q_proj.weight</code>: <code>[4096, 2688]</code></p>
+      <p><code>k_proj.weight</code>: <code>[256, 2688]</code></p>
+      <p><code>v_proj.weight</code>: <code>[256, 2688]</code></p>
+      <p><code>o_proj.weight</code>: <code>[2688, 4096]</code></p>
+    </div>
+  </section>
+
+  <section class="section" id="loading">
+    <span class="tag focus">This is your area of focus</span>
+    <h2>Loading path</h2>
+    <pre>read config.json
+  -> load custom NemotronH config
+  -> load custom NemotronH model code
+  -> read model.safetensors.index.json
+  -> map tensor names to shard files
+  -> load tensors into matching parameters</pre>
+    <p>Local config and tokenizer loading work. Full model construction is blocked by missing <code>mamba-ssm</code>, and full weight loading is blocked by missing shards 2 through 13.</p>
+  </section>
+
+  <section class="section" id="next">
+    <span class="tag focus">This is your area of focus</span>
+    <h2>Next artifact: tensor manifest</h2>
+    <p>The next step is a manifest with tensor name, shard, shape, dtype, byte count, layer number, block type, expert ID, projection type, and hash when local bytes exist.</p>
+    <table>
+      <tr><th>First experiments</th><th>Purpose</th></tr>
+      <tr><td>Hash every local tensor</td><td>Prove exact identity before and after compression.</td></tr>
+      <tr><td>Measure raw byte entropy</td><td>Find which tensor families are compressible.</td></tr>
+      <tr><td>Split BF16 high/low bytes</td><td>Check whether each byte stream compresses differently.</td></tr>
+      <tr><td>Compare layer 1 experts</td><td>Start with the biggest verified storage surface.</td></tr>
+      <tr><td>Test exact reconstruction</td><td>No exact reconstruction, no claim.</td></tr>
+    </table>
+  </section>
+</main>
+</body>
+</html>

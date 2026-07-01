@@ -1,0 +1,5 @@
+seed1 dense90=1.4608 dense180=1.3937
+seed1 v2 b=90000 M=32 sp=1.0 val=1.4454 gap=-0.0153
+seed1 v2 b=90000 M=32 sp=0.25 val=1.4528 gap=-0.0080
+seed1 v2 b=180000 M=64 sp=0.25 val=1.4046 gap=+0.0109
+seed1 v2 b=180000 M=64 sp=1.0 val=1.3967 gap=+0.0030

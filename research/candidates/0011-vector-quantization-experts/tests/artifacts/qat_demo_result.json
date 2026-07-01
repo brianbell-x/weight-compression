@@ -1,0 +1,31 @@
+[
+  {
+    "cond": "FP",
+    "bits": 16,
+    "val_loss": 1.3879
+  },
+  {
+    "cond": "quant",
+    "bits": 4,
+    "post_hoc_val_loss": 1.4117,
+    "qat_val_loss": 1.3696,
+    "fp_val_loss": 1.3879,
+    "qat_recovers_%": 177.0
+  },
+  {
+    "cond": "quant",
+    "bits": 3,
+    "post_hoc_val_loss": 1.4365,
+    "qat_val_loss": 1.4169,
+    "fp_val_loss": 1.3879,
+    "qat_recovers_%": 40.5
+  },
+  {
+    "cond": "quant",
+    "bits": 2,
+    "post_hoc_val_loss": 2.4505,
+    "qat_val_loss": 1.5072,
+    "fp_val_loss": 1.3879,
+    "qat_recovers_%": 88.8
+  }
+]

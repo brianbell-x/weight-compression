@@ -1,0 +1,8 @@
+{
+  "shard": "models\\synthetic\\nemotron_tiny\\hf_snapshot\\model-00001-of-00002.safetensors",
+  "file_size": 189784,
+  "header_length": 3248,
+  "data_start": 3256,
+  "tensor_count": 30,
+  "payload_bytes": 186528
+}
