@@ -266,8 +266,7 @@
 <!-- HERO -->
 <header class="hero">
   <div class="wrap reveal in">
-    <div class="eyebrow">Lossless weight compression &middot; NVIDIA Nemotron-3 family &middot; 30B &rarr; 550B</div>
-    <h1 style="margin-top:18px">BF16 weights,<br><em>30% smaller.</em> Completely lossless.</h1>
+    <h1>BF16 weights,<br><em>30% smaller.</em> Completely lossless.</h1>
     <p>We store BF16 weights in a form the matmul reads <b style="color:var(--fg)">directly</b>, then reconstruct
        them bit-for-bit. No quantization, no calibration, no quality tradeoff: the compressed weights are
        provably identical to the originals, and the same code holds across the Nemotron-3 family up to the 550B Ultra.</p>
@@ -541,20 +540,6 @@ bf16     = (sign_exp &lt;&lt; <span class="s">7</span>) | mantissa   <span class
     </div>
   </div>
 </section>
-
-<footer>
-  <div class="wrap">
-    <div>Lossless BF16 compression &middot; candidate 0009. Measurements are exact round-trips on the real
-      NVIDIA Nemotron-3 weights: <span class="mono">Nano 30B</span> whole-model, plus streamed single-shard
-      probes of <span class="mono">Super 120B</span> and <span class="mono">Ultra 550B</span>.</div>
-    <div class="srcs">
-      whole-model round-trip &rarr; whole_model_lossless_result.json (6,174 tensors, &minus;24.95% / &minus;30.03%)<br>
-      family scaling &rarr; stream_probe_super_120b.json (&minus;29.63%), stream_probe_ultra_550b.json (&minus;29.29%), one shard each, bounded-disk<br>
-      bit budget + concentration &rarr; regroup_result.json, byte_split_result.json (11.30 b/w, top-16 = 99.9%)<br>
-      on-device exact + fused decode &rarr; gpu_bench_result.json (rel err ~1e-7)
-    </div>
-  </div>
-</footer>
 
 <script>
   // scroll-reveal, reduced-motion aware. No scroll listeners.
