@@ -1,6 +1,0 @@
-config,bits_per_weight,rel_err_pct,mean_cosine,implied_vram_gb
-INT4_gs128_axis0,4.1272,11.9434,0.992942,18.53
-INT4_gs64_axis0,4.25,10.9255,0.994086,18.95
-INT4_gs32_axis0,4.5,9.8072,0.995227,19.8
-INT4_gs16_axis0,5.0,8.5821,0.996339,21.51
-INT8_gs64_axis0_ref,8.25,0.6026,0.999982,32.64

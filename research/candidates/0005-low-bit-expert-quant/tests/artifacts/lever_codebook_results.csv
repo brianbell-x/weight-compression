@@ -1,8 +1,0 @@
-config,bits_per_weight,rel_err_pct,mean_cosine,implied_vram_gb
-uniform_rtn_4b_g128,4.0001,12.267,0.992554,18.09
-uniform_rtn_3b_g128,3.0001,28.3912,0.961983,14.67
-codebook16_pergroup_g128,4.125,9.6575,0.995321,18.52
-codebook8_pergroup_g128,3.125,19.1183,0.981522,15.1
-codebook16_perexpert,4.0,11.3645,0.993482,18.09
-codebook8_perexpert,3.0,21.4859,0.976491,14.67
-int8_rtn_g128_ref,8.0001,0.6904,0.999976,31.78

@@ -1,4 +1,0 @@
-config,bits_per_weight,real_X_rel_err_pct,random_X_rel_err_pct,real_over_random,real_X_mean_cosine,random_X_mean_cosine,implied_vram_gb
-INT8_pg128_RTN,8.125,0.2795,0.6913,0.404,0.999996,0.999976,32.21
-INT4_pg128_RTN,4.125,5.0692,12.2834,0.413,0.998755,0.992533,18.52
-codebook16_pg128_4b,4.125,4.2573,9.6729,0.44,0.999166,0.995306,18.52
