@@ -1,0 +1,77 @@
+{
+  "prompts": [
+    "The capital of France is",
+    "Water is made of hydrogen and",
+    "The sun rises in the",
+    "Roses are red, violets are",
+    "The opposite of hot is",
+    "The largest planet in our solar system is",
+    "A group of lions is called a",
+    "The chemical symbol for gold is"
+  ],
+  "bf16_ppl": [
+    4.531,
+    7.546,
+    28.518,
+    4.086,
+    85.925,
+    5.689,
+    17.89,
+    7.649
+  ],
+  "bf16_ppl_geomean": 11.3037,
+  "int8": {
+    "mean_kl": 0.00034674652852118015,
+    "per_prompt_kl": [
+      4.8e-05,
+      9.3e-05,
+      3.3e-05,
+      0.001022,
+      3.4e-05,
+      2e-05,
+      0.000833,
+      0.00034
+    ],
+    "ppl": [
+      4.547,
+      7.536,
+      28.661,
+      4.076,
+      86.125,
+      5.707,
+      17.697,
+      7.633
+    ],
+    "ppl_geomean": 11.2995,
+    "top1_agreement_pct": 100.0,
+    "router_overlap_frac": 0.9937
+  },
+  "int4": {
+    "mean_kl": 0.07642508298158646,
+    "per_prompt_kl": [
+      0.046284,
+      0.17333,
+      0.056817,
+      0.11984,
+      0.067483,
+      0.032026,
+      0.053904,
+      0.056017
+    ],
+    "ppl": [
+      4.704,
+      6.717,
+      30.581,
+      5.065,
+      70.076,
+      5.408,
+      19.456,
+      7.686
+    ],
+    "ppl_geomean": 11.3601,
+    "top1_agreement_pct": 96.0,
+    "router_overlap_frac": 0.9248
+  },
+  "seconds_this_run": 379.0,
+  "peak_rss_gb": 10.78
+}
