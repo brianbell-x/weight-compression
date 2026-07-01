@@ -17,12 +17,12 @@ used only in the optional GPU step (3).
 
 ## 1. Fastest check: run it on ANY BF16 model (~1 min, no big download)
 
-`reproduce.py` (repo root) encodes every BF16 tensor, decodes it back from ONLY
+`tools/reproduce.py` (this candidate's folder) encodes every BF16 tensor, decodes it back from ONLY
 `(codebook + fixed-width index + in-order escape stream + raw mantissa)`, and checks
 the reconstructed bytes are bit-for-bit identical with SHA-256. numpy only, no GPU.
 
 ```bash
-uv run python reproduce.py --model /path/to/any/model.safetensors
+uv run python research/candidates/0009-fusible-exponent-codebook/tools/reproduce.py --model /path/to/any/model.safetensors
 ```
 
 `--model` takes a single `.safetensors` file, a directory of shards, or an
@@ -76,7 +76,7 @@ uv run hf download nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16 \
     model-00001-of-00013.safetensors \
     --local-dir models/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16/hf_snapshot
 
-uv run python reproduce.py \
+uv run python research/candidates/0009-fusible-exponent-codebook/tools/reproduce.py \
     --model models/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16/hf_snapshot/model-00001-of-00013.safetensors
 ```
 
@@ -101,7 +101,7 @@ and `tests/test-002.md` / `test-005.md` for the full picture.
 ## Where everything is
 
 ```
-reproduce.py                                          the portable verifier above
+research/candidates/0009-fusible-exponent-codebook/tools/reproduce.py                                          the portable verifier above
 research/candidates/0009-fusible-exponent-codebook/
   brief.md                                            the method and claims
   writeup/index.html                                  visual explainer (also live on GitHub Pages)
