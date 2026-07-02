@@ -392,6 +392,24 @@ confidence) realized the corrected-mantissa finding inside the frozen tile forma
   frozen+M1 cross-layer re-score). **stz is NOT a vehicle for this** (fractional-bit gain,
   fixed-width index can't realize it) — the tile format is now the primary container
   track; stz remains baseline + non-expert container.
+- **FULL MEASUREMENT (same day): whole-model tile+M1 = 10.68664 b/w = 33.21%** — all 23
+  expert layers × 256 tensors, every row bit-identical vs stored frozen artifacts, parity
+  exact, round-trips pass; skeptic re-derived everything incl. a from-scratch decoder on
+  serialized bytes (not refuted, high confidence). Mean expert delta vs frozen +0.0478
+  (min +0.0317 @L1, max +0.0643 @L3); vs stz whole-model +0.211 b/w.
+- **Mechanism located (MI decomposition, 64 tensors)**: the MSB structure is 99.99%
+  EXPONENT-MAGNITUDE-driven (MI(msb;exp)=0.0362; sign carries exactly 0): the
+  largest-magnitude weights sit just above their power-of-two boundary — p(msb=1|e)
+  collapses from ~0.50 to 0.19 across the top exponent tail. Model-wide stable. The
+  second mantissa bit repeats the pattern one level deeper: 0.0171 b/w total headroom,
+  98% exponent-driven — worth collecting ONLY with a lower-redundancy coder (M3's A=2048
+  redundancy 0.098 b/sym already ate most of it).
+- **Re-peel of the M1 emission: bulk converged** (payload ceilings <0.001 on layers
+  13/27/51; residual 6-bit plane carries exactly the known bit-2 signal, realized ~0.0065)
+  — no full certificate because layer 1 keeps localized structure (expert-0 up_proj alone
+  ~0.16 b/w; whole-model L1 residue ≤0.002). **Remaining quantified levers: byte-renorm/
+  wider-state coder (~0.06 incl. unlocking bit-2), tier-design ≤0.0335 bounded by pad
+  slack, early-layer bundle ~0.02–0.03.**
 
 ## Purged tracks — do not re-open (2026-07-01)
 

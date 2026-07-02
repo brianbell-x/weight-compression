@@ -812,3 +812,202 @@ Artifacts: `tests/artifacts/mantissa_phase_results.jsonl` (per-tensor exact acco
 stamp `ffd4e05b2da3`), `tests/artifacts/mantissa_phase_summary.json` (realized cells,
 bounds, coder-redundancy attribution, phase stability, gate, projection),
 `tests/artifacts/mantissa_phase_run.log`.
+
+---
+
+# Frozen+M1 measured whole-model, MSB MI decomposition, M1 re-peel (T1/T2/T3): RESULTS
+
+**Date:** 2026-07-02 · **Scope:** T1 = ALL 23 expert layers (1, 3, 6, 8, 10, 13, 15, 17,
+20, 22, 24, 27, 29, 31, 34, 36, 38, 40, 43, 45, 47, 49, 51) × 256 expert tensors each =
+5,888 tensors, 29,374,808,064 expert params — every expert tensor in the model; T2 = 64
+tensors across layers 1/13/27/51 (319,291,392 params, numel-weighted); T3 = 32 tensors
+across the same 4 layers · **Format under test (FROZEN + M1, zero re-selection):** W=128
+bit-stride, T=4 DP tiers, P100, L1+L3, sym10 = sign+exp8+mantMSB folded into a
+1024-entry 12-bit rANS table, 6 mantissa bits verbatim · **Accounting stamp:**
+`bb3a86666829` · **Tool:** `tools/measure_m1_full.py` (composes the skeptic-verified
+v1 loader/accounting, v2 coder/DP/tables, emission-peel batteries, and the M1 coder
+verbatim) · **Wall:** ~25 min across 22 parallel resumable invocations (layer 13 reused
+intact from the prior verified run, same stamp).
+
+**Verdict: the projection is replaced by a measurement, and the measurement is better.
+Whole-model frozen+M1 = 10.6866 b/w MEASURED** (10.686640), vs the 10.6923 projection —
+0.0057 b/w better. M1 beats frozen on **every one of the 23 expert layers** (min delta
++0.0317 @L1, max +0.0643 @L3, mean +0.0478). Same evidentiary standard as every prior
+section: all side costs charged, measured emitted bits, stz parity exact on all 5,888
+tensors (max |Δbpw| = 0.000000), round-trip 47,097 blocks with emitted bits == accounted
+bits and SHA-256-exact BF16, and an aggregate self-gate — the frozen whole-model
+recomputed from the same pipeline reproduces the 10.7311 reference to 3e-6. T2 locates
+the MSB structure entirely in **exponent magnitude** (99.99% of the MI; sign carries
+exactly zero). T3 does **not** issue a converged certificate: the bulk (layers 13/27/51)
+passes both randomness bars, but layer 1 fails locally, and the residual 6-bit mantissa
+plane is measurably phase-tilted — which is precisely the already-quantified bit-2
+signal, not a new unknown.
+
+## T1 — per-layer scores (numel-weighted; equal expert numel per layer)
+
+```
+ layer    stz b/w  frozen b/w    M1 b/w    delta   nonpos  parity  RT
+---------------------------------------------------------------------
+     1    11.0310     10.8443   10.8126  +0.0317   11/256    0.0  PASS
+     3    11.0176     10.8238   10.7595  +0.0643    2/256    0.0  PASS
+     6    10.9498     10.7618   10.7119  +0.0499    6/256    0.0  PASS
+     8    10.9133     10.7305   10.6869  +0.0436    4/256    0.0  PASS
+    10    10.8962     10.7138   10.6702  +0.0435    1/256    0.0  PASS
+    13    10.8931     10.7112   10.6670  +0.0442    1/256    0.0  PASS
+    15    10.8882     10.7058   10.6637  +0.0420    1/256    0.0  PASS
+    17    10.8880     10.7073   10.6627  +0.0446    1/256    0.0  PASS
+    20    10.8834     10.7021   10.6575  +0.0446    0/256    0.0  PASS
+    22    10.8849     10.7025   10.6587  +0.0438    0/256    0.0  PASS
+    24    10.8842     10.7008   10.6553  +0.0455    0/256    0.0  PASS
+    27    10.8822     10.7004   10.6540  +0.0465    0/256    0.0  PASS
+    29    10.8826     10.7009   10.6538  +0.0471    0/256    0.0  PASS
+    31    10.8784     10.6979   10.6485  +0.0494    0/256    0.0  PASS
+    34    10.8720     10.6949   10.6438  +0.0511    0/256    0.0  PASS
+    36    10.8698     10.6947   10.6430  +0.0517    0/256    0.0  PASS
+    38    10.8689     10.6947   10.6428  +0.0520    0/256    0.0  PASS
+    40    10.8706     10.6971   10.6455  +0.0516    1/256    0.0  PASS
+    43    10.8672     10.6927   10.6410  +0.0517    0/256    0.0  PASS
+    45    10.8659     10.6928   10.6413  +0.0515    1/256    0.0  PASS
+    47    10.8668     10.6943   10.6427  +0.0516    1/256    0.0  PASS
+    49    10.8662     10.6987   10.6488  +0.0499    5/256    0.0  PASS
+    51    10.8614     10.7041   10.6569  +0.0472    0/256    0.0  PASS
+```
+
+`nonpos` = tensors where M1's table cost exceeded the MSB gain (35/5,888 model-wide,
+concentrated at layer 1); layer-level M1 wins everywhere. Every tensor's frozen score
+was cross-checked bit-identical against the stored `blockcodes_v2_frozen_*` artifacts
+where they exist (256/256 per checked layer).
+
+## The measured whole-model number and the ladder
+
+Convention identical to the 10.7311 computation: wm = 10.897505 (stz whole-model) −
+0.930232 (expert share) × mean₂₃(stz_ref_L − m1_bpw_L); all 23 expert layers have equal
+numel so the expert plane is the plain mean; the non-expert ~7% of numel is held at stz.
+
+```
+frozen recomputed   10.7311   (reference 10.7311: REPRODUCED, aggregate gate PASS)
+frozen+M1 MEASURED  10.6866   (+0.0445 vs frozen, +0.2109 vs stz 10.8975)
+```
+
+**How the ledger should state the full ladder** (savings vs BF16 = 16 b/w, whole-model,
+non-expert at stz):
+
+> **stz 31.89% → tile (frozen W128/T4/P100/L1+L3) 32.93% → tile+M1 (sym10 fold)
+> 33.21%.** Whole-model **10.6866 b/w, fully MEASURED** on all 23 expert layers × 256
+> tensors (5,888 tensors, 29.4B expert params) — no projection, no interpolation, no
+> selection caveat (format and mechanism frozen before scoring; M1 wins on every
+> layer). stz parity exact; SHA-256-exact round-trip. Replaces the 10.6923 projection
+> (measured is 0.0057 better — the 4-layer sample had over-weighted layer 1, the
+> smallest-delta layer).
+
+## T2 — where the MSB structure lives: exponent magnitude, entirely
+
+64 tensors, layers 1/13/27/51, numel-weighted: H(msb) = 0.9794, H(msb|sym) = 0.9432,
+H(msb|exp8) = 0.9432 — the 8-bit exponent value captures **99.99%** of MI(msb; sym)
+(0.036183 of 0.036187 b/w). Sign carries **exactly nothing** (MI = 0.0000 marginal,
+4e-6 given exponent). The shape is smooth and monotone in exponent value: p(msb=1|e) ≈
+0.50 for all low/mid exponents and collapses only at the top of the magnitude tail —
+e=120: 0.473, e=121: 0.400, e=122: 0.191, e=123: ~0.01. The largest-magnitude weights
+sit just above their power-of-two boundary, biasing the mantissa MSB toward 0. Total
+MSB headroom vs verbatim = 0.0566 b/w (0.0206 marginal bias + 0.0362 conditioning) —
+what M1 monetizes. The structure is model-wide, not layer-local: H(msb|sym) varies only
+0.9403 (L1) to 0.9444 (L51).
+
+**Second bit (the sym11 question):** same structure one level deeper, decaying ~3.3×:
+H(b2) = 0.9950, H(b2|sym10) = 0.9829 — total headroom **0.0171 b/w** (0.0052 marginal +
+0.0120 conditioning), again ~98% exponent-driven (MI(b2;exp) = 0.0118 of MI(b2;sym10) =
+0.0120).
+
+**Does this justify a sym11 follow-up? Priced: NOT with the current coder; YES as a
+rider on a coder-mechanics probe.** The structure's shape is maximally favorable — a
+2048-entry table captures it, no sign or spatial keying needed — but M3 already
+*measured* the cost: coder redundancy grows +0.035 b/sym going A=1024→2048 (0.063 →
+0.098), which exceeds the entire 0.0171 collectible. Net with the current bit-by-bit
+renorm coder ≈ **−0.018 b/w** (M3's realized +0.0220 vs frozen = −0.0197 vs M1 confirms
+this empirically — already falsified, do not re-run). With a wider-state / byte-renorm
+coder that holds A=2048 redundancy at or below today's A=1024 level, the collectible is
+**+0.012–0.017 b/w experts ≈ +0.011–0.016 b/w whole-model → landing ≈ 10.670–10.675**.
+The coder change is the gate; sym11 is the payload it unlocks.
+
+## T3 — re-peel of the M1 emission: NO converged certificate; two quantified ceilings
+
+32 tensors, layers 1/13/27/51 (8 each); actual emitted M1 payload plane
+(serializer-gated bit-identical to the reference byte packer) + residual 6-bit plane.
+
+- **sym10 coded payload: RANDOM on 3 of 4 layers.** Ceilings 0.0005 (L13), 0.0000
+  (L27), 0.0001 (L51) b/w — under the 0.01 bar; lzma cannot compress it; order-0/1/2
+  bit entropies ~1.0. **NOT random on layer 1:** weighted 0.0123 b/w, dominated by
+  `backbone.layers.1.mixer.experts.0.up_proj.weight` at 0.066 b/w (lzma-visible;
+  small-lag MI at lags 1–4, 32, 64, 128); experts.36/91 up_proj at 0.012–0.016; all
+  four L1 down_proj payloads fully random (<1e-4). Pooled 32-tensor ceiling 0.0032 b/w.
+- **Residual 6-bit mantissa plane: NOT phase-flat, by a design-consistent amount.**
+  Pooled p(1|pos mod 6) = [0.4586, 0.4786, 0.4899, 0.4956, 0.4982, 0.4993] — the
+  monotone approach to 0.5 continues one bit deeper; native-lag MI at 6/12/18/756 on
+  32/32 tensors. This **is** the bit-2 signal T2 quantifies: realized-plane ceiling
+  ~0.0065 b/w on converged layers (entropy-level bound 0.0171). Layer 1 heavier: 0.0183
+  b/w weighted, max 0.093 on experts.0.up_proj. Pooled ceiling 0.0095 b/w.
+
+**Certificate decision: NOT converged** — per-layer convergence is 3/4, and pooling
+would hide the L1 signal. Two new ceilings replace the certificate:
+
+1. **Converged bulk (13/27/51 and by extension mid/late model):** the only residual
+   structure is the known bit-2 headroom — 0.0171 b/w entropy-level, ~0.0065 realized-
+   plane — i.e. exactly what sym11-with-a-better-coder collects. Nothing else found.
+2. **Layer-1 ceiling:** payload 0.0123 + mant6 0.0183 b/w on the L1 sample, concentrated
+   in early up_proj tensors (expert 0 up_proj alone: 0.066 + 0.093 ≈ 0.16 b/w on that
+   tensor). Layer 1 is 1/23 of expert numel → whole-model unclaimed residue **≤ ~0.002
+   b/w** — real but small; parked with the other layer-1/early-layer items (order-1
+   up_proj mode, column headroom).
+
+## Anomalies (recorded)
+
+1. **Layer 1 is the outlier everywhere:** smallest M1 delta (+0.0317 vs mean +0.0478),
+   11/256 non-positive per-tensor deltas, and the only layer failing the T3 re-peel bar
+   — concentrated in `experts.0.up_proj`. Consistent with every prior run's early-layer
+   findings; layer-level M1 still wins there.
+2. **Measured whole-model beat the skeptic-verified projection by 0.0057** — sampling
+   composition only (the 4-layer projection gave L1 a 1/4 weight vs its true 1/23); no
+   accounting change; the aggregate gate reproduced the frozen 10.7311 to 3e-6.
+3. **M1 delta trends up with depth** (0.044 @L8–22 → 0.052 @L34–47) then dips at
+   L49/51 — same shape as the frozen-vs-stz profile: the exponent-tail concentration M1
+   exploits strengthens mid-to-late model.
+4. T3 pooled passes the 0.01 bar (payload 0.0032, mant6 0.0095) but is reported NOT
+   converged to avoid pooling away the L1 signal.
+5. No gate failures, no parity drift, no lock contention across 22 parallel resumable
+   invocations; layer 13 reused intact (same stamp `bb3a86666829`).
+
+## Compounding order
+
+**The measured number closes the M1 chapter; the coder is now the single blocking
+lever.** (i) The ledger entry above supersedes 10.7346 and the 10.6923 projection;
+frozen+M1 (sym10) is the v3-container spec for expert tensors. (ii) **The single next
+object of study: the rANS coder's renorm/flush mechanics** — a wider-state / byte-renorm
+variant. It is the third time this lever has been named (M2's per-bit-lane failure, M3's
+erosion, now T2/T3's convergence onto bit-2-behind-coder-redundancy), and it now gates
+everything that remains: it directly bounds the ~0.06 b/w of measured renorm redundancy
+inside M1's standing ~0.15 gap-to-bound, and it is the stated precondition for sym11's
++0.011–0.016 b/w whole-model. One probe, two priced collectibles, landing zone ≈
+10.62–10.67 if both pay. (iii) The layer-1 residue (≤0.002 b/w whole-model) stays parked
+with the early-layer column candidate. (iv) The register-tile decode kernel remains the
+runtime-credibility step — unchanged, and a byte-renorm coder likely *simplifies* it.
+
+## Reproduction
+
+```
+# smoke (synthetic snapshot, seconds; runs T1+T2+T3)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/measure_m1_full.py --synthetic
+
+# real, one layer (resumable; all tasks or --tasks t1|t2|t3)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/measure_m1_full.py --layer 13
+
+# THE whole-model number (combines the 23 per-layer summaries; runs the aggregate gate)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/measure_m1_full.py --aggregate
+```
+
+Artifacts: `tests/artifacts/m1full_whole_model.json` (the measured number, per-layer
+deltas, convention, gates), `m1full_summary_layer{N}.json` × 23 (per-layer T1 accounting),
+`m1full_mi_layer{1,13,27,51}.json` (T2 MI decomposition),
+`m1full_repeel_layer{1,13,27,51}.json` + `m1full_repeel_results_layer{N}.jsonl` (T3
+per-plane certificates). Stamp `bb3a86666829` throughout. Baseline reference unchanged:
+`../0009-fusible-exponent-codebook/tests/artifacts/stz/stz_tensor_stats.jsonl` (parity
+exact on all 5,888 tensors).

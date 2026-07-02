@@ -1,0 +1,1716 @@
+{
+  "mode": "real",
+  "layer": 13,
+  "acct_stamp": "bb3a86666829",
+  "targets": 16,
+  "total_params": 79822848,
+  "layers": [
+    13
+  ],
+  "weighted": {
+    "H_msb": 0.979625,
+    "H_msb_given_sign": 0.979625,
+    "H_msb_given_exp": 0.943788,
+    "H_msb_given_sym": 0.943785,
+    "H_b2": 0.994823,
+    "H_b2_given_exp": 0.984393,
+    "H_b2_given_sym9": 0.98439,
+    "H_b2_given_sym10": 0.984139
+  },
+  "mi_bpw": {
+    "MI_msb_sign": 0.0,
+    "MI_msb_exp": 0.035837,
+    "MI_msb_sym": 0.03584,
+    "MI_msb_sign_given_exp": 3e-06,
+    "MI_b2_exp": 0.01043,
+    "MI_b2_sym9": 0.010433,
+    "MI_b2_sym10": 0.010684
+  },
+  "headroom_bpw": {
+    "msb_marginal_bias": 0.020375,
+    "msb_conditioning": 0.03584,
+    "msb_total_vs_verbatim": 0.056215,
+    "b2_marginal_bias": 0.005177,
+    "b2_conditioning_at_sym10": 0.010684,
+    "b2_total_vs_verbatim": 0.015861
+  },
+  "exp_share_of_sym_mi": 0.999916,
+  "per_layer": {
+    "L13": {
+      "H_msb": 0.979625,
+      "H_msb_given_sign": 0.979625,
+      "H_msb_given_exp": 0.943788,
+      "H_msb_given_sym": 0.943785,
+      "H_b2": 0.994823,
+      "H_b2_given_exp": 0.984393,
+      "H_b2_given_sym9": 0.98439,
+      "H_b2_given_sym10": 0.984139
+    }
+  },
+  "exp_profile_pooled": [
+    {
+      "exp": 121,
+      "mass": 0.315636,
+      "p1_msb": 0.39891
+    },
+    {
+      "exp": 120,
+      "mass": 0.252567,
+      "p1_msb": 0.474847
+    },
+    {
+      "exp": 119,
+      "mass": 0.143207,
+      "p1_msb": 0.495256
+    },
+    {
+      "exp": 122,
+      "mass": 0.135651,
+      "p1_msb": 0.184181
+    },
+    {
+      "exp": 118,
+      "mass": 0.073942,
+      "p1_msb": 0.500537
+    },
+    {
+      "exp": 117,
+      "mass": 0.037232,
+      "p1_msb": 0.501103
+    },
+    {
+      "exp": 116,
+      "mass": 0.018655,
+      "p1_msb": 0.501183
+    },
+    {
+      "exp": 115,
+      "mass": 0.009338,
+      "p1_msb": 0.501336
+    },
+    {
+      "exp": 114,
+      "mass": 0.004673,
+      "p1_msb": 0.500845
+    },
+    {
+      "exp": 123,
+      "mass": 0.004293,
+      "p1_msb": 0.010696
+    },
+    {
+      "exp": 113,
+      "mass": 0.002331,
+      "p1_msb": 0.49943
+    },
+    {
+      "exp": 112,
+      "mass": 0.001172,
+      "p1_msb": 0.499139
+    }
+  ],
+  "model_cost_note": "entropy-level; a transmitted 256x2 12-bit model would cost pad8(256*2*12)=6144 bits/tensor ~ 0.0012 b/w -- noted, not charged (diagnostic, not a code)",
+  "verdict": "sym-conditioned MSB structure is EXPONENT-MAGNITUDE structure: conditioning on the 8-bit exponent captures 100.0% of MI(msb; sym) (0.0358 of 0.0358 b/w); sign adds 0.0000 b/w given exp (sign alone 0.0000)",
+  "per_tensor": [
+    {
+      "name": "backbone.layers.13.mixer.experts.0.up_proj.weight",
+      "layer": 13,
+      "proj": "up",
+      "n": 4988928,
+      "H_msb": 0.979533,
+      "H_msb_given_sign": 0.979533,
+      "H_msb_given_exp": 0.943623,
+      "H_msb_given_sym": 0.943619,
+      "H_b2": 0.994884,
+      "H_b2_given_exp": 0.983915,
+      "H_b2_given_sym9": 0.983909,
+      "H_b2_given_sym10": 0.983679,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.315153,
+          "p1_msb": 0.399701,
+          "p1_msb_pos": 0.399478,
+          "p1_msb_neg": 0.399922
+        },
+        {
+          "exp": 120,
+          "mass": 0.252097,
+          "p1_msb": 0.47491,
+          "p1_msb_pos": 0.474763,
+          "p1_msb_neg": 0.475056
+        },
+        {
+          "exp": 119,
+          "mass": 0.142711,
+          "p1_msb": 0.496071,
+          "p1_msb_pos": 0.497658,
+          "p1_msb_neg": 0.494481
+        },
+        {
+          "exp": 122,
+          "mass": 0.13716,
+          "p1_msb": 0.185907,
+          "p1_msb_pos": 0.185778,
+          "p1_msb_neg": 0.186035
+        },
+        {
+          "exp": 118,
+          "mass": 0.073748,
+          "p1_msb": 0.500024,
+          "p1_msb_pos": 0.49973,
+          "p1_msb_neg": 0.500317
+        },
+        {
+          "exp": 117,
+          "mass": 0.036977,
+          "p1_msb": 0.498225,
+          "p1_msb_pos": 0.496389,
+          "p1_msb_neg": 0.500071
+        },
+        {
+          "exp": 116,
+          "mass": 0.018561,
+          "p1_msb": 0.49858,
+          "p1_msb_pos": 0.499676,
+          "p1_msb_neg": 0.497481
+        },
+        {
+          "exp": 115,
+          "mass": 0.009305,
+          "p1_msb": 0.505213,
+          "p1_msb_pos": 0.505669,
+          "p1_msb_neg": 0.504758
+        },
+        {
+          "exp": 114,
+          "mass": 0.004666,
+          "p1_msb": 0.499248,
+          "p1_msb_pos": 0.49715,
+          "p1_msb_neg": 0.501389
+        },
+        {
+          "exp": 123,
+          "mass": 0.004412,
+          "p1_msb": 0.010949,
+          "p1_msb_pos": 0.009897,
+          "p1_msb_neg": 0.011982
+        },
+        {
+          "exp": 113,
+          "mass": 0.002344,
+          "p1_msb": 0.50949,
+          "p1_msb_pos": 0.507873,
+          "p1_msb_neg": 0.51107
+        },
+        {
+          "exp": 112,
+          "mass": 0.001171,
+          "p1_msb": 0.502996,
+          "p1_msb_pos": 0.501342,
+          "p1_msb_neg": 0.504719
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.18.up_proj.weight",
+      "layer": 13,
+      "proj": "up",
+      "n": 4988928,
+      "H_msb": 0.979616,
+      "H_msb_given_sign": 0.979616,
+      "H_msb_given_exp": 0.944696,
+      "H_msb_given_sym": 0.944693,
+      "H_b2": 0.994828,
+      "H_b2_given_exp": 0.984643,
+      "H_b2_given_sym9": 0.984639,
+      "H_b2_given_sym10": 0.984424,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.316639,
+          "p1_msb": 0.405477,
+          "p1_msb_pos": 0.406012,
+          "p1_msb_neg": 0.404942
+        },
+        {
+          "exp": 120,
+          "mass": 0.245942,
+          "p1_msb": 0.476532,
+          "p1_msb_pos": 0.47612,
+          "p1_msb_neg": 0.476945
+        },
+        {
+          "exp": 122,
+          "mass": 0.149327,
+          "p1_msb": 0.201506,
+          "p1_msb_pos": 0.201616,
+          "p1_msb_neg": 0.201396
+        },
+        {
+          "exp": 119,
+          "mass": 0.138523,
+          "p1_msb": 0.495862,
+          "p1_msb_pos": 0.495908,
+          "p1_msb_neg": 0.495817
+        },
+        {
+          "exp": 118,
+          "mass": 0.071282,
+          "p1_msb": 0.500727,
+          "p1_msb_pos": 0.50036,
+          "p1_msb_neg": 0.501095
+        },
+        {
+          "exp": 117,
+          "mass": 0.035999,
+          "p1_msb": 0.501434,
+          "p1_msb_pos": 0.498339,
+          "p1_msb_neg": 0.504543
+        },
+        {
+          "exp": 116,
+          "mass": 0.017941,
+          "p1_msb": 0.501614,
+          "p1_msb_pos": 0.502016,
+          "p1_msb_neg": 0.501215
+        },
+        {
+          "exp": 115,
+          "mass": 0.00903,
+          "p1_msb": 0.497869,
+          "p1_msb_pos": 0.49769,
+          "p1_msb_neg": 0.498048
+        },
+        {
+          "exp": 123,
+          "mass": 0.006364,
+          "p1_msb": 0.015905,
+          "p1_msb_pos": 0.014812,
+          "p1_msb_neg": 0.016969
+        },
+        {
+          "exp": 114,
+          "mass": 0.004485,
+          "p1_msb": 0.497519,
+          "p1_msb_pos": 0.495843,
+          "p1_msb_neg": 0.499196
+        },
+        {
+          "exp": 113,
+          "mass": 0.002191,
+          "p1_msb": 0.4957,
+          "p1_msb_pos": 0.496631,
+          "p1_msb_neg": 0.49476
+        },
+        {
+          "exp": 112,
+          "mass": 0.001133,
+          "p1_msb": 0.493456,
+          "p1_msb_pos": 0.483374,
+          "p1_msb_neg": 0.503754
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.36.up_proj.weight",
+      "layer": 13,
+      "proj": "up",
+      "n": 4988928,
+      "H_msb": 0.979697,
+      "H_msb_given_sign": 0.979697,
+      "H_msb_given_exp": 0.943455,
+      "H_msb_given_sym": 0.943452,
+      "H_b2": 0.994764,
+      "H_b2_given_exp": 0.984458,
+      "H_b2_given_sym9": 0.984454,
+      "H_b2_given_sym10": 0.984201,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.315666,
+          "p1_msb": 0.396459,
+          "p1_msb_pos": 0.396754,
+          "p1_msb_neg": 0.396164
+        },
+        {
+          "exp": 120,
+          "mass": 0.254549,
+          "p1_msb": 0.474828,
+          "p1_msb_pos": 0.473824,
+          "p1_msb_neg": 0.475833
+        },
+        {
+          "exp": 119,
+          "mass": 0.144457,
+          "p1_msb": 0.49619,
+          "p1_msb_pos": 0.495972,
+          "p1_msb_neg": 0.496408
+        },
+        {
+          "exp": 122,
+          "mass": 0.131532,
+          "p1_msb": 0.17776,
+          "p1_msb_pos": 0.177745,
+          "p1_msb_neg": 0.177775
+        },
+        {
+          "exp": 118,
+          "mass": 0.074541,
+          "p1_msb": 0.500836,
+          "p1_msb_pos": 0.501459,
+          "p1_msb_neg": 0.500215
+        },
+        {
+          "exp": 117,
+          "mass": 0.037701,
+          "p1_msb": 0.501159,
+          "p1_msb_pos": 0.501548,
+          "p1_msb_neg": 0.500771
+        },
+        {
+          "exp": 116,
+          "mass": 0.018822,
+          "p1_msb": 0.503056,
+          "p1_msb_pos": 0.506123,
+          "p1_msb_neg": 0.499989
+        },
+        {
+          "exp": 115,
+          "mass": 0.009458,
+          "p1_msb": 0.503497,
+          "p1_msb_pos": 0.507425,
+          "p1_msb_neg": 0.499599
+        },
+        {
+          "exp": 114,
+          "mass": 0.00475,
+          "p1_msb": 0.502427,
+          "p1_msb_pos": 0.503353,
+          "p1_msb_neg": 0.501511
+        },
+        {
+          "exp": 123,
+          "mass": 0.003812,
+          "p1_msb": 0.009939,
+          "p1_msb_pos": 0.009473,
+          "p1_msb_neg": 0.010394
+        },
+        {
+          "exp": 113,
+          "mass": 0.002364,
+          "p1_msb": 0.496439,
+          "p1_msb_pos": 0.500255,
+          "p1_msb_neg": 0.492651
+        },
+        {
+          "exp": 112,
+          "mass": 0.001172,
+          "p1_msb": 0.497177,
+          "p1_msb_pos": 0.500341,
+          "p1_msb_neg": 0.493984
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.54.up_proj.weight",
+      "layer": 13,
+      "proj": "up",
+      "n": 4988928,
+      "H_msb": 0.979546,
+      "H_msb_given_sign": 0.979546,
+      "H_msb_given_exp": 0.944177,
+      "H_msb_given_sym": 0.944174,
+      "H_b2": 0.994771,
+      "H_b2_given_exp": 0.984045,
+      "H_b2_given_sym9": 0.984042,
+      "H_b2_given_sym10": 0.983819,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.316404,
+          "p1_msb": 0.404298,
+          "p1_msb_pos": 0.404709,
+          "p1_msb_neg": 0.40389
+        },
+        {
+          "exp": 120,
+          "mass": 0.247212,
+          "p1_msb": 0.476224,
+          "p1_msb_pos": 0.476185,
+          "p1_msb_neg": 0.476262
+        },
+        {
+          "exp": 122,
+          "mass": 0.147146,
+          "p1_msb": 0.199249,
+          "p1_msb_pos": 0.198209,
+          "p1_msb_neg": 0.200285
+        },
+        {
+          "exp": 119,
+          "mass": 0.139022,
+          "p1_msb": 0.495033,
+          "p1_msb_pos": 0.495011,
+          "p1_msb_neg": 0.495054
+        },
+        {
+          "exp": 118,
+          "mass": 0.071578,
+          "p1_msb": 0.502522,
+          "p1_msb_pos": 0.50298,
+          "p1_msb_neg": 0.502064
+        },
+        {
+          "exp": 117,
+          "mass": 0.036011,
+          "p1_msb": 0.502254,
+          "p1_msb_pos": 0.50083,
+          "p1_msb_neg": 0.503676
+        },
+        {
+          "exp": 116,
+          "mass": 0.01804,
+          "p1_msb": 0.499911,
+          "p1_msb_pos": 0.499519,
+          "p1_msb_neg": 0.500298
+        },
+        {
+          "exp": 115,
+          "mass": 0.009,
+          "p1_msb": 0.50049,
+          "p1_msb_pos": 0.501196,
+          "p1_msb_neg": 0.499776
+        },
+        {
+          "exp": 123,
+          "mass": 0.005993,
+          "p1_msb": 0.015151,
+          "p1_msb_pos": 0.015254,
+          "p1_msb_neg": 0.015049
+        },
+        {
+          "exp": 114,
+          "mass": 0.00457,
+          "p1_msb": 0.499803,
+          "p1_msb_pos": 0.50448,
+          "p1_msb_neg": 0.495047
+        },
+        {
+          "exp": 113,
+          "mass": 0.002251,
+          "p1_msb": 0.505566,
+          "p1_msb_pos": 0.504608,
+          "p1_msb_neg": 0.506533
+        },
+        {
+          "exp": 112,
+          "mass": 0.001118,
+          "p1_msb": 0.506633,
+          "p1_msb_pos": 0.513315,
+          "p1_msb_neg": 0.499633
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.73.up_proj.weight",
+      "layer": 13,
+      "proj": "up",
+      "n": 4988928,
+      "H_msb": 0.979712,
+      "H_msb_given_sign": 0.979712,
+      "H_msb_given_exp": 0.943715,
+      "H_msb_given_sym": 0.943711,
+      "H_b2": 0.994863,
+      "H_b2_given_exp": 0.984616,
+      "H_b2_given_sym9": 0.984613,
+      "H_b2_given_sym10": 0.984382,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.313913,
+          "p1_msb": 0.393192,
+          "p1_msb_pos": 0.392706,
+          "p1_msb_neg": 0.393678
+        },
+        {
+          "exp": 120,
+          "mass": 0.258076,
+          "p1_msb": 0.4733,
+          "p1_msb_pos": 0.47342,
+          "p1_msb_neg": 0.473181
+        },
+        {
+          "exp": 119,
+          "mass": 0.14738,
+          "p1_msb": 0.494888,
+          "p1_msb_pos": 0.494109,
+          "p1_msb_neg": 0.495664
+        },
+        {
+          "exp": 122,
+          "mass": 0.12439,
+          "p1_msb": 0.170886,
+          "p1_msb_pos": 0.170435,
+          "p1_msb_neg": 0.171332
+        },
+        {
+          "exp": 118,
+          "mass": 0.076206,
+          "p1_msb": 0.499431,
+          "p1_msb_pos": 0.499921,
+          "p1_msb_neg": 0.49894
+        },
+        {
+          "exp": 117,
+          "mass": 0.038295,
+          "p1_msb": 0.500675,
+          "p1_msb_pos": 0.500961,
+          "p1_msb_neg": 0.500391
+        },
+        {
+          "exp": 116,
+          "mass": 0.019187,
+          "p1_msb": 0.501813,
+          "p1_msb_pos": 0.500986,
+          "p1_msb_neg": 0.502632
+        },
+        {
+          "exp": 115,
+          "mass": 0.009601,
+          "p1_msb": 0.502056,
+          "p1_msb_pos": 0.499314,
+          "p1_msb_neg": 0.504823
+        },
+        {
+          "exp": 114,
+          "mass": 0.004797,
+          "p1_msb": 0.508336,
+          "p1_msb_pos": 0.50403,
+          "p1_msb_neg": 0.512783
+        },
+        {
+          "exp": 123,
+          "mass": 0.003332,
+          "p1_msb": 0.013114,
+          "p1_msb_pos": 0.013916,
+          "p1_msb_neg": 0.012335
+        },
+        {
+          "exp": 113,
+          "mass": 0.00242,
+          "p1_msb": 0.497764,
+          "p1_msb_pos": 0.506293,
+          "p1_msb_neg": 0.489231
+        },
+        {
+          "exp": 112,
+          "mass": 0.001203,
+          "p1_msb": 0.510663,
+          "p1_msb_pos": 0.511119,
+          "p1_msb_neg": 0.510218
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.91.up_proj.weight",
+      "layer": 13,
+      "proj": "up",
+      "n": 4988928,
+      "H_msb": 0.979575,
+      "H_msb_given_sign": 0.979575,
+      "H_msb_given_exp": 0.943444,
+      "H_msb_given_sym": 0.94344,
+      "H_b2": 0.994839,
+      "H_b2_given_exp": 0.984577,
+      "H_b2_given_sym9": 0.984574,
+      "H_b2_given_sym10": 0.984313,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.317508,
+          "p1_msb": 0.401735,
+          "p1_msb_pos": 0.401602,
+          "p1_msb_neg": 0.401868
+        },
+        {
+          "exp": 120,
+          "mass": 0.251186,
+          "p1_msb": 0.475456,
+          "p1_msb_pos": 0.475081,
+          "p1_msb_neg": 0.475829
+        },
+        {
+          "exp": 119,
+          "mass": 0.14171,
+          "p1_msb": 0.494756,
+          "p1_msb_pos": 0.495149,
+          "p1_msb_neg": 0.494364
+        },
+        {
+          "exp": 122,
+          "mass": 0.138654,
+          "p1_msb": 0.184021,
+          "p1_msb_pos": 0.18298,
+          "p1_msb_neg": 0.185048
+        },
+        {
+          "exp": 118,
+          "mass": 0.073026,
+          "p1_msb": 0.502222,
+          "p1_msb_pos": 0.500759,
+          "p1_msb_neg": 0.50368
+        },
+        {
+          "exp": 117,
+          "mass": 0.036722,
+          "p1_msb": 0.500925,
+          "p1_msb_pos": 0.501911,
+          "p1_msb_neg": 0.49994
+        },
+        {
+          "exp": 116,
+          "mass": 0.018371,
+          "p1_msb": 0.499122,
+          "p1_msb_pos": 0.496748,
+          "p1_msb_neg": 0.501527
+        },
+        {
+          "exp": 115,
+          "mass": 0.009256,
+          "p1_msb": 0.500855,
+          "p1_msb_pos": 0.49753,
+          "p1_msb_neg": 0.504177
+        },
+        {
+          "exp": 114,
+          "mass": 0.004538,
+          "p1_msb": 0.499139,
+          "p1_msb_pos": 0.498858,
+          "p1_msb_neg": 0.499422
+        },
+        {
+          "exp": 123,
+          "mass": 0.004404,
+          "p1_msb": 0.009968,
+          "p1_msb_pos": 0.009577,
+          "p1_msb_neg": 0.010337
+        },
+        {
+          "exp": 113,
+          "mass": 0.002295,
+          "p1_msb": 0.487513,
+          "p1_msb_pos": 0.484512,
+          "p1_msb_neg": 0.490468
+        },
+        {
+          "exp": 112,
+          "mass": 0.001166,
+          "p1_msb": 0.498367,
+          "p1_msb_pos": 0.498286,
+          "p1_msb_neg": 0.498448
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.109.up_proj.weight",
+      "layer": 13,
+      "proj": "up",
+      "n": 4988928,
+      "H_msb": 0.979602,
+      "H_msb_given_sign": 0.979602,
+      "H_msb_given_exp": 0.944592,
+      "H_msb_given_sym": 0.944589,
+      "H_b2": 0.994913,
+      "H_b2_given_exp": 0.984678,
+      "H_b2_given_sym9": 0.984674,
+      "H_b2_given_sym10": 0.984431,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.316016,
+          "p1_msb": 0.400983,
+          "p1_msb_pos": 0.400256,
+          "p1_msb_neg": 0.401705
+        },
+        {
+          "exp": 120,
+          "mass": 0.249813,
+          "p1_msb": 0.475696,
+          "p1_msb_pos": 0.475827,
+          "p1_msb_neg": 0.475565
+        },
+        {
+          "exp": 122,
+          "mass": 0.14144,
+          "p1_msb": 0.192892,
+          "p1_msb_pos": 0.193118,
+          "p1_msb_neg": 0.192667
+        },
+        {
+          "exp": 119,
+          "mass": 0.141318,
+          "p1_msb": 0.495233,
+          "p1_msb_pos": 0.495694,
+          "p1_msb_neg": 0.494772
+        },
+        {
+          "exp": 118,
+          "mass": 0.072768,
+          "p1_msb": 0.499247,
+          "p1_msb_pos": 0.498798,
+          "p1_msb_neg": 0.499695
+        },
+        {
+          "exp": 117,
+          "mass": 0.03666,
+          "p1_msb": 0.500656,
+          "p1_msb_pos": 0.500246,
+          "p1_msb_neg": 0.501065
+        },
+        {
+          "exp": 116,
+          "mass": 0.018406,
+          "p1_msb": 0.504552,
+          "p1_msb_pos": 0.50464,
+          "p1_msb_neg": 0.504464
+        },
+        {
+          "exp": 115,
+          "mass": 0.009192,
+          "p1_msb": 0.5006,
+          "p1_msb_pos": 0.505304,
+          "p1_msb_neg": 0.495981
+        },
+        {
+          "exp": 123,
+          "mass": 0.005129,
+          "p1_msb": 0.013757,
+          "p1_msb_pos": 0.014207,
+          "p1_msb_neg": 0.013316
+        },
+        {
+          "exp": 114,
+          "mass": 0.004617,
+          "p1_msb": 0.505557,
+          "p1_msb_pos": 0.507046,
+          "p1_msb_neg": 0.504054
+        },
+        {
+          "exp": 113,
+          "mass": 0.002279,
+          "p1_msb": 0.499428,
+          "p1_msb_pos": 0.504145,
+          "p1_msb_neg": 0.494739
+        },
+        {
+          "exp": 112,
+          "mass": 0.001182,
+          "p1_msb": 0.506698,
+          "p1_msb_pos": 0.51322,
+          "p1_msb_neg": 0.50017
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.127.up_proj.weight",
+      "layer": 13,
+      "proj": "up",
+      "n": 4988928,
+      "H_msb": 0.979733,
+      "H_msb_given_sign": 0.979733,
+      "H_msb_given_exp": 0.944875,
+      "H_msb_given_sym": 0.944871,
+      "H_b2": 0.994796,
+      "H_b2_given_exp": 0.984575,
+      "H_b2_given_sym9": 0.984573,
+      "H_b2_given_sym10": 0.984357,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.316808,
+          "p1_msb": 0.405122,
+          "p1_msb_pos": 0.404946,
+          "p1_msb_neg": 0.405297
+        },
+        {
+          "exp": 120,
+          "mass": 0.246732,
+          "p1_msb": 0.477183,
+          "p1_msb_pos": 0.477555,
+          "p1_msb_neg": 0.476814
+        },
+        {
+          "exp": 122,
+          "mass": 0.147815,
+          "p1_msb": 0.200197,
+          "p1_msb_pos": 0.19967,
+          "p1_msb_neg": 0.200715
+        },
+        {
+          "exp": 119,
+          "mass": 0.138873,
+          "p1_msb": 0.495624,
+          "p1_msb_pos": 0.495982,
+          "p1_msb_neg": 0.495267
+        },
+        {
+          "exp": 118,
+          "mass": 0.071601,
+          "p1_msb": 0.49924,
+          "p1_msb_pos": 0.49821,
+          "p1_msb_neg": 0.500265
+        },
+        {
+          "exp": 117,
+          "mass": 0.035989,
+          "p1_msb": 0.498117,
+          "p1_msb_pos": 0.499055,
+          "p1_msb_neg": 0.497177
+        },
+        {
+          "exp": 116,
+          "mass": 0.018026,
+          "p1_msb": 0.50233,
+          "p1_msb_pos": 0.500301,
+          "p1_msb_neg": 0.504348
+        },
+        {
+          "exp": 115,
+          "mass": 0.00905,
+          "p1_msb": 0.500244,
+          "p1_msb_pos": 0.499823,
+          "p1_msb_neg": 0.500665
+        },
+        {
+          "exp": 123,
+          "mass": 0.006045,
+          "p1_msb": 0.013529,
+          "p1_msb_pos": 0.011073,
+          "p1_msb_neg": 0.015816
+        },
+        {
+          "exp": 114,
+          "mass": 0.004548,
+          "p1_msb": 0.499119,
+          "p1_msb_pos": 0.50112,
+          "p1_msb_neg": 0.49718
+        },
+        {
+          "exp": 113,
+          "mass": 0.002246,
+          "p1_msb": 0.508523,
+          "p1_msb_pos": 0.505047,
+          "p1_msb_neg": 0.512055
+        },
+        {
+          "exp": 112,
+          "mass": 0.001149,
+          "p1_msb": 0.500873,
+          "p1_msb_pos": 0.499827,
+          "p1_msb_neg": 0.501933
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.0.down_proj.weight",
+      "layer": 13,
+      "proj": "down",
+      "n": 4988928,
+      "H_msb": 0.979643,
+      "H_msb_given_sign": 0.979643,
+      "H_msb_given_exp": 0.942593,
+      "H_msb_given_sym": 0.94259,
+      "H_b2": 0.994996,
+      "H_b2_given_exp": 0.983918,
+      "H_b2_given_sym9": 0.983913,
+      "H_b2_given_sym10": 0.983641,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.315605,
+          "p1_msb": 0.395079,
+          "p1_msb_pos": 0.395041,
+          "p1_msb_neg": 0.395118
+        },
+        {
+          "exp": 120,
+          "mass": 0.257026,
+          "p1_msb": 0.473695,
+          "p1_msb_pos": 0.473576,
+          "p1_msb_neg": 0.473815
+        },
+        {
+          "exp": 119,
+          "mass": 0.146396,
+          "p1_msb": 0.495007,
+          "p1_msb_pos": 0.495512,
+          "p1_msb_neg": 0.494503
+        },
+        {
+          "exp": 122,
+          "mass": 0.125799,
+          "p1_msb": 0.168527,
+          "p1_msb_pos": 0.168112,
+          "p1_msb_neg": 0.168941
+        },
+        {
+          "exp": 118,
+          "mass": 0.0756,
+          "p1_msb": 0.501478,
+          "p1_msb_pos": 0.501185,
+          "p1_msb_neg": 0.501772
+        },
+        {
+          "exp": 117,
+          "mass": 0.037974,
+          "p1_msb": 0.501987,
+          "p1_msb_pos": 0.501332,
+          "p1_msb_neg": 0.502637
+        },
+        {
+          "exp": 116,
+          "mass": 0.019075,
+          "p1_msb": 0.500294,
+          "p1_msb_pos": 0.499445,
+          "p1_msb_neg": 0.501149
+        },
+        {
+          "exp": 115,
+          "mass": 0.00955,
+          "p1_msb": 0.501595,
+          "p1_msb_pos": 0.502431,
+          "p1_msb_neg": 0.500771
+        },
+        {
+          "exp": 114,
+          "mass": 0.004767,
+          "p1_msb": 0.502397,
+          "p1_msb_pos": 0.50302,
+          "p1_msb_neg": 0.501771
+        },
+        {
+          "exp": 123,
+          "mass": 0.002917,
+          "p1_msb": 0.006321,
+          "p1_msb_pos": 0.006686,
+          "p1_msb_neg": 0.005952
+        },
+        {
+          "exp": 113,
+          "mass": 0.002356,
+          "p1_msb": 0.501446,
+          "p1_msb_pos": 0.502394,
+          "p1_msb_neg": 0.500508
+        },
+        {
+          "exp": 112,
+          "mass": 0.001202,
+          "p1_msb": 0.494496,
+          "p1_msb_pos": 0.486396,
+          "p1_msb_neg": 0.502484
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.18.down_proj.weight",
+      "layer": 13,
+      "proj": "down",
+      "n": 4988928,
+      "H_msb": 0.979736,
+      "H_msb_given_sign": 0.979736,
+      "H_msb_given_exp": 0.944664,
+      "H_msb_given_sym": 0.944661,
+      "H_b2": 0.994823,
+      "H_b2_given_exp": 0.984772,
+      "H_b2_given_sym9": 0.984769,
+      "H_b2_given_sym10": 0.984506,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.315751,
+          "p1_msb": 0.403182,
+          "p1_msb_pos": 0.402696,
+          "p1_msb_neg": 0.40367
+        },
+        {
+          "exp": 120,
+          "mass": 0.249268,
+          "p1_msb": 0.475429,
+          "p1_msb_pos": 0.476009,
+          "p1_msb_neg": 0.474847
+        },
+        {
+          "exp": 122,
+          "mass": 0.143118,
+          "p1_msb": 0.193215,
+          "p1_msb_pos": 0.193859,
+          "p1_msb_neg": 0.192569
+        },
+        {
+          "exp": 119,
+          "mass": 0.140689,
+          "p1_msb": 0.495229,
+          "p1_msb_pos": 0.494373,
+          "p1_msb_neg": 0.496082
+        },
+        {
+          "exp": 118,
+          "mass": 0.072686,
+          "p1_msb": 0.500109,
+          "p1_msb_pos": 0.49933,
+          "p1_msb_neg": 0.500888
+        },
+        {
+          "exp": 117,
+          "mass": 0.036654,
+          "p1_msb": 0.501539,
+          "p1_msb_pos": 0.500945,
+          "p1_msb_neg": 0.502136
+        },
+        {
+          "exp": 116,
+          "mass": 0.018512,
+          "p1_msb": 0.499762,
+          "p1_msb_pos": 0.498638,
+          "p1_msb_neg": 0.500872
+        },
+        {
+          "exp": 115,
+          "mass": 0.009153,
+          "p1_msb": 0.499354,
+          "p1_msb_pos": 0.496901,
+          "p1_msb_neg": 0.501859
+        },
+        {
+          "exp": 123,
+          "mass": 0.00492,
+          "p1_msb": 0.00986,
+          "p1_msb_pos": 0.010956,
+          "p1_msb_neg": 0.008771
+        },
+        {
+          "exp": 114,
+          "mass": 0.004647,
+          "p1_msb": 0.504098,
+          "p1_msb_pos": 0.503727,
+          "p1_msb_neg": 0.504475
+        },
+        {
+          "exp": 113,
+          "mass": 0.00233,
+          "p1_msb": 0.501032,
+          "p1_msb_pos": 0.492887,
+          "p1_msb_neg": 0.509044
+        },
+        {
+          "exp": 112,
+          "mass": 0.001158,
+          "p1_msb": 0.498788,
+          "p1_msb_pos": 0.501374,
+          "p1_msb_neg": 0.496159
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.36.down_proj.weight",
+      "layer": 13,
+      "proj": "down",
+      "n": 4988928,
+      "H_msb": 0.979508,
+      "H_msb_given_sign": 0.979508,
+      "H_msb_given_exp": 0.943367,
+      "H_msb_given_sym": 0.943363,
+      "H_b2": 0.994785,
+      "H_b2_given_exp": 0.984555,
+      "H_b2_given_sym9": 0.984549,
+      "H_b2_given_sym10": 0.984278,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.313677,
+          "p1_msb": 0.3938,
+          "p1_msb_pos": 0.393917,
+          "p1_msb_neg": 0.393683
+        },
+        {
+          "exp": 120,
+          "mass": 0.257161,
+          "p1_msb": 0.473188,
+          "p1_msb_pos": 0.47338,
+          "p1_msb_neg": 0.472996
+        },
+        {
+          "exp": 119,
+          "mass": 0.146728,
+          "p1_msb": 0.49433,
+          "p1_msb_pos": 0.494092,
+          "p1_msb_neg": 0.494568
+        },
+        {
+          "exp": 122,
+          "mass": 0.126355,
+          "p1_msb": 0.171431,
+          "p1_msb_pos": 0.171513,
+          "p1_msb_neg": 0.17135
+        },
+        {
+          "exp": 118,
+          "mass": 0.07607,
+          "p1_msb": 0.499671,
+          "p1_msb_pos": 0.500111,
+          "p1_msb_neg": 0.499232
+        },
+        {
+          "exp": 117,
+          "mass": 0.038458,
+          "p1_msb": 0.50116,
+          "p1_msb_pos": 0.500562,
+          "p1_msb_neg": 0.501758
+        },
+        {
+          "exp": 116,
+          "mass": 0.019197,
+          "p1_msb": 0.500282,
+          "p1_msb_pos": 0.499948,
+          "p1_msb_neg": 0.500614
+        },
+        {
+          "exp": 115,
+          "mass": 0.009622,
+          "p1_msb": 0.502489,
+          "p1_msb_pos": 0.502993,
+          "p1_msb_neg": 0.501983
+        },
+        {
+          "exp": 114,
+          "mass": 0.004778,
+          "p1_msb": 0.498322,
+          "p1_msb_pos": 0.497251,
+          "p1_msb_neg": 0.499408
+        },
+        {
+          "exp": 123,
+          "mass": 0.003117,
+          "p1_msb": 0.00566,
+          "p1_msb_pos": 0.004879,
+          "p1_msb_neg": 0.006443
+        },
+        {
+          "exp": 113,
+          "mass": 0.002422,
+          "p1_msb": 0.496482,
+          "p1_msb_pos": 0.490833,
+          "p1_msb_neg": 0.502056
+        },
+        {
+          "exp": 112,
+          "mass": 0.001209,
+          "p1_msb": 0.490798,
+          "p1_msb_pos": 0.498843,
+          "p1_msb_neg": 0.482701
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.54.down_proj.weight",
+      "layer": 13,
+      "proj": "down",
+      "n": 4988928,
+      "H_msb": 0.979296,
+      "H_msb_given_sign": 0.979296,
+      "H_msb_given_exp": 0.943278,
+      "H_msb_given_sym": 0.943275,
+      "H_b2": 0.994835,
+      "H_b2_given_exp": 0.983922,
+      "H_b2_given_sym9": 0.983919,
+      "H_b2_given_sym10": 0.983656,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.316557,
+          "p1_msb": 0.400002,
+          "p1_msb_pos": 0.399593,
+          "p1_msb_neg": 0.400412
+        },
+        {
+          "exp": 120,
+          "mass": 0.250669,
+          "p1_msb": 0.47485,
+          "p1_msb_pos": 0.475743,
+          "p1_msb_neg": 0.473956
+        },
+        {
+          "exp": 119,
+          "mass": 0.141622,
+          "p1_msb": 0.495324,
+          "p1_msb_pos": 0.496078,
+          "p1_msb_neg": 0.494567
+        },
+        {
+          "exp": 122,
+          "mass": 0.139481,
+          "p1_msb": 0.18748,
+          "p1_msb_pos": 0.187155,
+          "p1_msb_neg": 0.187807
+        },
+        {
+          "exp": 118,
+          "mass": 0.073023,
+          "p1_msb": 0.500947,
+          "p1_msb_pos": 0.500553,
+          "p1_msb_neg": 0.501338
+        },
+        {
+          "exp": 117,
+          "mass": 0.036837,
+          "p1_msb": 0.501475,
+          "p1_msb_pos": 0.501382,
+          "p1_msb_neg": 0.501567
+        },
+        {
+          "exp": 116,
+          "mass": 0.018438,
+          "p1_msb": 0.503457,
+          "p1_msb_pos": 0.505253,
+          "p1_msb_neg": 0.501663
+        },
+        {
+          "exp": 115,
+          "mass": 0.009243,
+          "p1_msb": 0.5009,
+          "p1_msb_pos": 0.501949,
+          "p1_msb_neg": 0.499848
+        },
+        {
+          "exp": 114,
+          "mass": 0.004602,
+          "p1_msb": 0.4951,
+          "p1_msb_pos": 0.493906,
+          "p1_msb_neg": 0.496296
+        },
+        {
+          "exp": 123,
+          "mass": 0.004403,
+          "p1_msb": 0.006966,
+          "p1_msb_pos": 0.007736,
+          "p1_msb_neg": 0.006194
+        },
+        {
+          "exp": 113,
+          "mass": 0.002305,
+          "p1_msb": 0.491867,
+          "p1_msb_pos": 0.481285,
+          "p1_msb_neg": 0.502143
+        },
+        {
+          "exp": 112,
+          "mass": 0.00113,
+          "p1_msb": 0.499734,
+          "p1_msb_pos": 0.496811,
+          "p1_msb_neg": 0.502664
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.73.down_proj.weight",
+      "layer": 13,
+      "proj": "down",
+      "n": 4988928,
+      "H_msb": 0.979782,
+      "H_msb_given_sign": 0.979782,
+      "H_msb_given_exp": 0.943154,
+      "H_msb_given_sym": 0.943152,
+      "H_b2": 0.994753,
+      "H_b2_given_exp": 0.984289,
+      "H_b2_given_sym9": 0.984286,
+      "H_b2_given_sym10": 0.984025,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.311568,
+          "p1_msb": 0.385567,
+          "p1_msb_pos": 0.385491,
+          "p1_msb_neg": 0.385643
+        },
+        {
+          "exp": 120,
+          "mass": 0.263939,
+          "p1_msb": 0.471757,
+          "p1_msb_pos": 0.471231,
+          "p1_msb_neg": 0.472283
+        },
+        {
+          "exp": 119,
+          "mass": 0.152244,
+          "p1_msb": 0.494192,
+          "p1_msb_pos": 0.495189,
+          "p1_msb_neg": 0.493195
+        },
+        {
+          "exp": 122,
+          "mass": 0.111845,
+          "p1_msb": 0.154493,
+          "p1_msb_pos": 0.154503,
+          "p1_msb_neg": 0.154483
+        },
+        {
+          "exp": 118,
+          "mass": 0.078753,
+          "p1_msb": 0.50115,
+          "p1_msb_pos": 0.500895,
+          "p1_msb_neg": 0.501406
+        },
+        {
+          "exp": 117,
+          "mass": 0.039628,
+          "p1_msb": 0.503257,
+          "p1_msb_pos": 0.504282,
+          "p1_msb_neg": 0.502232
+        },
+        {
+          "exp": 116,
+          "mass": 0.01993,
+          "p1_msb": 0.498522,
+          "p1_msb_pos": 0.49727,
+          "p1_msb_neg": 0.499751
+        },
+        {
+          "exp": 115,
+          "mass": 0.009883,
+          "p1_msb": 0.500335,
+          "p1_msb_pos": 0.498981,
+          "p1_msb_neg": 0.501675
+        },
+        {
+          "exp": 114,
+          "mass": 0.005007,
+          "p1_msb": 0.502302,
+          "p1_msb_pos": 0.505372,
+          "p1_msb_neg": 0.499241
+        },
+        {
+          "exp": 113,
+          "mass": 0.002504,
+          "p1_msb": 0.498199,
+          "p1_msb_pos": 0.496527,
+          "p1_msb_neg": 0.499919
+        },
+        {
+          "exp": 123,
+          "mass": 0.002189,
+          "p1_msb": 0.014649,
+          "p1_msb_pos": 0.01539,
+          "p1_msb_neg": 0.013909
+        },
+        {
+          "exp": 112,
+          "mass": 0.001264,
+          "p1_msb": 0.488029,
+          "p1_msb_pos": 0.487935,
+          "p1_msb_neg": 0.488126
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.91.down_proj.weight",
+      "layer": 13,
+      "proj": "down",
+      "n": 4988928,
+      "H_msb": 0.979656,
+      "H_msb_given_sign": 0.979656,
+      "H_msb_given_exp": 0.943154,
+      "H_msb_given_sym": 0.943151,
+      "H_b2": 0.994797,
+      "H_b2_given_exp": 0.98439,
+      "H_b2_given_sym9": 0.984385,
+      "H_b2_given_sym10": 0.98409,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.31772,
+          "p1_msb": 0.400562,
+          "p1_msb_pos": 0.400551,
+          "p1_msb_neg": 0.400574
+        },
+        {
+          "exp": 120,
+          "mass": 0.251786,
+          "p1_msb": 0.475776,
+          "p1_msb_pos": 0.476221,
+          "p1_msb_neg": 0.475329
+        },
+        {
+          "exp": 119,
+          "mass": 0.142154,
+          "p1_msb": 0.496261,
+          "p1_msb_pos": 0.495449,
+          "p1_msb_neg": 0.497073
+        },
+        {
+          "exp": 122,
+          "mass": 0.136925,
+          "p1_msb": 0.180329,
+          "p1_msb_pos": 0.180109,
+          "p1_msb_neg": 0.18055
+        },
+        {
+          "exp": 118,
+          "mass": 0.073563,
+          "p1_msb": 0.499952,
+          "p1_msb_pos": 0.49955,
+          "p1_msb_neg": 0.500354
+        },
+        {
+          "exp": 117,
+          "mass": 0.037042,
+          "p1_msb": 0.500801,
+          "p1_msb_pos": 0.500038,
+          "p1_msb_neg": 0.501557
+        },
+        {
+          "exp": 116,
+          "mass": 0.018521,
+          "p1_msb": 0.501797,
+          "p1_msb_pos": 0.503299,
+          "p1_msb_neg": 0.500292
+        },
+        {
+          "exp": 115,
+          "mass": 0.009277,
+          "p1_msb": 0.500583,
+          "p1_msb_pos": 0.497877,
+          "p1_msb_neg": 0.503332
+        },
+        {
+          "exp": 114,
+          "mass": 0.00463,
+          "p1_msb": 0.50461,
+          "p1_msb_pos": 0.507433,
+          "p1_msb_neg": 0.501778
+        },
+        {
+          "exp": 123,
+          "mass": 0.003736,
+          "p1_msb": 0.004507,
+          "p1_msb_pos": 0.00411,
+          "p1_msb_neg": 0.004919
+        },
+        {
+          "exp": 113,
+          "mass": 0.002328,
+          "p1_msb": 0.495652,
+          "p1_msb_pos": 0.496513,
+          "p1_msb_neg": 0.49477
+        },
+        {
+          "exp": 112,
+          "mass": 0.001138,
+          "p1_msb": 0.49815,
+          "p1_msb_pos": 0.499646,
+          "p1_msb_neg": 0.496673
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.109.down_proj.weight",
+      "layer": 13,
+      "proj": "down",
+      "n": 4988928,
+      "H_msb": 0.97952,
+      "H_msb_given_sign": 0.97952,
+      "H_msb_given_exp": 0.9433,
+      "H_msb_given_sym": 0.943296,
+      "H_b2": 0.994728,
+      "H_b2_given_exp": 0.984389,
+      "H_b2_given_sym9": 0.984386,
+      "H_b2_given_sym10": 0.984128,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.3152,
+          "p1_msb": 0.394867,
+          "p1_msb_pos": 0.395286,
+          "p1_msb_neg": 0.394446
+        },
+        {
+          "exp": 120,
+          "mass": 0.256165,
+          "p1_msb": 0.473387,
+          "p1_msb_pos": 0.472776,
+          "p1_msb_neg": 0.473998
+        },
+        {
+          "exp": 119,
+          "mass": 0.146063,
+          "p1_msb": 0.494691,
+          "p1_msb_pos": 0.49338,
+          "p1_msb_neg": 0.496
+        },
+        {
+          "exp": 122,
+          "mass": 0.127615,
+          "p1_msb": 0.17233,
+          "p1_msb_pos": 0.171436,
+          "p1_msb_neg": 0.173223
+        },
+        {
+          "exp": 118,
+          "mass": 0.075555,
+          "p1_msb": 0.500255,
+          "p1_msb_pos": 0.499649,
+          "p1_msb_neg": 0.500858
+        },
+        {
+          "exp": 117,
+          "mass": 0.038016,
+          "p1_msb": 0.501816,
+          "p1_msb_pos": 0.500437,
+          "p1_msb_neg": 0.503196
+        },
+        {
+          "exp": 116,
+          "mass": 0.019056,
+          "p1_msb": 0.500642,
+          "p1_msb_pos": 0.501308,
+          "p1_msb_neg": 0.499979
+        },
+        {
+          "exp": 115,
+          "mass": 0.009583,
+          "p1_msb": 0.501788,
+          "p1_msb_pos": 0.505089,
+          "p1_msb_neg": 0.498469
+        },
+        {
+          "exp": 114,
+          "mass": 0.00476,
+          "p1_msb": 0.494251,
+          "p1_msb_pos": 0.494233,
+          "p1_msb_neg": 0.49427
+        },
+        {
+          "exp": 123,
+          "mass": 0.003194,
+          "p1_msb": 0.005899,
+          "p1_msb_pos": 0.005582,
+          "p1_msb_neg": 0.00621
+        },
+        {
+          "exp": 113,
+          "mass": 0.002382,
+          "p1_msb": 0.502483,
+          "p1_msb_pos": 0.506854,
+          "p1_msb_neg": 0.498051
+        },
+        {
+          "exp": 112,
+          "mass": 0.001196,
+          "p1_msb": 0.488684,
+          "p1_msb_pos": 0.500671,
+          "p1_msb_neg": 0.476717
+        }
+      ]
+    },
+    {
+      "name": "backbone.layers.13.mixer.experts.127.down_proj.weight",
+      "layer": 13,
+      "proj": "down",
+      "n": 4988928,
+      "H_msb": 0.979846,
+      "H_msb_given_sign": 0.979846,
+      "H_msb_given_exp": 0.944523,
+      "H_msb_given_sym": 0.944521,
+      "H_b2": 0.994796,
+      "H_b2_given_exp": 0.984552,
+      "H_b2_given_sym9": 0.98455,
+      "H_b2_given_sym10": 0.984296,
+      "exp_profile": [
+        {
+          "exp": 121,
+          "mass": 0.315985,
+          "p1_msb": 0.402198,
+          "p1_msb_pos": 0.402537,
+          "p1_msb_neg": 0.401858
+        },
+        {
+          "exp": 120,
+          "mass": 0.249451,
+          "p1_msb": 0.475739,
+          "p1_msb_pos": 0.476102,
+          "p1_msb_neg": 0.475375
+        },
+        {
+          "exp": 122,
+          "mass": 0.14182,
+          "p1_msb": 0.191702,
+          "p1_msb_pos": 0.191603,
+          "p1_msb_neg": 0.191803
+        },
+        {
+          "exp": 119,
+          "mass": 0.141426,
+          "p1_msb": 0.495545,
+          "p1_msb_pos": 0.495271,
+          "p1_msb_neg": 0.495822
+        },
+        {
+          "exp": 118,
+          "mass": 0.073066,
+          "p1_msb": 0.500811,
+          "p1_msb_pos": 0.500236,
+          "p1_msb_neg": 0.501386
+        },
+        {
+          "exp": 117,
+          "mass": 0.036747,
+          "p1_msb": 0.501947,
+          "p1_msb_pos": 0.500928,
+          "p1_msb_neg": 0.502965
+        },
+        {
+          "exp": 116,
+          "mass": 0.018399,
+          "p1_msb": 0.503464,
+          "p1_msb_pos": 0.503529,
+          "p1_msb_neg": 0.5034
+        },
+        {
+          "exp": 115,
+          "mass": 0.009211,
+          "p1_msb": 0.503264,
+          "p1_msb_pos": 0.505231,
+          "p1_msb_neg": 0.501303
+        },
+        {
+          "exp": 123,
+          "mass": 0.004717,
+          "p1_msb": 0.007097,
+          "p1_msb_pos": 0.006635,
+          "p1_msb_neg": 0.007571
+        },
+        {
+          "exp": 114,
+          "mass": 0.004601,
+          "p1_msb": 0.500871,
+          "p1_msb_pos": 0.495631,
+          "p1_msb_neg": 0.505981
+        },
+        {
+          "exp": 113,
+          "mass": 0.002277,
+          "p1_msb": 0.503609,
+          "p1_msb_pos": 0.502122,
+          "p1_msb_neg": 0.505081
+        },
+        {
+          "exp": 112,
+          "mass": 0.001156,
+          "p1_msb": 0.51214,
+          "p1_msb_pos": 0.515329,
+          "p1_msb_neg": 0.508907
+        }
+      ]
+    }
+  ]
+}

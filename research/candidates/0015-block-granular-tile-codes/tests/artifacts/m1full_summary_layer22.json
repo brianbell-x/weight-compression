@@ -1,0 +1,41 @@
+{
+  "mode": "real",
+  "layer": 22,
+  "acct_stamp": "bb3a86666829",
+  "targets": 256,
+  "total_params": 1277165568,
+  "stz_ref_weighted_bpw": 10.884875,
+  "parity_max_abs_diff": 0.0,
+  "stored_frozen_checked": 256,
+  "frozen_bpw": 10.702531,
+  "m1_bpw": 10.65869,
+  "delta_bpw": 0.04384,
+  "delta_vs_stz_m1_bpw": 0.226184,
+  "floor7_bpw": 10.559849,
+  "bound_m1_bpw": 10.503877,
+  "per_proj": {
+    "down": {
+      "tensors": 128,
+      "frozen_bpw": 10.698966,
+      "m1_bpw": 10.658508,
+      "delta_bpw": 0.040458
+    },
+    "up": {
+      "tensors": 128,
+      "frozen_bpw": 10.706095,
+      "m1_bpw": 10.658872,
+      "delta_bpw": 0.047223
+    }
+  },
+  "per_tensor_delta": {
+    "min": 0.021834,
+    "max": 0.070671,
+    "n_nonpositive": 0
+  },
+  "roundtrip": {
+    "frozen_blocks": 1024,
+    "m1_blocks": 1024,
+    "all_ok": true
+  },
+  "accounting_note": "identical mechanics/charges to probe_mantissa_phase (frozen k=7 vs M1 sym10 k=6); stz parity + stored-frozen cross-check + round-trip gates all fatal on mismatch"
+}

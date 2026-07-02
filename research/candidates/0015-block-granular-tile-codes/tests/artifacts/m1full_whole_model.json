@@ -1,0 +1,160 @@
+{
+  "acct_stamp": "bb3a86666829",
+  "convention": "wm = stz_wm - expert_share * mean_23(stz_ref_L - format_bpw_L); all 23 expert layers have identical numel so the expert plane is the plain mean of per-layer deltas; non-expert ~7% held at stz -- IDENTICAL to the 10.7311 computation",
+  "stz_whole_model_bpw": 10.897505,
+  "expert_share": 0.930232,
+  "layers": {
+    "1": {
+      "stz_ref": 11.031005,
+      "frozen": 10.844315,
+      "m1": 10.812593,
+      "delta_m1_vs_frozen": 0.031722
+    },
+    "3": {
+      "stz_ref": 11.017593,
+      "frozen": 10.823759,
+      "m1": 10.759474,
+      "delta_m1_vs_frozen": 0.064285
+    },
+    "6": {
+      "stz_ref": 10.949809,
+      "frozen": 10.761832,
+      "m1": 10.711942,
+      "delta_m1_vs_frozen": 0.04989
+    },
+    "8": {
+      "stz_ref": 10.913267,
+      "frozen": 10.730473,
+      "m1": 10.68691,
+      "delta_m1_vs_frozen": 0.043563
+    },
+    "10": {
+      "stz_ref": 10.896154,
+      "frozen": 10.713757,
+      "m1": 10.670237,
+      "delta_m1_vs_frozen": 0.04352
+    },
+    "13": {
+      "stz_ref": 10.893134,
+      "frozen": 10.711249,
+      "m1": 10.666999,
+      "delta_m1_vs_frozen": 0.04425
+    },
+    "15": {
+      "stz_ref": 10.888246,
+      "frozen": 10.70576,
+      "m1": 10.663718,
+      "delta_m1_vs_frozen": 0.042042
+    },
+    "17": {
+      "stz_ref": 10.888043,
+      "frozen": 10.707279,
+      "m1": 10.662689,
+      "delta_m1_vs_frozen": 0.04459
+    },
+    "20": {
+      "stz_ref": 10.883367,
+      "frozen": 10.702086,
+      "m1": 10.657501,
+      "delta_m1_vs_frozen": 0.044585
+    },
+    "22": {
+      "stz_ref": 10.884875,
+      "frozen": 10.702531,
+      "m1": 10.65869,
+      "delta_m1_vs_frozen": 0.043841
+    },
+    "24": {
+      "stz_ref": 10.884227,
+      "frozen": 10.700789,
+      "m1": 10.655326,
+      "delta_m1_vs_frozen": 0.045463
+    },
+    "27": {
+      "stz_ref": 10.882182,
+      "frozen": 10.700447,
+      "m1": 10.653971,
+      "delta_m1_vs_frozen": 0.046476
+    },
+    "29": {
+      "stz_ref": 10.882618,
+      "frozen": 10.700912,
+      "m1": 10.653787,
+      "delta_m1_vs_frozen": 0.047125
+    },
+    "31": {
+      "stz_ref": 10.878357,
+      "frozen": 10.697889,
+      "m1": 10.648524,
+      "delta_m1_vs_frozen": 0.049365
+    },
+    "34": {
+      "stz_ref": 10.871979,
+      "frozen": 10.694912,
+      "m1": 10.643769,
+      "delta_m1_vs_frozen": 0.051143
+    },
+    "36": {
+      "stz_ref": 10.869805,
+      "frozen": 10.694723,
+      "m1": 10.642982,
+      "delta_m1_vs_frozen": 0.051741
+    },
+    "38": {
+      "stz_ref": 10.868916,
+      "frozen": 10.694738,
+      "m1": 10.64277,
+      "delta_m1_vs_frozen": 0.051968
+    },
+    "40": {
+      "stz_ref": 10.870616,
+      "frozen": 10.697099,
+      "m1": 10.645518,
+      "delta_m1_vs_frozen": 0.051581
+    },
+    "43": {
+      "stz_ref": 10.867236,
+      "frozen": 10.692735,
+      "m1": 10.641018,
+      "delta_m1_vs_frozen": 0.051717
+    },
+    "45": {
+      "stz_ref": 10.86589,
+      "frozen": 10.692838,
+      "m1": 10.641295,
+      "delta_m1_vs_frozen": 0.051543
+    },
+    "47": {
+      "stz_ref": 10.866796,
+      "frozen": 10.694293,
+      "m1": 10.642657,
+      "delta_m1_vs_frozen": 0.051636
+    },
+    "49": {
+      "stz_ref": 10.866184,
+      "frozen": 10.698702,
+      "m1": 10.648759,
+      "delta_m1_vs_frozen": 0.049943
+    },
+    "51": {
+      "stz_ref": 10.861394,
+      "frozen": 10.704131,
+      "m1": 10.656928,
+      "delta_m1_vs_frozen": 0.047203
+    }
+  },
+  "frozen_whole_model_recomputed_bpw": 10.731097,
+  "frozen_whole_model_ref_bpw": 10.7311,
+  "m1_whole_model_bpw": 10.68664,
+  "m1_delta_vs_frozen_wm_bpw": 0.044457,
+  "m1_delta_vs_stz_wm_bpw": 0.210865,
+  "expert_delta_m1_vs_frozen": {
+    "mean": 0.047791,
+    "min": 0.031722,
+    "max": 0.064285,
+    "min_layer": 1,
+    "max_layer": 3
+  },
+  "roundtrip_blocks_total": 47097,
+  "note": "MEASURED on every expert tensor of every expert layer (23 x 256); replaces the 10.6923 projection"
+}

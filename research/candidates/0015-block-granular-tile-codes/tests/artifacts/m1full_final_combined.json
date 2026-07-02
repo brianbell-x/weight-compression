@@ -1,0 +1,369 @@
+{
+  "t1": {
+    "per_layer": [
+      {
+        "layer": 1,
+        "frozen_bpw": 10.844315,
+        "m1_bpw": 10.812593,
+        "delta": 0.031721,
+        "stz_ref_bpw": 11.031005,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 11
+      },
+      {
+        "layer": 3,
+        "frozen_bpw": 10.823759,
+        "m1_bpw": 10.759474,
+        "delta": 0.064286,
+        "stz_ref_bpw": 11.017593,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 2
+      },
+      {
+        "layer": 6,
+        "frozen_bpw": 10.761832,
+        "m1_bpw": 10.711942,
+        "delta": 0.04989,
+        "stz_ref_bpw": 10.949809,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 6
+      },
+      {
+        "layer": 8,
+        "frozen_bpw": 10.730473,
+        "m1_bpw": 10.68691,
+        "delta": 0.043563,
+        "stz_ref_bpw": 10.913267,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 4
+      },
+      {
+        "layer": 10,
+        "frozen_bpw": 10.713757,
+        "m1_bpw": 10.670237,
+        "delta": 0.04352,
+        "stz_ref_bpw": 10.896154,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 1
+      },
+      {
+        "layer": 13,
+        "frozen_bpw": 10.711249,
+        "m1_bpw": 10.666999,
+        "delta": 0.04425,
+        "stz_ref_bpw": 10.893134,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 1
+      },
+      {
+        "layer": 15,
+        "frozen_bpw": 10.70576,
+        "m1_bpw": 10.663718,
+        "delta": 0.042042,
+        "stz_ref_bpw": 10.888246,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 1
+      },
+      {
+        "layer": 17,
+        "frozen_bpw": 10.707279,
+        "m1_bpw": 10.662689,
+        "delta": 0.044589,
+        "stz_ref_bpw": 10.888043,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 1
+      },
+      {
+        "layer": 20,
+        "frozen_bpw": 10.702086,
+        "m1_bpw": 10.657501,
+        "delta": 0.044586,
+        "stz_ref_bpw": 10.883367,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 0
+      },
+      {
+        "layer": 22,
+        "frozen_bpw": 10.702531,
+        "m1_bpw": 10.65869,
+        "delta": 0.04384,
+        "stz_ref_bpw": 10.884875,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 0
+      },
+      {
+        "layer": 24,
+        "frozen_bpw": 10.700789,
+        "m1_bpw": 10.655326,
+        "delta": 0.045463,
+        "stz_ref_bpw": 10.884227,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 0
+      },
+      {
+        "layer": 27,
+        "frozen_bpw": 10.700447,
+        "m1_bpw": 10.653971,
+        "delta": 0.046476,
+        "stz_ref_bpw": 10.882182,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 0
+      },
+      {
+        "layer": 29,
+        "frozen_bpw": 10.700912,
+        "m1_bpw": 10.653787,
+        "delta": 0.047125,
+        "stz_ref_bpw": 10.882618,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 0
+      },
+      {
+        "layer": 31,
+        "frozen_bpw": 10.697889,
+        "m1_bpw": 10.648524,
+        "delta": 0.049365,
+        "stz_ref_bpw": 10.878357,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 0
+      },
+      {
+        "layer": 34,
+        "frozen_bpw": 10.694912,
+        "m1_bpw": 10.643769,
+        "delta": 0.051143,
+        "stz_ref_bpw": 10.871979,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 0
+      },
+      {
+        "layer": 36,
+        "frozen_bpw": 10.694723,
+        "m1_bpw": 10.642982,
+        "delta": 0.051741,
+        "stz_ref_bpw": 10.869805,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 0
+      },
+      {
+        "layer": 38,
+        "frozen_bpw": 10.694738,
+        "m1_bpw": 10.64277,
+        "delta": 0.051968,
+        "stz_ref_bpw": 10.868916,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 0
+      },
+      {
+        "layer": 40,
+        "frozen_bpw": 10.697099,
+        "m1_bpw": 10.645518,
+        "delta": 0.051581,
+        "stz_ref_bpw": 10.870616,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 1
+      },
+      {
+        "layer": 43,
+        "frozen_bpw": 10.692735,
+        "m1_bpw": 10.641018,
+        "delta": 0.051716,
+        "stz_ref_bpw": 10.867236,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 0
+      },
+      {
+        "layer": 45,
+        "frozen_bpw": 10.692838,
+        "m1_bpw": 10.641295,
+        "delta": 0.051542,
+        "stz_ref_bpw": 10.86589,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 1
+      },
+      {
+        "layer": 47,
+        "frozen_bpw": 10.694293,
+        "m1_bpw": 10.642657,
+        "delta": 0.051636,
+        "stz_ref_bpw": 10.866796,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 1
+      },
+      {
+        "layer": 49,
+        "frozen_bpw": 10.698702,
+        "m1_bpw": 10.648759,
+        "delta": 0.049943,
+        "stz_ref_bpw": 10.866184,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 5
+      },
+      {
+        "layer": 51,
+        "frozen_bpw": 10.704131,
+        "m1_bpw": 10.656928,
+        "delta": 0.047203,
+        "stz_ref_bpw": 10.861394,
+        "parity_max_abs_diff": 0.0,
+        "roundtrip_ok": true,
+        "n_delta_nonpositive_tensors": 0
+      }
+    ],
+    "measured_whole_model_bpw": 10.68664,
+    "frozen_whole_model_recomputed_bpw": 10.731097,
+    "delta_vs_frozen_wm": 0.044457,
+    "delta_vs_stz_wm": 0.210865,
+    "expert_delta_stats": {
+      "mean": 0.047791,
+      "min": 0.031722,
+      "max": 0.064285,
+      "min_layer": 1,
+      "max_layer": 3
+    },
+    "parity_ok": true,
+    "roundtrip_ok": true
+  },
+  "t2": {
+    "tensors": 64,
+    "layers": [
+      1,
+      13,
+      27,
+      51
+    ],
+    "h_msb": 0.979359,
+    "h_msb_given_sym": 0.943172,
+    "h_msb_given_expbin": 0.943176,
+    "h_msb_given_sign": 0.979359,
+    "mi_bpw": {
+      "MI_msb_sign": 0.0,
+      "MI_msb_exp": 0.036183,
+      "MI_msb_sym": 0.036187,
+      "MI_msb_sign_given_exp": 4e-06,
+      "MI_b2_sym10": 0.012046,
+      "MI_b2_exp": 0.01177
+    },
+    "exp_share_of_sym_mi": 0.999889,
+    "b2": {
+      "h_b2": 0.994971,
+      "h_b2_given_sym10": 0.982925,
+      "h_b2_given_exp": 0.983201,
+      "headroom_total_vs_verbatim": 0.017075
+    },
+    "exp_profile_pooled": [
+      {
+        "exp": 121,
+        "mass": 0.309812,
+        "p1_msb": 0.400031
+      },
+      {
+        "exp": 120,
+        "mass": 0.248597,
+        "p1_msb": 0.473409
+      },
+      {
+        "exp": 119,
+        "mass": 0.142797,
+        "p1_msb": 0.493848
+      },
+      {
+        "exp": 122,
+        "mass": 0.137081,
+        "p1_msb": 0.190703
+      },
+      {
+        "exp": 118,
+        "mass": 0.074537,
+        "p1_msb": 0.499094
+      },
+      {
+        "exp": 117,
+        "mass": 0.038332,
+        "p1_msb": 0.497007
+      },
+      {
+        "exp": 116,
+        "mass": 0.020217,
+        "p1_msb": 0.493163
+      },
+      {
+        "exp": 115,
+        "mass": 0.010829,
+        "p1_msb": 0.493329
+      }
+    ],
+    "per_layer": {
+      "1": {
+        "H_msb": 0.97844,
+        "H_msb_given_sym": 0.940288,
+        "H_msb_given_exp": 0.940292
+      },
+      "13": {
+        "H_msb": 0.979625,
+        "H_msb_given_sym": 0.943785,
+        "H_msb_given_exp": 0.943788
+      },
+      "27": {
+        "H_msb": 0.97972,
+        "H_msb_given_sym": 0.944223,
+        "H_msb_given_exp": 0.944227
+      },
+      "51": {
+        "H_msb": 0.979652,
+        "H_msb_given_sym": 0.944392,
+        "H_msb_given_exp": 0.944397
+      }
+    }
+  },
+  "t3": {
+    "tensors": 32,
+    "layers": [
+      1,
+      13,
+      27,
+      51
+    ],
+    "payload_ceiling_bpw": 0.003216,
+    "mant6_ceiling_bpw": 0.009468,
+    "payload_mi_hits": 28,
+    "mant6_mi_hits": 32,
+    "phase6_p1_pooled": [
+      0.458599,
+      0.478644,
+      0.489859,
+      0.495563,
+      0.498153,
+      0.499291
+    ],
+    "converged_all_layers": false,
+    "per_layer_verdicts": {
+      "1": "NEW QUANTIFIED CEILING: payload 0.0123, residual 6-bit plane 0.0183 b/w (bar 0.01)",
+      "13": "CONVERGED at the 0.01 b/w bar: M1 payload ceiling 0.0005, residual 6-bit plane ceiling 0.0065",
+      "27": "CONVERGED at the 0.01 b/w bar: M1 payload ceiling 0.0000, residual 6-bit plane ceiling 0.0065",
+      "51": "CONVERGED at the 0.01 b/w bar: M1 payload ceiling 0.0001, residual 6-bit plane ceiling 0.0066"
+    }
+  }
+}

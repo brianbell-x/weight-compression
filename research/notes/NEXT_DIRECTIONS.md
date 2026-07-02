@@ -63,14 +63,16 @@ conservative interpolation.** floor+0.15 holds mid-model only. Queue, in order:
 1. ~~Completeness sweep~~ **DONE 2026-07-02**: all 23 expert layers measured —
    **fully measured whole-model 10.7311 b/w = 32.93%**, G1 23/23, parity exact
    23/23, round-trips 23/23. Non-expert 7% (held at stz) still extendable.
-2. ~~Peel + mantissa phase-bias probe~~ **BOTH DONE 2026-07-02, probe FIRED**: M1
-   (MSB folded into sym10) realizes **+0.0417 b/w**, 2× gate, skeptic-verified;
-   projected whole-model **10.6923 ≈ 33.2%**. Now running: frozen+M1 re-score on
-   all 23 layers (projection → measured), H(mantMSB|exp) MI decomposition, and
-   re-peel of the M1 emission. Then queued: byte-renorm/wider-state coder
-   mechanics (~0.06 b/w unlock; M2's binary-lane loss was coder redundancy, not
-   the direction), second-mantissa-bit fold (~0.017 at bound), tier-design
-   headroom (lens 0.0335, bounded by pad slack).
+2. ~~Peel + mantissa probe + full measurement~~ **ALL DONE 2026-07-02**:
+   **tile+M1 measured whole-model 10.68664 b/w = 33.21%** (23/23 layers,
+   skeptic-verified to from-scratch decode). Mechanism located: MSB bias is
+   99.99% exponent-magnitude-driven (top-of-binade weights), model-wide stable;
+   bit-2 repeats it (~0.017 headroom, coder-gated). Bulk emission converged;
+   only L1 keeps localized structure (≤0.002 model-wide). **NEXT PRIMARY:
+   byte-renorm/wider-state coder probe** — reduce the measured 0.063 b/sym
+   redundancy at A=1024 AND collect bit-2 via sym11 (~0.06 b/w combined
+   ceiling). Then tier-design headroom (≤0.0335, pad-bounded), early-layer
+   bundle (~0.02–0.03), then container realization.
 3. **Layout-aware early-layer column candidate** (new lead): L1/L3 per-column sym
    ceiling is 0.125–0.160 b/w but 64–128-col groups capture <5%; column-major
    blocking or ≤16-col groups with O(1) address math; whole-model ceiling only

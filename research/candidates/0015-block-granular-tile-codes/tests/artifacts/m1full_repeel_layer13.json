@@ -1,0 +1,22 @@
+{
+  "mode": "real",
+  "layer": 13,
+  "acct_stamp": "bb3a86666829",
+  "targets": 8,
+  "total_params": 39911424,
+  "payload_ceiling_bpw_weighted": 0.000496,
+  "mant6_ceiling_bpw_weighted": 0.006547,
+  "payload_mi_hit_tensors": 7,
+  "mant6_mi_hit_tensors": 8,
+  "phase6_p1_pooled": [
+    0.457697,
+    0.479448,
+    0.490649,
+    0.496498,
+    0.498999,
+    0.500088
+  ],
+  "phase6_note": "residual plane phases 0..5 are the OLD mantissa phases 1..6 (the MSB left the plane with M1); a non-flat profile here is the second-bit signal T2 quantifies as H(b2|sym10)",
+  "converged": true,
+  "verdict": "CONVERGED at the 0.01 b/w bar: M1 payload ceiling 0.0005, residual 6-bit plane ceiling 0.0065"
+}
