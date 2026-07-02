@@ -195,6 +195,33 @@ and `verify` decodes from the .stz alone:
   (`stz_tensor_stats.jsonl`, 6243 tensors), not the old 11.2 b/w baseline — part of the
   escape-side headroom those directions priced in has already been harvested.
 
+## Column-keyed codebooks FALSIFIED — stz certified near-optimal at per-weight width (candidate 0014, 2026-07-01)
+
+Direction D (NEXT_DIRECTIONS) probed decisively on real weights (shard 7, layer 27: all 128
+experts × {up,down}_proj = 256 tensors, 1.28 B params) and **falsified**. Probe
+(`0014/tools/probe_column_codebooks.py`, adversarially reviewed, parity gate vs
+`stz_tensor_stats.jsonl` EXACT to 0.000000 on all 256 tensors; skeptic re-derived all
+weighted numbers from raw per-tensor bits — not refuted, high confidence):
+
+- **All 16 column-keyed variants lose to realized stz** (per-tensor and expert-shared ×
+  g∈{1,4,16,64} × b∈{3,4}, every side cost exactly charged). Best (shared, g=64, b=3) is
+  still −0.0283 b/w; an adoption-aware envelope letting every tensor freely adopt any
+  variant chose the stz baseline **256/256 times**.
+- **Mechanism (record this rule)**: after stz's second-level escape recoder, escape-rate
+  reductions convert at only (k−b) recoded bits per converted escape — "fewer escapes"
+  levers must be priced through the recoder first. That killed b=4 column tables (escape
+  halving reproduced, but the extra index bit costs +0.21–0.31 b/w net) and b=3 (K=7 runs
+  21–22% escapes).
+- **Escape forensics: the emitted escape mask is near-random** (down_proj Fano ≈1.0,
+  adjacency lifts ≈1.00, H(sign|col)≈H(sign)≈1.0) — a recursive peel-until-random pass on
+  stz's own emission that certifies per-weight fixed-width column conditioning is done.
+  The one residual signal: **up_proj row-wise escape overdispersion (Fano ~2.3 vs ~0.79
+  binomial)** → a small per-row escape-k chooser lever, ceiling ~0.01–0.03 b/w.
+- Consequence: the ~0.4 b/w fusible-vs-storage gap cannot be closed by finer weight-level
+  keying — it moves to **block/tile granularity (direction A)** or storage realization
+  (E/F). Per-column BASE re-centering survives only as a chooser option (ceiling
+  ~0.02–0.05 b/w); column-keying the second-level table is ruled out (<0.01 b/w).
+
 ## Purged tracks — do not re-open (2026-07-01)
 
 Lossy/quantization/QAT/train-time tracks (candidates 0005–0008, 0011, 0013,

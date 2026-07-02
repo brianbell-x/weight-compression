@@ -1,0 +1,246 @@
+{
+  "mode": "real",
+  "scope": "layer 27 only; cross-layer transfer unvalidated",
+  "targets": 256,
+  "total_params": 1277165568,
+  "parity_max_abs_diff": 0.0,
+  "baseline_bpw": 10.882179,
+  "whole_model_baseline_bpw": 10.8975,
+  "expert_frac": 0.93,
+  "variants": {
+    "pt_g16_b3": {
+      "bpw": 10.934666,
+      "delta_bpw": -0.052487,
+      "projected_whole_model_bpw": 10.946313,
+      "delta_pts_of_16": -0.3051,
+      "first_level_table_bytes_max": 2352
+    },
+    "pt_g16_b4": {
+      "bpw": 11.096889,
+      "delta_bpw": -0.214709,
+      "projected_whole_model_bpw": 11.09718,
+      "delta_pts_of_16": -1.248,
+      "first_level_table_bytes_max": 5040
+    },
+    "pt_g1_b3": {
+      "bpw": 10.961231,
+      "delta_bpw": -0.079051,
+      "projected_whole_model_bpw": 10.971018,
+      "delta_pts_of_16": -0.4595,
+      "first_level_table_bytes_max": 37632
+    },
+    "pt_g1_b4": {
+      "bpw": 11.196127,
+      "delta_bpw": -0.313948,
+      "projected_whole_model_bpw": 11.189471,
+      "delta_pts_of_16": -1.8248,
+      "first_level_table_bytes_max": 80640
+    },
+    "pt_g4_b3": {
+      "bpw": 10.943509,
+      "delta_bpw": -0.061329,
+      "projected_whole_model_bpw": 10.954536,
+      "delta_pts_of_16": -0.3565,
+      "first_level_table_bytes_max": 9408
+    },
+    "pt_g4_b4": {
+      "bpw": 11.116062,
+      "delta_bpw": -0.233883,
+      "projected_whole_model_bpw": 11.115011,
+      "delta_pts_of_16": -1.3594,
+      "first_level_table_bytes_max": 20160
+    },
+    "pt_g64_b3": {
+      "bpw": 10.926667,
+      "delta_bpw": -0.044487,
+      "projected_whole_model_bpw": 10.938873,
+      "delta_pts_of_16": -0.2586,
+      "first_level_table_bytes_max": 588
+    },
+    "pt_g64_b4": {
+      "bpw": 11.092435,
+      "delta_bpw": -0.210256,
+      "projected_whole_model_bpw": 11.093038,
+      "delta_pts_of_16": -1.2221,
+      "first_level_table_bytes_max": 1260
+    },
+    "sh_g16_b3": {
+      "bpw": 10.93049,
+      "delta_bpw": -0.04831,
+      "projected_whole_model_bpw": 10.942429,
+      "delta_pts_of_16": -0.2808,
+      "first_level_table_bytes_max": 2352
+    },
+    "sh_g16_b4": {
+      "bpw": 11.09137,
+      "delta_bpw": -0.209191,
+      "projected_whole_model_bpw": 11.092047,
+      "delta_pts_of_16": -1.2159,
+      "first_level_table_bytes_max": 5040
+    },
+    "sh_g1_b3": {
+      "bpw": 10.937107,
+      "delta_bpw": -0.054928,
+      "projected_whole_model_bpw": 10.948583,
+      "delta_pts_of_16": -0.3193,
+      "first_level_table_bytes_max": 37632
+    },
+    "sh_g1_b4": {
+      "bpw": 11.091137,
+      "delta_bpw": -0.208958,
+      "projected_whole_model_bpw": 11.091831,
+      "delta_pts_of_16": -1.2146,
+      "first_level_table_bytes_max": 80640
+    },
+    "sh_g4_b3": {
+      "bpw": 10.933826,
+      "delta_bpw": -0.051647,
+      "projected_whole_model_bpw": 10.945532,
+      "delta_pts_of_16": -0.3002,
+      "first_level_table_bytes_max": 9408
+    },
+    "sh_g4_b4": {
+      "bpw": 11.091171,
+      "delta_bpw": -0.208992,
+      "projected_whole_model_bpw": 11.091862,
+      "delta_pts_of_16": -1.2148,
+      "first_level_table_bytes_max": 20160
+    },
+    "sh_g64_b3": {
+      "bpw": 10.910477,
+      "delta_bpw": -0.028297,
+      "projected_whole_model_bpw": 10.923817,
+      "delta_pts_of_16": -0.1645,
+      "first_level_table_bytes_max": 588
+    },
+    "sh_g64_b4": {
+      "bpw": 11.091388,
+      "delta_bpw": -0.209209,
+      "projected_whole_model_bpw": 11.092064,
+      "delta_pts_of_16": -1.216,
+      "first_level_table_bytes_max": 1260
+    }
+  },
+  "variants_note": "sh_* rows assume uniform adoption by all sharers of a (layer, proj): the (payload + frame)/share amortization is exact only then",
+  "envelope": {
+    "base_plus_pt": 10.882179,
+    "base_plus_all_adoption_aware": 10.882179,
+    "adoption_detail": {
+      "iterations": 1,
+      "choice_counts": {
+        "baseline": 256
+      },
+      "adopted_shared_tables": {},
+      "note": "adoption-aware exact pricing: each adopted shared table (payload + 128-bit frame) charged fully once across its actual adopters; replaces the invalid uniformly-amortized env_all"
+    }
+  },
+  "serializer_roundtrip": {
+    "records": 4,
+    "coverage": {
+      "pt": [
+        "down",
+        "up"
+      ],
+      "sh": [
+        "down",
+        "up"
+      ]
+    },
+    "winner_kind_covered_all_projections": true,
+    "note": "every record asserts serialized bits == colkey_plan bits exactly (table_share=1) and SHA-256 bit-exact reconstruction"
+  },
+  "winner": "sh_g64_b3",
+  "winner_delta_bpw": -0.028297,
+  "gate_bpw": 0.09,
+  "verdict": "FALSIFIED at this operating point",
+  "forensics": [
+    {
+      "name": "backbone.layers.27.mixer.experts.0.down_proj.weight",
+      "variant": "sh_g64_b3",
+      "esc_rate": 0.221955,
+      "row_density": {
+        "mean": 411.9479166666667,
+        "std": 20.008431150100044,
+        "fano": 0.9718
+      },
+      "col_density": {
+        "mean": 596.614224137931,
+        "std": 24.253530054152804,
+        "fano": 0.986
+      },
+      "binomial_fano_ref": 0.778,
+      "adjacency_lift": {
+        "horizontal": 0.9995,
+        "vertical": 0.9999
+      },
+      "H_sign": 1.0,
+      "H_sign_given_col": 0.999682
+    },
+    {
+      "name": "backbone.layers.27.mixer.experts.64.down_proj.weight",
+      "variant": "sh_g64_b3",
+      "esc_rate": 0.224155,
+      "row_density": {
+        "mean": 416.03125,
+        "std": 21.378040153822624,
+        "fano": 1.0985
+      },
+      "col_density": {
+        "mean": 602.5280172413793,
+        "std": 24.89121312624707,
+        "fano": 1.0283
+      },
+      "binomial_fano_ref": 0.7758,
+      "adjacency_lift": {
+        "horizontal": 1.002,
+        "vertical": 0.9978
+      },
+      "H_sign": 1.0,
+      "H_sign_given_col": 0.999725
+    },
+    {
+      "name": "backbone.layers.27.mixer.experts.0.up_proj.weight",
+      "variant": "sh_g64_b3",
+      "esc_rate": 0.211292,
+      "row_density": {
+        "mean": 567.953125,
+        "std": 35.89589924917314,
+        "fano": 2.2687
+      },
+      "col_density": {
+        "mean": 392.1581101190476,
+        "std": 28.160729971003565,
+        "fano": 2.0222
+      },
+      "binomial_fano_ref": 0.7887,
+      "adjacency_lift": {
+        "horizontal": 1.0021,
+        "vertical": 1.0008
+      },
+      "H_sign": 0.999974,
+      "H_sign_given_col": 0.990738
+    },
+    {
+      "name": "backbone.layers.27.mixer.experts.64.up_proj.weight",
+      "variant": "sh_g64_b3",
+      "esc_rate": 0.205784,
+      "row_density": {
+        "mean": 553.1465517241379,
+        "std": 35.63089136050173,
+        "fano": 2.2952
+      },
+      "col_density": {
+        "mean": 381.9345238095238,
+        "std": 23.81951352931547,
+        "fano": 1.4855
+      },
+      "binomial_fano_ref": 0.7942,
+      "adjacency_lift": {
+        "horizontal": 1.002,
+        "vertical": 1.001
+      },
+      "H_sign": 0.999997,
+      "H_sign_given_col": 0.990449
+    }
+  ]
+}

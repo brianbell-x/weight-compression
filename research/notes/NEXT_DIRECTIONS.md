@@ -105,18 +105,15 @@ report %-bit-identical uint16 words + XOR high-byte H0. Vetting adjustments:
 include an expert-heavy shard pair (not just shard 1) and mandatory baselines
 (`zstd --patch-from`, xdelta3) — beat both or it isn't a contribution.
 
-### D. Column-keyed codebooks + escape forensics  [viable/strong, pre-measured]
-The fresh measurements above are this direction's evidence: per-column(-group)
-codebooks/BASE shared across all 128 experts per layer (the 99.65% cross-expert
-column-profile correlation says tables transfer; side cost /128 → <0.001 b/w).
-Escape rates halving → ~0.26 b/w direct, possibly 3-bit indices on
-down_proj-class tensors. Expected +0.5–1.0 pt whole-model fusible (30.0→~31%),
-~10× the separable-predictor win. First probe (<1 day, decisive form per
-vetting): one **mid/late** expert shard (shard 7, not the anomalous shard 1),
-three-way K15 escape + exact side-cost table per tensor across a full layer —
-(a) per-tensor global, (b) per-tensor-per-column, (c) per-column shared across
-128 experts — benchmarked against the tuned 11.2072 b/w baseline. Null result on
-escape spatial structure doubles as an optimality certificate.
+### D. Column-keyed codebooks + escape forensics — **FALSIFIED 2026-07-01 (candidate 0014)**
+Probed on shard-7 layer 27 (256 tensors, exact accounting, parity vs stz exact,
+skeptic-verified): all 16 pt/shared × g × b variants lose to realized stz; the
+adoption-aware envelope picked the baseline 256/256. Mechanism: post
+second-level-recoder, escape reductions convert at only (k−b) bits per converted
+escape. The null on escape spatial structure delivered the promised optimality
+certificate — the escape mask is near-random. Salvage leads moved to "New leads"
+below. Do not re-propose per-weight column keying; the untested remnant is
+cross-layer transfer of the *certificate* (cheap closure rider), not a rescue.
 
 ## Tier 2 — consolidate the crown (product + realization)
 
@@ -180,6 +177,21 @@ on its own. Fit the exponent-concentration scaling law across 30B/120B/550B.
   rarely-routed experts less trained → more compressible?) and re-derive the
   escape-density claim from stream_probe_ultra_550b.json first (30 min gate).
 
+## New leads (2026-07-01, from 0014's escape forensics — chooser-scale, fold into E)
+
+- **Per-row second-level escape k for up_proj**: up_proj escape mask is row-overdispersed
+  (Fano ~2.3 vs ~0.79 binomial null) — a per-row k chooser could harvest it. Ceiling
+  ~0.01–0.03 b/w; price through the (k−b) conversion rule.
+- **Per-column BASE re-centering as a chooser option only**: fires only if column exponent
+  distributions are shifted copies (not shape-varying); ceiling ~0.02–0.05 b/w.
+- **Extend direction I's certification to stz's emitted planes** (index plane, side
+  tables): 0014's forensics already did the escape mask; finishing this states terminal
+  closure on the whole emission.
+- **Cross-layer closure rider**: re-run the 0014 probe on one early MoE layer
+  (one-constant edit) to upgrade the falsification from "layer 27" to model-wide.
+- **Pricing rule for all future escape-based pitches**: value = (k−b) bits × converted
+  escapes, NOT 16 or 9 bits per escape avoided. Reprice before probing.
+
 ## Falsified during this scouting pass — do not re-propose
 
 - **Per-tile BASE re-windowing / fractional-radix packing as a headline lever**
@@ -206,10 +218,11 @@ output streams.
 1. **Tonight (zero risk)**: commit `stream_validate.py` + probe JSONs +
    `contrarian_probe.py`; kick off full Super-120B streamed validation in the
    background. (G core, integrity item 1)
-2. **This week, hour-scale, information-per-hour order**: C's shard-pair delta
-   probe (<1 h) → B's FP8 expert-shard probe (~2 h) → D's three-way column
-   codebook table on shard 7 (<1 day) → A's per-block code-length histogram
-   (~2 h, gates the rANS design).
-3. **Next**: whichever of A–D fires, plus E (the container realizes any winner
-   as a shippable, SHA-256-verified artifact — it is also how the flagship claim
-   gets upgraded from estimate to fact).
+2. **This week, hour-scale, information-per-hour order** (updated 2026-07-01 after
+   D's falsification): A's per-block code-length histogram (~2 h, CPU-local, gates
+   the rANS design; now the primary path to the ~0.4 b/w gap) → C's shard-pair
+   delta probe (<1 h, when bandwidth frees up — Super-120B validation is hogging
+   the flaky link) → B's FP8 expert-shard probe (~2 h, same bandwidth constraint).
+3. **Next**: whichever of A–C fires, plus E's remaining scope (loader,
+   DFloat11/ZipNN same-bytes bench, cold-start measurement, and the chooser-scale
+   "New leads" above).
