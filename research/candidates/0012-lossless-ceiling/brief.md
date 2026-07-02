@@ -1,7 +1,10 @@
 # Candidate 0012 — Lossless ceiling & the exponent-context lever
 
-**Status:** in progress (adversarial whole-model verification running: workflow
-`research/tools/lossless_exhaustion.workflow.js` → this dir's `RESULTS.md`).
+**Status:** complete (2026-07-01). Adversarial whole-model verification done
+(workflow `research/tools/lossless_exhaustion.workflow.js` → this dir's `RESULTS.md`;
+runtime-real slice in `RUNTIME.md`). The fusible form is realized and serialized as
+candidate 0009's `.stz` container: whole model 31.89% smaller (10.8975 b/w BF16),
+all 13 shards SHA-256-verified.
 
 **Constraint:** pure lossless, bit-exact reconstruction only. No lossy, no quantization,
 no combination with lossy.
@@ -65,7 +68,9 @@ mantissa across 11 tensors spanning roles/layers, with brotli-11 (strongest tool
 
 ## FINAL lossless frontier (complete)
 - Storage: **~34–35%** (sign 1.0 + specialized-exponent ~2.5 + mantissa ~6.9). Variable-length.
-- Runtime/fusible: **~30%** (separable predictor, verified whole-model, bit-exact).
+- Runtime/fusible: **31.89% realized** (.stz container: per-tensor chooser + second-level
+  escape codebook, 10.8975 b/w BF16, SHA-256-verified whole model — supersedes the earlier
+  "~30%" predictor estimate).
 - Working codec: 32.9–33.7% bit-exact round-trip (`lossless_codec.py`), at/above SOTA (DFloat11 ~30%).
 - 90% lossless is information-theoretically impossible (8 random bits/weight). Every field peeled.
 
