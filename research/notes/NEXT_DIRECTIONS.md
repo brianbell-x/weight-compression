@@ -187,8 +187,12 @@ on its own. Fit the exponent-concentration scaling law across 30B/120B/550B.
 - **Extend direction I's certification to stz's emitted planes** (index plane, side
   tables): 0014's forensics already did the escape mask; finishing this states terminal
   closure on the whole emission.
-- **Cross-layer closure rider**: re-run the 0014 probe on one early MoE layer
-  (one-constant edit) to upgrade the falsification from "layer 27" to model-wide.
+- ~~Cross-layer closure rider~~ **DONE 2026-07-01** (7-layer sweep, `--layer` flag):
+  certificate holds for layers ≥13; early layers keep a small adoption-aware win
+  (envelope +0.098 L1 → 0 by L13; ≈ +0.011 b/w experts ≈ +0.065 pt model-wide).
+  **Concrete E-scope item: add `colkey` to the .stz per-tensor chooser** — measured
+  free upside, mostly layers 1–10. Vetting's column numbers were early-layer-only
+  (layer identity was the hidden variable).
 - **Pricing rule for all future escape-based pitches**: value = (k−b) bits × converted
   escapes, NOT 16 or 9 bits per escape avoided. Reprice before probing.
 

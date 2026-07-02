@@ -1,0 +1,346 @@
+{
+  "mode": "synthetic",
+  "scope": "synthetic smoke -- carries no evidential weight",
+  "targets": 16,
+  "total_params": 49152,
+  "parity_max_abs_diff": 0.0,
+  "baseline_recomputed_bpw": 11.379395,
+  "baseline_ref_weighted_bpw": 11.379394,
+  "stz_target_bpw": 10.8822,
+  "whole_model_baseline_bpw": 10.8975,
+  "expert_frac": 0.93,
+  "floor_bpw_weighted": 10.539822,
+  "quant_delta_bpw_weighted": 0.00011,
+  "ideal_tails_bw": {
+    "W32": {
+      "p50": 3.5184,
+      "p90": 3.8293,
+      "p95": 3.9223,
+      "p97": 3.9884,
+      "p99": 4.1033,
+      "max": 4.2191
+    },
+    "W64": {
+      "p50": 3.5285,
+      "p90": 3.7453,
+      "p95": 3.8047,
+      "p97": 3.8382,
+      "p99": 3.8996,
+      "max": 3.9395
+    },
+    "W128": {
+      "p50": 3.5361,
+      "p90": 3.6746,
+      "p95": 3.7238,
+      "p97": 3.7521,
+      "p99": 3.7835,
+      "max": 3.7992
+    },
+    "W256": {
+      "p50": 3.5349,
+      "p90": 3.6356,
+      "p95": 3.6556,
+      "p97": 3.6637,
+      "p99": 3.6718,
+      "max": 3.6758
+    },
+    "W512": {
+      "p50": 3.5452,
+      "p90": 3.5959,
+      "p95": 3.6046,
+      "p97": 3.6082,
+      "p99": 3.6117,
+      "max": 3.6134
+    },
+    "W1024": {
+      "p50": 3.5396,
+      "p90": 3.5699,
+      "p95": 3.5736,
+      "p97": 3.5752,
+      "p99": 3.5767,
+      "max": 3.5774
+    },
+    "W4096": {
+      "p50": 3.5398,
+      "p90": 3.5398,
+      "p95": 3.5398,
+      "p97": 3.5398,
+      "p99": 3.5398,
+      "max": 3.5398
+    },
+    "W16384": {
+      "p50": 3.5398,
+      "p90": 3.5398,
+      "p95": 3.5398,
+      "p97": 3.5398,
+      "p99": 3.5398,
+      "max": 3.5398
+    }
+  },
+  "format_b": {
+    "W32_P90": {
+      "bpw": 11.96875,
+      "esc_frac": 0.044922,
+      "pad_bpw": 0.405945,
+      "tax_bpw": 0.396973
+    },
+    "W32_P95": {
+      "bpw": 11.961426,
+      "esc_frac": 0.014323,
+      "pad_bpw": 0.540792,
+      "tax_bpw": 0.396973
+    },
+    "W32_P97": {
+      "bpw": 11.987467,
+      "esc_frac": 0.009766,
+      "pad_bpw": 0.586833,
+      "tax_bpw": 0.396973
+    },
+    "W32_P99": {
+      "bpw": 12.146973,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.788574,
+      "tax_bpw": 0.396973
+    },
+    "W32_P100": {
+      "bpw": 12.146973,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.788574,
+      "tax_bpw": 0.396973
+    },
+    "W64_P90": {
+      "bpw": 11.638509,
+      "esc_frac": 0.046875,
+      "pad_bpw": 0.276957,
+      "tax_bpw": 0.381348
+    },
+    "W64_P95": {
+      "bpw": 11.574219,
+      "esc_frac": 0.02474,
+      "pad_bpw": 0.321716,
+      "tax_bpw": 0.381348
+    },
+    "W64_P97": {
+      "bpw": 11.562174,
+      "esc_frac": 0.013021,
+      "pad_bpw": 0.367533,
+      "tax_bpw": 0.381348
+    },
+    "W64_P99": {
+      "bpw": 11.600098,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.468079,
+      "tax_bpw": 0.381348
+    },
+    "W64_P100": {
+      "bpw": 11.600098,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.468079,
+      "tax_bpw": 0.381348
+    },
+    "W128_P90": {
+      "bpw": 11.504557,
+      "esc_frac": 0.059896,
+      "pad_bpw": 0.179871,
+      "tax_bpw": 0.373535
+    },
+    "W128_P95": {
+      "bpw": 11.397461,
+      "esc_frac": 0.03125,
+      "pad_bpw": 0.219971,
+      "tax_bpw": 0.373535
+    },
+    "W128_P97": {
+      "bpw": 11.307129,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.288371,
+      "tax_bpw": 0.373535
+    },
+    "W128_P99": {
+      "bpw": 11.307129,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.288371,
+      "tax_bpw": 0.373535
+    },
+    "W128_P100": {
+      "bpw": 11.307129,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.288371,
+      "tax_bpw": 0.373535
+    },
+    "W256_P90": {
+      "bpw": 11.38151,
+      "esc_frac": 0.057292,
+      "pad_bpw": 0.116191,
+      "tax_bpw": 0.370931
+    },
+    "W256_P95": {
+      "bpw": 11.113118,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.149353,
+      "tax_bpw": 0.370931
+    },
+    "W256_P97": {
+      "bpw": 11.113118,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.149353,
+      "tax_bpw": 0.370931
+    },
+    "W256_P99": {
+      "bpw": 11.113118,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.149353,
+      "tax_bpw": 0.370931
+    },
+    "W256_P100": {
+      "bpw": 11.113118,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.149353,
+      "tax_bpw": 0.370931
+    },
+    "W512_P90": {
+      "bpw": 11.014811,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.08018,
+      "tax_bpw": 0.368327
+    },
+    "W512_P95": {
+      "bpw": 11.014811,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.08018,
+      "tax_bpw": 0.368327
+    },
+    "W512_P97": {
+      "bpw": 11.014811,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.08018,
+      "tax_bpw": 0.368327
+    },
+    "W512_P99": {
+      "bpw": 11.014811,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.08018,
+      "tax_bpw": 0.368327
+    },
+    "W512_P100": {
+      "bpw": 11.014811,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.08018,
+      "tax_bpw": 0.368327
+    },
+    "W1024_P90": {
+      "bpw": 10.962077,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.040649,
+      "tax_bpw": 0.368327
+    },
+    "W1024_P95": {
+      "bpw": 10.962077,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.040649,
+      "tax_bpw": 0.368327
+    },
+    "W1024_P97": {
+      "bpw": 10.962077,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.040649,
+      "tax_bpw": 0.368327
+    },
+    "W1024_P99": {
+      "bpw": 10.962077,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.040649,
+      "tax_bpw": 0.368327
+    },
+    "W1024_P100": {
+      "bpw": 10.962077,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.040649,
+      "tax_bpw": 0.368327
+    },
+    "W4096_P90": {
+      "bpw": 10.914062,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.001404,
+      "tax_bpw": 0.368327
+    },
+    "W4096_P95": {
+      "bpw": 10.914062,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.001404,
+      "tax_bpw": 0.368327
+    },
+    "W4096_P97": {
+      "bpw": 10.914062,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.001404,
+      "tax_bpw": 0.368327
+    },
+    "W4096_P99": {
+      "bpw": 10.914062,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.001404,
+      "tax_bpw": 0.368327
+    },
+    "W4096_P100": {
+      "bpw": 10.914062,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.001404,
+      "tax_bpw": 0.368327
+    },
+    "W16384_P90": {
+      "bpw": 10.914062,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.001404,
+      "tax_bpw": 0.368327
+    },
+    "W16384_P95": {
+      "bpw": 10.914062,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.001404,
+      "tax_bpw": 0.368327
+    },
+    "W16384_P97": {
+      "bpw": 10.914062,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.001404,
+      "tax_bpw": 0.368327
+    },
+    "W16384_P99": {
+      "bpw": 10.914062,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.001404,
+      "tax_bpw": 0.368327
+    },
+    "W16384_P100": {
+      "bpw": 10.914062,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.001404,
+      "tax_bpw": 0.368327
+    }
+  },
+  "format_a": {
+    "bpw": 11.063151,
+    "esc_frac": 0.0,
+    "pad_bpw": 0.001078,
+    "tax_bpw": 0.521973
+  },
+  "best": {
+    "key": "W4096_P90",
+    "bpw": 10.914062,
+    "best_fixed_stride_key": "W4096_P90",
+    "best_fixed_stride_bpw": 10.914062
+  },
+  "gates": {
+    "G1_vs": "recomputed baseline (synthetic)",
+    "G1_pass": true,
+    "G1_pass_fixed_stride_only": true,
+    "G1_delta_bpw": 0.465332,
+    "G2_bar_bpw": 10.689822,
+    "G2_pass": false,
+    "G2_delta_vs_floor_bpw": 0.374241
+  },
+  "verdict": "positive (G1 only)",
+  "projected_whole_model_bpw": null,
+  "accounting_note": "per-weight totals include the pad8(7n) mantissa plane; format (b) charges kept blocks a full B-byte fixed-stride slot (padding waste reported), escaped blocks max(B, ceil(9W/8)) bytes wholesale-raw, pad8(nb) escape bitmap, u32/512-blocks rank directory, pad8(512+nnz*12) quantized-table, 32B header; block size model = ceil(sum(12-log2 q)) + 13-bit tANS flush per block; format (a) charges 32x13-bit lane states + byte alignment per superblock and the exact two-level offset index (u32/superblock + u64/64)"
+}

@@ -597,7 +597,8 @@ def summarize(tg, jsonl: Path, aggp: Path, summaryp: Path, snap: Path, synthetic
     proj = lambda d: WHOLE_MODEL_BPW - EXPERT_FRAC * d          # projected whole-model b/w
     pts = lambda d: EXPERT_FRAC * d / 16 * 100                  # pts of the original 16 b/w
 
-    mode = "SYNTHETIC (smoke only -- projections meaningless)" if synthetic else "REAL layer-27"
+    mode = ("SYNTHETIC (smoke only -- projections meaningless)" if synthetic
+            else f"REAL layer-{TARGET_LAYER}")
     print(f"\n=== candidate 0014 column-keyed codebooks -- summary [{mode}] ===")
     print(f"targets: {len(names)} tensors, {n_tot:,} params; "
           f"parity gate OK (max |d bpw| vs stz reference = {parity_max:.6f})")
@@ -867,10 +868,15 @@ def main():
     ap.add_argument("--limit", type=int, default=0, help="max tensors read this invocation")
     ap.add_argument("--budget-s", type=float, default=400.0,
                     help="soft wall-clock budget; checkpoints and exits when exceeded")
+    ap.add_argument("--layer", type=int, default=27,
+                    help="target expert layer (cross-layer closure rider; artifacts "
+                         "for non-default layers get a _layer<N> suffix)")
     a = ap.parse_args()
 
+    global TARGET_LAYER
+    TARGET_LAYER = a.layer
     snap = SYN_SNAP if a.synthetic else REAL_SNAP
-    tag = "_synthetic" if a.synthetic else ""
+    tag = "_synthetic" if a.synthetic else ("" if a.layer == 27 else f"_layer{a.layer}")
     ART.mkdir(parents=True, exist_ok=True)
     jsonl = ART / f"colkey_results{tag}.jsonl"
     aggp = ART / f"colkey_shared_hists{tag}.npz"

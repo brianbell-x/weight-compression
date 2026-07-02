@@ -221,6 +221,16 @@ weighted numbers from raw per-tensor bits — not refuted, high confidence):
   keying — it moves to **block/tile granularity (direction A)** or storage realization
   (E/F). Per-column BASE re-centering survives only as a chooser option (ceiling
   ~0.02–0.05 b/w); column-keying the second-level table is ruled out (<0.01 b/w).
+- **Cross-layer rider (same day, 7 layers swept)**: the certificate holds from mid-model
+  on (layers ≥13: envelope ≈0), but **early layers keep a small real win** — the
+  adoption-aware envelope gains +0.098 (L1), +0.070 (L3), decaying to 0 by L13; averaged
+  over all 23 MoE layers ≈ **+0.011 b/w experts ≈ +0.065 pt whole-model**. The vetting
+  numbers that motivated D (escape halving, H(sign|col)=0.978) were early-layer
+  properties that don't transfer (L27 H(sign|col)=0.9997) — layer identity was the
+  hidden variable. Actionable residue: add `colkey` as a variant in the .stz per-tensor
+  chooser (E); free upside wherever it wins. Layer-1 expert-0's known anomaly resurfaces
+  as extreme escape-mask spatial structure (Fano ~166–178 vs ~1.0 elsewhere); localized,
+  not a lever.
 
 ## Purged tracks — do not re-open (2026-07-01)
 

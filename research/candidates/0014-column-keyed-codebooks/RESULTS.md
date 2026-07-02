@@ -220,3 +220,41 @@ The parity gate aborts loudly if the recomputed baseline drifts from
 - `tests/artifacts/colkey_shared_hists.npz` — aggregated per-group histograms
   + membership (atomic checkpoint).
 - `tests/artifacts/colkey_*_synthetic.*` — synthetic smoke equivalents.
+
+## Cross-layer closure rider (2026-07-01, --layer sweep)
+
+The probe gained a `--layer` flag (artifacts suffixed `_layer<N>`) and was re-run
+on 6 more MoE layers (parity gate exact on every layer). Envelope = the
+adoption-aware per-tensor chooser (free to pick baseline or any exactly-priced
+column-keyed variant per tensor):
+
+| layer | stz baseline b/w | best solo variant d | env(base+all) gain |
+|------:|-----------------:|--------------------:|-------------------:|
+| 1     | 11.0310          | +0.0697 (sh_g1_b3)  | **+0.0978**        |
+| 3     | 11.0176          | +0.0297 (pt_g1_b3)  | +0.0697            |
+| 6     | 10.9498          | -0.0176             | +0.0274            |
+| 8     | 10.9133          | -0.0074             | +0.0191            |
+| 10    | 10.8962          | -0.0058             | +0.0208            |
+| 13    | 10.8931          | -0.0248             | +0.0029            |
+| 27    | 10.8822          | -0.0283             | +0.0000            |
+
+Findings:
+
+1. **The falsification certificate holds from mid-model on** (layers >= 13:
+   envelope ~0, all solo variants lose) and the headline verdict stands - no
+   solo column-keyed variant reaches the +0.09 gate on ANY layer.
+2. **Early layers keep a real, small adoption-aware win** (layers 1/3 are weak
+   positives even solo). Averaged over all 23 MoE layers with the measured
+   decay, the model-wide envelope ceiling is ~ +0.011 b/w on experts
+   ~ **+0.065 pt whole-model** - chooser-scale, not a direction. Actionable
+   form: add `colkey` as one more variant in the .stz per-tensor chooser
+   (direction E); the chooser adopts it only where it wins, so it is free upside.
+3. **This explains the vetting mispricing**: the original fresh measurements
+   (escape halving, H(sign|col)=0.978) were taken on early-layer tensors and are
+   real THERE (layer-1 up_proj H(sign|col)=0.978 reproduced) but do not
+   transfer (layer-27 H(sign|col)=0.9997). Layer identity was the hidden
+   variable.
+4. **Layer-1 expert-0 anomaly resurfaces in the escape mask** (Fano(col) 165.8
+   on down_proj, Fano(row) 178.3 on up_proj vs ~1.0 for expert 64) - consistent
+   with the known 0010/0012 layer-1-expert-0 near-zero cluster; localized,
+   ~0.08% of mass, certificate-relevant but not a lever.
