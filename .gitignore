@@ -31,3 +31,6 @@ logs/
 # OS cruft
 .DS_Store
 Thumbs.db
+
+# Probe run locks (live process state, never history)
+*.lock
