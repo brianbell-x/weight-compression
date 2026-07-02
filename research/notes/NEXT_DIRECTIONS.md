@@ -63,9 +63,13 @@ conservative interpolation.** floor+0.15 holds mid-model only. Queue, in order:
 1. ~~Completeness sweep~~ **DONE 2026-07-02**: all 23 expert layers measured —
    **fully measured whole-model 10.7311 b/w = 32.93%**, G1 23/23, parity exact
    23/23, round-trips 23/23. Non-expert 7% (held at stz) still extendable.
-2. **Peel-until-random on the v2 emission** (compounding directive's next object
-   of study): tier-slot streams, 2-bit flag plane, renorm stream, mantissa plane —
-   below-order-0 structure or a randomness certificate.
+2. ~~Peel-until-random on the v2 emission~~ **DONE 2026-07-02**: sym-side certified
+   near-random (payload 0.0029, flags 0.0023 — peel converged); order-1 context dead
+   (+0.0086 << gate). **NEW PRIMARY: mantissa phase-bias probe (running)** — the
+   mantissa plane is NOT random (MSB p(1)≈0.416, H(bit|pos mod 7) ceiling ~0.0287
+   b/w, fusible-compatible since phase is address-derived); the old "random wall"
+   was pooled-measurement geometry. Gate: ≥0.02 b/w realized, all side costs.
+   Secondary: tier-design headroom (lens ceiling 0.0335, bounded by pad slack).
 3. **Layout-aware early-layer column candidate** (new lead): L1/L3 per-column sym
    ceiling is 0.125–0.160 b/w but 64–128-col groups capture <5%; column-major
    blocking or ≤16-col groups with O(1) address math; whole-model ceiling only

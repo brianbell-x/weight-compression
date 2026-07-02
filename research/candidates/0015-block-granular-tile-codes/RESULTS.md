@@ -540,3 +540,132 @@ Artifacts: `tests/artifacts/blockcodes_v2_frozen_summary_layer{1,3,13,24,40,51}.
 aggregate `blockcodes_v2_frozen_crosslayer_aggregate.json`. Baseline reference
 unchanged: `../0009-fusible-exponent-codebook/tests/artifacts/stz/stz_tensor_stats.jsonl`
 (parity exact on all 7 layers).
+
+---
+
+# Emission peel — randomness certification of the v2 planes + within-block order-1: RESULTS
+
+**Date:** 2026-07-02 · **Scope:** 64 real expert tensors (8 experts × {up,down}_proj ×
+layers 1, 13, 27, 40; 319,291,392 params), actual streams emitted with the frozen v2
+serializer (W=128 bit-stride, T=4 DP tiers, P100, L1+L3, order-0 12-bit tables) and the
+frozen reference recomputed on the same sample · **Accounting stamp:** `b4e62994d250` ·
+**Tool:** `tools/probe_emission_peel.py` · **Wall:** ~20 min.
+
+**Verdict: PARTIAL — H2 does NOT fire (both gate conditions fail); H1 certifies the
+coded sym-side planes near-random and finds one real, transmitted-plane structure: the
+mantissa plane is NOT at 7.00 b/w — a fixed-position, phase-dependent MSB bias gives a
+quantified ceiling of ~0.0287 b/w, revising the "mantissa is random noise" floor down
+~0.03 b/w.** Same evidentiary standard as v1/v2: measured emitted bits, all side costs
+charged, round-trip 256 frozen + 1,024 order-1 blocks serializer bit-exact + SHA-256
+exact BF16 PASS.
+
+## H1 — per-plane certificates (pre-registered structure bar: 0.01 b/w ceiling)
+
+| Plane | Transmitted? | Plane size (b/w) | Ceiling (b/w) | Verdict |
+|---|---|---|---|---|
+| **payload** (coded rANS bits) | yes | 3.7382 | 0.0029 | **Random at these tests**, up to sub-bar weak hits: MI above the circular-shift null at lags 1–4 in 58/64 tensors but magnitudes ~1e-6 bits; layer 1 alone reaches 0.0103, other layers 0.0003–0.0005. |
+| **flags** (2-bit tier plane) | yes | 0.0156 | 0.0023 | **Weak structure, below bar:** 64/64 MI + 52/64 autocorr hits (lags 2–4, r ≈ 0.02–0.03), but the whole plane is only 0.0156 b/w — exploitable value bounded there. |
+| **lens** (per-block DP code lengths) | **no — diagnostic** | (0.0793 as fixed-width strawman) | 0.0335 | **Structure found** — block-to-block autocorrelation at lags 1–4, entropy-bound-driven, 64/64 tensors. But rb is not transmitted (flags+budgets are), so the ceiling is measured against a hypothetical fixed-width length plane; the *realizable* part is tier/budget design headroom bounded by the actual pad slack, not the full 0.0335. |
+| **mant** (mantissa plane, new layout) | yes | 6.9063 | **0.0287** (0.0265–0.0351 by layer) | **Structure found — the real finding.** Driver in 62/64 tensors is per-phase entropy H(bit \| position mod 7): mantissa MSB p(1) ≈ 0.416 decaying monotonically to ~0.50 by bit 6 (mean p(1) per position = 0.416, 0.458, 0.479, 0.490, 0.496, 0.498, 0.4995). Pooled bit entropy (h0 = 0.9985) dilutes this ~7×, which is why it was never seen before; MI hits at native lags 7/14/21/884 in 64/64 tensors corroborate. Fixed-position (phase known at decode) → a fusible exploitation path exists. |
+
+Batteries per plane: order-0/1/2 entropy, bit-pair MI vs a circular-shift null (16
+shifts, family α = 0.01), autocorrelation of block-level code lengths and tier flags,
+lzma -9e. Payload excludes slot padding (pad is already-quantified structure).
+
+## H2 — within-block order-1 context (sym[i] | bucket(sym[i-1]), reset at block starts)
+
+**Does NOT fire — fails both pre-registered conditions:** realized best delta **+0.0086
+b/w « 0.05 gate**, and holdout confirms only **4/8** layer×proj cells positive (the
+negative cells sit at ~−0.0005 bits/sym — zero structure, not noise). Realized numbers
+use fit-on-self tables with ALL side costs charged (C occupied 12-bit-quantized bucket
+tables + order-0 start table + pad8(8+C+(C−1)·9)-bit context header), frozen v2
+mechanics otherwise unchanged, DP tier budgets recomputed.
+
+```
+layer  tensors  params       floor    frozen   C4       C8       C16      C32      bestC  delta    | H1 ceilings b/w: payload flags  lens   mant
+L1     16       79,822,848   10.6990  10.8541  10.8485  10.8431  10.8344  10.8249  32     +0.0292  |                   0.0103  0.0030 0.0349 0.0351
+L13    16       79,822,848   10.5596  10.7011  10.6998  10.6987  10.6989  10.6987  32     +0.0024  |                   0.0005  0.0020 0.0334 0.0266
+L27    16       79,822,848   10.5590  10.7000  10.6986  10.6985  10.6990  10.7001  8      +0.0014  |                   0.0003  0.0019 0.0329 0.0265
+L40    16       79,822,848   10.5549  10.7010  10.6975  10.6966  10.6969  10.6980  8      +0.0044  |                   0.0003  0.0021 0.0327 0.0266
+ALL    64       319,291,392  10.5931  10.7390  10.7361  10.7342  10.7323  10.7304  32     +0.0086  |                   0.0029  0.0023 0.0335 0.0287
+```
+
+- **All of the order-1 signal is one cell:** layer-1 up_proj (realized +0.0596 b/w
+  there; holdout gain +0.0380 bits/sym at C32 vs ~0.000 everywhere else, including
+  layer-1 down_proj at −0.0013). Any follow-up is an *early-layer-only mode*, not a
+  format change — worth ≈ 0.93 × 0.0292/23 ≈ **0.001 b/w whole-model** if adopted for
+  layer 1 alone. Below adoption threshold; parked alongside the early-layer column
+  headroom already named in the transfer run.
+- **Block-boundary reset cost is negligible:** 0.000026 b/w weighted at best C (the
+  1/128 of symbols that lose their context cost essentially nothing).
+- If folded anyway, projected whole-model = **10.7266** = 10.7346 − 0.93 × 0.0086
+  (selection-optimistic). **Recommendation: do not fold** — the gate failed; the frozen
+  format's standing number remains **10.7346**.
+- Holdout gains (bits/sym, fit on half the experts, scored on the other half), C32:
+  L1_up +0.0380, L13_up +0.0013, L40_up +0.0012, L40_down +0.0000, others ≈ 0 or
+  negative.
+
+## What this means
+
+1. **The sym-side emission is essentially done.** Payload certified random at these
+   tests (pooled ceiling 0.0029 b/w), flags bounded at 0.0023, within-block order-1
+   dead as a format change. The "peel until random" loop on the coded planes has
+   converged: the residual 0.13–0.19 above the order-0 floor is coder mechanics
+   (flush/renorm/tier slack), already decomposed in v2, not hidden symbol structure.
+2. **The frontier moves to the mantissa plane.** The ~0.0287 b/w phase-bias ceiling is
+   on a *transmitted* plane, is fixed-position (fusible-compatible), and revises the
+   project's "mantissa ≈ 7.95/8 bits, incompressible" assumption: the true floor is
+   H(sym) + ~6.97, not H(sym) + 7. The MSB alone carries ~0.020 b/w of it
+   (h(0.416) ≈ 0.9797).
+3. **Layer 1 is consistently the outlier** (payload ceiling 0.0103, order-1 signal,
+   mant ceiling 0.0351) — one more datum that early layers hold the only remaining
+   *model* structure; everything mid/late is mechanics.
+
+## Anomalies (recorded)
+
+1. All H2 signal concentrated in layer-1 up_proj (see above) — a property of the model,
+   not the probe.
+2. The lens ceiling (0.0335) must not be read as realizable: rb is not transmitted; it
+   bounds tier/budget *design* headroom, realizable part limited by actual pad slack
+   (~0.073 b/w pad component at layer 27, of which only a fraction is reachable).
+3. Layer-1 payload ceiling alone (0.0103) marginally exceeds the 0.01 bar though the
+   pooled payload verdict stays below it (0.0029); payload MI magnitudes ~1e-6 bits sit
+   at the null threshold.
+4. A pre-existing layer-27 tensor row (same acct stamp `b4e62994d250`) was seeded into
+   the combined results file to resume rather than recompute; a concurrent background
+   sweep (blockcodes_v2_frozen layer-38 lock, different tool) was left running — CPU
+   cost only, no shared state.
+
+## Compounding order
+
+**Confirms the tile format as the primary track for a container v3 — and names its next
+lever.** (i) The frozen W=128 format now carries: cross-layer-validated wins over stz
+on every layer tested (honest whole-model 10.7346 vs 10.8975), *and* a randomness
+certificate on its coded planes — stz has neither. The .stz container's role for expert
+tensors should be succeeded by the tile format in a container v3; stz remains the
+baseline reference and the container for non-expert tensors until the tile format is
+extended there. (ii) The next object of study is the **mantissa plane's phase-dependent
+bias** (~0.0287 b/w ceiling, fixed-position, fusible path) — the first new-entropy
+lever found since L4 died, and it applies to *any* container that moves mantissas
+verbatim, including stz. (iii) Order-1 context is closed as a format change; the
+layer-1-only mode (+0.001 b/w whole-model) is parked with the early-layer column
+candidate. (iv) Tier/budget design headroom (bounded by pad slack) is the remaining
+mechanics lever, secondary to (ii). (v) The register-tile decode kernel remains the
+runtime-credibility step.
+
+## Reproduction
+
+```
+# smoke (synthetic snapshot, seconds)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_emission_peel.py --synthetic
+
+# real run (resumable; self-limits per invocation and checkpoints; optionally --layer N)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_emission_peel.py
+
+# summary + gates + summary JSON
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_emission_peel.py --summary
+```
+
+Artifacts: `tests/artifacts/emission_peel_results.jsonl` (per-tensor exact accounting,
+stamp `b4e62994d250`), `tests/artifacts/emission_peel_summary.json` (per-plane
+certificates, H2 per-layer/per-C realized numbers, holdout table, gates).

@@ -333,6 +333,31 @@ block coding, 10.70 b/w ≈ 32.9% projected, O(W)-sequential-decode contract, cr
 gate pending). They share the mantissa/sym anatomy but compete on the index plane; the
 container can carry both as per-tensor codec choices.
 
+## Emission peel: sym-side CONVERGED random; the "mantissa is noise" claim CORRECTED (2026-07-02)
+
+Peel-until-random on the 0015-v2 emitted planes (64 tensors, layers 1/13/27/40,
+skeptic-verified: every battery re-run with independent code, order-1 coder re-implemented
+from spec and round-tripped):
+
+- **Sym-side emission is certified near-random — the recursive peel loop CONVERGES**:
+  coded payload ceiling 0.0029 b/w, tier-flag plane 0.0023 (whole plane is only 0.0156).
+  Residual above floor is decomposed coder mechanics, not hidden symbol structure.
+- **Within-block order-1 context: DEAD as a format change** (+0.0086 realized << 0.05 gate;
+  holdout positive in only 4/8 cells). All signal is layer-1 up_proj (+0.0596 there);
+  parked into the early-layer bundle (~0.001 b/w whole-model).
+- **CORRECTION to the 0012-era mantissa verdict**: the transmitted mantissa plane is NOT
+  random. Per-position analysis H(bit | position mod 7) exposes a monotone MSB bias —
+  p(1) = [0.416, 0.458, 0.480, 0.491, 0.497, 0.499, 0.500] by bit position — worth a
+  **~0.0287 b/w ceiling (MSB alone ~0.020)**, present on 62–64/64 tensors, MI hits at
+  native lags 7/14/21/884. The old "6.9875/7, hard random wall, diagnostic terminates"
+  claim was a **measurement-geometry artifact**: pooled bit entropy dilutes the positional
+  bias ~7×, and byte-aligned compressors (brotli/lzma) cannot see mod-7 phase. Phase is
+  fixed-position → known at decode → **fusible-compatible**, and it applies to EVERY
+  container that ships mantissas verbatim (stz included). Storage floor drops ~0.03 b/w
+  (~10.53); tile-format target if realized: ~10.70 → ~10.67–10.68.
+- Tier/budget design headroom (diagnostic lens plane): 0.0335 b/w ceiling, realizable
+  slice bounded by the actual pad slack (~0.073) — secondary mechanics probe.
+
 ## Purged tracks — do not re-open (2026-07-01)
 
 Lossy/quantization/QAT/train-time tracks (candidates 0005–0008, 0011, 0013,
