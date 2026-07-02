@@ -174,11 +174,17 @@ on its own. Fit the exponent-concentration scaling law across 30B/120B/550B.
 
 ## New leads (2026-07-01, from 0014's escape forensics — chooser-scale, fold into E)
 
-- **Per-row second-level escape k for up_proj**: up_proj escape mask is row-overdispersed
-  (Fano ~2.3 vs ~0.79 binomial null) — a per-row k chooser could harvest it. Ceiling
-  ~0.01–0.03 b/w; price through the (k−b) conversion rule.
-- **Per-column BASE re-centering as a chooser option only**: fires only if column exponent
-  distributions are shifted copies (not shape-varying); ceiling ~0.02–0.05 b/w.
+**Pre-probe DONE 2026-07-02** (`0009/tools/probe_chooser_levers.py`, skeptic-verified):
+- ~~Per-row escape k~~ **DROPPED**: +0.0053 b/w, below the +0.01 bar (the (k−b) rule
+  priced it right).
+- ~~Per-column BASE~~ **ADOPT V2-g1, early layers only**: +0.0105–0.0136 b/w — but it is
+  the SAME early-layer column-shift structure as colkey (L1 +0.0991 ≈ colkey +0.0978);
+  one pot, not additive. Chooser carries both options; min-envelope settles it.
+- **NEW: V3 fractional-m ADOPTED as the strongest chooser lever**: +0.0489 b/w
+  model-wide, 768/768 adopted, gain rises with depth. Joint +0.0568 b/w ≈ +0.36 pt.
+- **Concrete E-scope deliverable: .stz chooser v3** adding {V3 fractional-m,
+  V2-g1 column base, colkey} → container 31.89% → ~32.2%, still per-weight
+  random access.
 - **Extend direction I's certification to stz's emitted planes** (index plane, side
   tables): 0014's forensics already did the escape mask; finishing this states terminal
   closure on the whole emission.

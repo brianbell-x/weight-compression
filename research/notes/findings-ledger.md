@@ -291,6 +291,30 @@ blocks (gap 38,975) decoded bit-exact straight from O(1)-computed stride address
   block — a register-tile kernel prototype is the remaining runtime-credibility step
   (parked: kernel work is out of current scope).
 
+## Chooser-levers pre-probe — V3 fractional-m fires everywhere, column family is one pot (2026-07-02)
+
+Three chooser-scale levers priced exactly (adoption-aware, parity vs realized stz exact
+768/768, 9+18 SHA-256 round-trips, skeptic re-derived from raw weights — not refuted):
+
+- **V3 fractional-m (grouped-radix index plane, non-power-of-2 K): ADOPT — the strongest
+  chooser lever.** +0.0489 b/w model-wide, adopted on 768/768 tensors, and the gain RISES
+  with depth (+0.0486 L1 → +0.0540 L27) — the one lever whose mass lives in late layers.
+- **V2 per-column int8 BASE (g=1 only): ADOPT for early layers — it is the SAME structure
+  as 0014's colkey win, not a second win.** Independent implementations converge (L1:
+  +0.0991 vs colkey's +0.0978). Grouping kills it (g16/g64 adopted 0/256 — pure per-column
+  shift). **The column family (colkey | V2-g1) is one pot worth ~+0.011–0.014 b/w total**;
+  put both in the chooser and let the min-envelope settle supersession at zero risk.
+- **V1 per-row escape-k: DROP** (+0.0053 b/w, below the +0.01 bar even before an uncharged
+  offset-table cost — the (k−b) conversion rule priced it correctly in advance).
+- **Joint projection: +0.0568 b/w ≈ +0.36 pt whole-model** → a .stz chooser v3 takes the
+  container from 31.89% to ~32.2% at per-weight random access.
+
+Two-track picture now current: the **.stz track** (per-weight random access, strongest
+runtime contract, 31.89% → ~32.2% with these levers) and the **0015 tile track** (W=128
+block coding, 10.70 b/w ≈ 32.9% projected, O(W)-sequential-decode contract, cross-layer
+gate pending). They share the mantissa/sym anatomy but compete on the index plane; the
+container can carry both as per-tensor codec choices.
+
 ## Purged tracks — do not re-open (2026-07-01)
 
 Lossy/quantization/QAT/train-time tracks (candidates 0005–0008, 0011, 0013,

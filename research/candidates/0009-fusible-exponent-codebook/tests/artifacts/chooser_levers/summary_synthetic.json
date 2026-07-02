@@ -150,6 +150,7 @@
   "notes": [
     "adoption-aware envelope: all lever side costs are per-tensor, so the per-tensor min with full side-cost charging is the achievable total",
     "joint envelope = per-tensor min over single-lever options; lever composition (e.g. V2+V3) is not priced",
-    "V1 priced through the per-group k*n_esc + 9*n_raw conversion rule, never 9 or 16 bits per escape avoided"
+    "V1 priced through the per-group k*n_esc + 9*n_raw conversion rule, never 9 or 16 bits per escape avoided",
+    "V1 random-access caveat: per-group k makes row r's escape-code bit offset an O(ng) weighted prefix (sum k_g*cnt_g) derivable from the stored count prefix + k side stream, not baseline stz's O(1) k*prefix[r]; a strictly-O(1) stored per-group code-offset table is NOT charged and would cost ~_pw(bits)*ng extra bits (~0.01 b/w at group=1 on a 5M-param tensor) -- same order as V1's expected gain, so read group=1 V1 gains with that caveat (or assume a load-time-derived offset table)"
   ]
 }

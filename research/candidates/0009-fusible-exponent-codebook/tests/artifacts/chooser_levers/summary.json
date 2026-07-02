@@ -1,0 +1,338 @@
+{
+  "mode": "real",
+  "scope": "measured layers [1, 13, 27]",
+  "baseline": "realized stz (plan_regroup, parity-gated exact per tensor)",
+  "gate_model_bpw": 0.01,
+  "layers": {
+    "1": {
+      "tensors": 256,
+      "params": 1277165568,
+      "baseline_bpw": 11.031003,
+      "levers": {
+        "v1": {
+          "envelope_bpw": 11.027175,
+          "envelope_gain_bpw": 0.003828,
+          "adopt_tensors": 110,
+          "adopt_frac": 0.4297,
+          "adopt_numel_frac": 0.4297
+        },
+        "v2": {
+          "envelope_bpw": 10.931887,
+          "envelope_gain_bpw": 0.099116,
+          "adopt_tensors": 220,
+          "adopt_frac": 0.8594,
+          "adopt_numel_frac": 0.8594
+        },
+        "v3": {
+          "envelope_bpw": 10.982445,
+          "envelope_gain_bpw": 0.048558,
+          "adopt_tensors": 256,
+          "adopt_frac": 1.0,
+          "adopt_numel_frac": 1.0
+        }
+      },
+      "variants": {
+        "v1_g1": {
+          "bpw": 11.027539,
+          "envelope_gain_bpw": 0.003827,
+          "adopt_tensors": 110,
+          "adopt_frac": 0.4297,
+          "adopt_numel_frac": 0.4297
+        },
+        "v1_g8": {
+          "bpw": 11.028803,
+          "envelope_gain_bpw": 0.002343,
+          "adopt_tensors": 75,
+          "adopt_frac": 0.293,
+          "adopt_numel_frac": 0.293
+        },
+        "v1_g64": {
+          "bpw": 11.031002,
+          "envelope_gain_bpw": 4.4e-05,
+          "adopt_tensors": 8,
+          "adopt_frac": 0.0312,
+          "adopt_numel_frac": 0.0312
+        },
+        "v2_g1": {
+          "bpw": 10.932334,
+          "envelope_gain_bpw": 0.099116,
+          "adopt_tensors": 220,
+          "adopt_frac": 0.8594,
+          "adopt_numel_frac": 0.8594
+        },
+        "v2_g16": {
+          "bpw": 11.086505,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v2_g64": {
+          "bpw": 11.081015,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v3": {
+          "bpw": 10.982445,
+          "envelope_gain_bpw": 0.048558,
+          "adopt_tensors": 256,
+          "adopt_frac": 1.0,
+          "adopt_numel_frac": 1.0
+        }
+      },
+      "joint": {
+        "envelope_bpw": 10.921649,
+        "envelope_gain_bpw": 0.109354
+      }
+    },
+    "13": {
+      "tensors": 256,
+      "params": 1277165568,
+      "baseline_bpw": 10.893136,
+      "levers": {
+        "v1": {
+          "envelope_bpw": 10.887083,
+          "envelope_gain_bpw": 0.006053,
+          "adopt_tensors": 209,
+          "adopt_frac": 0.8164,
+          "adopt_numel_frac": 0.8164
+        },
+        "v2": {
+          "envelope_bpw": 10.888514,
+          "envelope_gain_bpw": 0.004622,
+          "adopt_tensors": 35,
+          "adopt_frac": 0.1367,
+          "adopt_numel_frac": 0.1367
+        },
+        "v3": {
+          "envelope_bpw": 10.842056,
+          "envelope_gain_bpw": 0.05108,
+          "adopt_tensors": 256,
+          "adopt_frac": 1.0,
+          "adopt_numel_frac": 1.0
+        }
+      },
+      "variants": {
+        "v1_g1": {
+          "bpw": 10.887151,
+          "envelope_gain_bpw": 0.006053,
+          "adopt_tensors": 209,
+          "adopt_frac": 0.8164,
+          "adopt_numel_frac": 0.8164
+        },
+        "v1_g8": {
+          "bpw": 10.890914,
+          "envelope_gain_bpw": 0.002335,
+          "adopt_tensors": 99,
+          "adopt_frac": 0.3867,
+          "adopt_numel_frac": 0.3867
+        },
+        "v1_g64": {
+          "bpw": 10.892378,
+          "envelope_gain_bpw": 0.0008,
+          "adopt_tensors": 23,
+          "adopt_frac": 0.0898,
+          "adopt_numel_frac": 0.0898
+        },
+        "v2_g1": {
+          "bpw": 10.895382,
+          "envelope_gain_bpw": 0.004622,
+          "adopt_tensors": 35,
+          "adopt_frac": 0.1367,
+          "adopt_numel_frac": 0.1367
+        },
+        "v2_g16": {
+          "bpw": 10.893911,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v2_g64": {
+          "bpw": 10.893209,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v3": {
+          "bpw": 10.842056,
+          "envelope_gain_bpw": 0.05108,
+          "adopt_tensors": 256,
+          "adopt_frac": 1.0,
+          "adopt_numel_frac": 1.0
+        }
+      },
+      "joint": {
+        "envelope_bpw": 10.840366,
+        "envelope_gain_bpw": 0.05277
+      }
+    },
+    "27": {
+      "tensors": 256,
+      "params": 1277165568,
+      "baseline_bpw": 10.882179,
+      "levers": {
+        "v1": {
+          "envelope_bpw": 10.876299,
+          "envelope_gain_bpw": 0.00588,
+          "adopt_tensors": 202,
+          "adopt_frac": 0.7891,
+          "adopt_numel_frac": 0.7891
+        },
+        "v2": {
+          "envelope_bpw": 10.881872,
+          "envelope_gain_bpw": 0.000307,
+          "adopt_tensors": 8,
+          "adopt_frac": 0.0312,
+          "adopt_numel_frac": 0.0312
+        },
+        "v3": {
+          "envelope_bpw": 10.828214,
+          "envelope_gain_bpw": 0.053965,
+          "adopt_tensors": 256,
+          "adopt_frac": 1.0,
+          "adopt_numel_frac": 1.0
+        }
+      },
+      "variants": {
+        "v1_g1": {
+          "bpw": 10.876355,
+          "envelope_gain_bpw": 0.00588,
+          "adopt_tensors": 202,
+          "adopt_frac": 0.7891,
+          "adopt_numel_frac": 0.7891
+        },
+        "v1_g8": {
+          "bpw": 10.881028,
+          "envelope_gain_bpw": 0.00125,
+          "adopt_tensors": 121,
+          "adopt_frac": 0.4727,
+          "adopt_numel_frac": 0.4727
+        },
+        "v1_g64": {
+          "bpw": 10.882005,
+          "envelope_gain_bpw": 0.000213,
+          "adopt_tensors": 37,
+          "adopt_frac": 0.1445,
+          "adopt_numel_frac": 0.1445
+        },
+        "v2_g1": {
+          "bpw": 10.887529,
+          "envelope_gain_bpw": 0.000307,
+          "adopt_tensors": 8,
+          "adopt_frac": 0.0312,
+          "adopt_numel_frac": 0.0312
+        },
+        "v2_g16": {
+          "bpw": 10.882423,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v2_g64": {
+          "bpw": 10.882252,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v3": {
+          "bpw": 10.828214,
+          "envelope_gain_bpw": 0.053965,
+          "adopt_tensors": 256,
+          "adopt_frac": 1.0,
+          "adopt_numel_frac": 1.0
+        }
+      },
+      "joint": {
+        "envelope_bpw": 10.828214,
+        "envelope_gain_bpw": 0.053965
+      }
+    }
+  },
+  "projection": {
+    "v1": {
+      "measured_layers": [
+        1,
+        13,
+        27
+      ],
+      "measured_gains_bpw": [
+        0.003828,
+        0.006053,
+        0.00588
+      ],
+      "model_wide_gain_bpw": 0.005253,
+      "passes_bar": false
+    },
+    "v2": {
+      "measured_layers": [
+        1,
+        13,
+        27
+      ],
+      "measured_gains_bpw": [
+        0.099116,
+        0.004622,
+        0.000307
+      ],
+      "model_wide_gain_bpw": 0.013578,
+      "passes_bar": true
+    },
+    "v3": {
+      "measured_layers": [
+        1,
+        13,
+        27
+      ],
+      "measured_gains_bpw": [
+        0.048558,
+        0.05108,
+        0.053965
+      ],
+      "model_wide_gain_bpw": 0.048877,
+      "passes_bar": true
+    },
+    "joint": {
+      "measured_layers": [
+        1,
+        13,
+        27
+      ],
+      "measured_gains_bpw": [
+        0.109354,
+        0.05277,
+        0.053965
+      ],
+      "model_wide_gain_bpw": 0.056839,
+      "passes_bar": true
+    }
+  },
+  "roundtrip_evidence": {
+    "v1": {
+      "roundtrips": 3,
+      "adopted_roundtrip": true,
+      "note": "OK"
+    },
+    "v2": {
+      "roundtrips": 3,
+      "adopted_roundtrip": true,
+      "note": "OK"
+    },
+    "v3": {
+      "roundtrips": 3,
+      "adopted_roundtrip": true,
+      "note": "OK"
+    }
+  },
+  "notes": [
+    "adoption-aware envelope: all lever side costs are per-tensor, so the per-tensor min with full side-cost charging is the achievable total",
+    "joint envelope = per-tensor min over single-lever options; lever composition (e.g. V2+V3) is not priced",
+    "V1 priced through the per-group k*n_esc + 9*n_raw conversion rule, never 9 or 16 bits per escape avoided",
+    "V1 random-access caveat: per-group k makes row r's escape-code bit offset an O(ng) weighted prefix (sum k_g*cnt_g) derivable from the stored count prefix + k side stream, not baseline stz's O(1) k*prefix[r]; a strictly-O(1) stored per-group code-offset table is NOT charged and would cost ~_pw(bits)*ng extra bits (~0.01 b/w at group=1 on a 5M-param tensor) -- same order as V1's expected gain, so read group=1 V1 gains with that caveat (or assume a load-time-derived offset table)"
+  ]
+}

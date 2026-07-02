@@ -26,9 +26,16 @@ The three levers (each priced separately; joint = per-tensor min over all):
        + pad8(R*pw) + pad8(R*pw2) + pad8(7n) + (K + L_cap)*16 + head + 7*u64,
      the per-group k_g argmin of k*n_esc_g + 9*n_raw_g(k) (k=0 -> 9*n_esc_g),
      i.e. priced through the (k-b)-style conversion rule, never "9 bits saved
-     per escape". Row prefix tables (pw / pw2) are kept, so random access
-     survives at row granularity within a group (k constant inside a group ->
-     bit offsets derivable from the count prefix + the k side stream).
+     per escape". Row prefix tables (pw / pw2) are kept, so nothing is
+     untransmitted -- but note the random-access caveat: baseline stz finds
+     row r's escape codes at bit k*prefix[r] in O(1), while with per-group k
+     the code bit offset of row r is sum over previous groups of k_g*cnt_g,
+     an O(ng) weighted prefix scan over the stored count prefix + k side
+     stream (or a load-time-derived offset table). A strictly-O(1) STORED
+     per-group code-offset table is NOT charged here; it would cost roughly
+     _pw(bits)*ng extra bits (~0.01 b/w at group=1 on a 5M-param tensor) --
+     the same order as V1's expected ceiling, so V1 gains at group=1 should
+     be read with that fusibility-honesty caveat.
 
   V2 per-column(-group) BASE re-centering as a chooser option. Subtract an
      address-derived per-column-group (group in {1, 16, 64} columns) base
@@ -1000,6 +1007,14 @@ def summarize(synthetic: bool):
             "composition (e.g. V2+V3) is not priced",
             "V1 priced through the per-group k*n_esc + 9*n_raw conversion rule, "
             "never 9 or 16 bits per escape avoided",
+            "V1 random-access caveat: per-group k makes row r's escape-code bit "
+            "offset an O(ng) weighted prefix (sum k_g*cnt_g) derivable from the "
+            "stored count prefix + k side stream, not baseline stz's O(1) "
+            "k*prefix[r]; a strictly-O(1) stored per-group code-offset table is "
+            "NOT charged and would cost ~_pw(bits)*ng extra bits (~0.01 b/w at "
+            "group=1 on a 5M-param tensor) -- same order as V1's expected gain, "
+            "so read group=1 V1 gains with that caveat (or assume a load-time-"
+            "derived offset table)",
         ],
     }
     outp = ART / ("summary_synthetic.json" if synthetic else "summary.json")

@@ -100,6 +100,22 @@ Usage:
   uv run python probe_block_codes_v2.py --gate-only    # L4 gate phase only
   uv run python probe_block_codes_v2.py                # real run (resumable)
   uv run python probe_block_codes_v2.py --summary      # table + gates + JSON
+
+FROZEN cross-layer transfer mode (post-hoc gate on the layer-27 win):
+  uv run python probe_block_codes_v2.py --frozen --layer 13
+scores ONLY the frozen layer-27 winning cell W128_T4_P100_L11L31L40 (W=128
+bit-granular fixed stride, T=4 DP-optimal PER-TENSOR tier budgets -- re-derived
+per tensor, legitimate because they are transmitted side info charged exactly
+as in the full grid -- P100 top budget, L1+L3 on, L4 off). No re-selection of
+W/T/P/levers on the new layer. The per-layer L4 gate is re-measured first
+(recorded either way); if it passes the pre-registered 0.05 b/w threshold on
+that layer, ONE clearly-separated L4-ON variant row (same cell, L4=1) is
+reported as an optional variant -- never mixed into the frozen score. stz
+parity assertions and per-config round-trip sampling are unchanged. Artifacts:
+blockcodes_v2_frozen_*_layer<N>.* (the L4 gate files are shared per layer with
+the full-grid mode). --layer <N> alone retargets the full grid (artifacts
+suffixed _layer<N>; the 10.8822 canonical-reference check applies to layer 27
+only -- other layers gate G1 against their own realized stz reference).
 """
 from __future__ import annotations
 import argparse, hashlib, json, math, os, sys, time
@@ -133,6 +149,12 @@ REF_WEIGHTED_TOL = 0.001
 BUDGET_BEAT_STZ = 0.316              # v1-measured overhead budget to beat stz @W=128
 BUDGET_G2 = 0.142                    # v1-measured overhead budget for floor+0.15
 V1_ANCHOR = ("W128_T1_P99_L10L30L40", 11.0349)  # v1 W128_P99 (real set) sanity anchor
+
+# frozen layer-27 winning cell (transfer scoring; NOT in ACCT -- it is a subset
+# of the already-stamped grid, accounting identical, so old artifacts stay valid)
+FROZEN_W, FROZEN_T, FROZEN_P, FROZEN_L1, FROZEN_L3 = 128, 4, 100, 1, 1
+FROZEN_KEY = f"W{FROZEN_W}_T{FROZEN_T}_P{FROZEN_P}_L1{FROZEN_L1}L3{FROZEN_L3}L40"
+FROZEN_L4_KEY = f"W{FROZEN_W}_T{FROZEN_T}_P{FROZEN_P}_L1{FROZEN_L1}L3{FROZEN_L3}L41"
 
 CODER_SPEC = ("per-block single-lane bit-renorm rANS; M=4096 12-bit quantized "
               "table(s) (stores q-1); state in [M,2M); bit-by-bit renorm (emit "
@@ -366,7 +388,7 @@ def gate_summary_from_rows(rows: list[dict], synthetic: bool) -> dict:
 
 # ------------------------------------------------------------- per-tensor ---
 def analyze_tensor(raw: bytes, t: dict, synthetic: bool, stats_ref: dict,
-                   l4_active: bool) -> dict:
+                   l4_active: bool, frozen: bool = False) -> dict:
     u = np.frombuffer(raw, "<u2")
     n = u.size
     R, C = t["shape"]
@@ -402,11 +424,16 @@ def analyze_tensor(raw: bytes, t: dict, synthetic: bool, stats_ref: dict,
     quant_delta = float((hist * clq0).sum() / n - H)
 
     l4_opts = (0, 1) if l4_active else (0,)
+    if frozen:   # score ONLY the frozen layer-27 winner (+ L4 variant if active)
+        ws_l, ts_l, ps_l, l1_l, l3_l = ((FROZEN_W,), (FROZEN_T,), (FROZEN_P,),
+                                        (FROZEN_L1,), (FROZEN_L3,))
+    else:
+        ws_l, ts_l, ps_l, l1_l, l3_l = WS, TIERS, PS, (0, 1), (0, 1)
     measured, cells = {}, {}
     rt_blocks = rt_syms = 0
     sha_o, sha_r = hashlib.sha256(), hashlib.sha256()
 
-    for W in WS:
+    for W in ws_l:
         if n % W:
             die(f"n={n} not divisible by W={W}")
         nb = n // W
@@ -447,7 +474,7 @@ def analyze_tensor(raw: bytes, t: dict, synthetic: bool, stats_ref: dict,
             # conditioning gain when l4=1 (can be negative). Used by the summary
             # so the ovhd column is attributed to the tables actually in play.
             quant_row = float(qent_b.sum() / n - H)
-            for l3 in (0, 1):
+            for l3 in l3_l:
                 x0v = x0_l3 if l3 else x0_l0
                 rb = rans_sim_blocks(qm, cm, x0v)
                 mkey = f"W{W}_L3{l3}L4{l4}"
@@ -504,18 +531,18 @@ def analyze_tensor(raw: bytes, t: dict, synthetic: bool, stats_ref: dict,
                     rt_syms += W
 
                 # ---- grid cells: P x l1 x T (DP once per (P, l1), read all T)
-                for P in PS:
+                for P in ps_l:
                     B_top = int(v1.pct_higher(rb, P))
                     esc = rb > B_top
                     n_esc = int(esc.sum())
                     kept_rb = rb[~esc]
                     coded_kept = int(kept_rb.sum())
                     qent_kept = float(qent_b[~esc].sum())
-                    for l1 in (0, 1):
+                    for l1 in l1_l:
                         dp = tier_dp(kept_rb, bool(l1), max(TIERS))
                         esc_content = 9 * W + (BORROW_BITS if l3 else 0)
                         esc_slot = esc_content if l1 else 8 * ceil_div(esc_content, 8)
-                        for T in TIERS:
+                        for T in ts_l:
                             kept_slot, budgets, slots, counts = dp[T]
                             classes = len(budgets) + (1 if n_esc else 0)
                             flagb = int(math.ceil(math.log2(classes))) if classes > 1 else 0
@@ -574,6 +601,7 @@ def analyze_tensor(raw: bytes, t: dict, synthetic: bool, stats_ref: dict,
         "name": t["name"], "layer": t["layer"], "expert": t["expert"],
         "proj": t["proj"], "n": int(n), "R": int(R), "C": int(C),
         "acct": ACCT_STAMP, "l4_active": bool(l4_active),
+        "frozen": bool(frozen),
         "H_sym": round(H, 6), "floor_bpw": round(floor_bpw, 6),
         "baseline": {"bpw": round(base_bpw, 6), "bits": int(plan["bits"]),
                      "variant": plan["variant"]},
@@ -617,7 +645,8 @@ def summarize(tg: list[dict], jsonl: Path, summaryp: Path, gate_sum: dict,
     floor_w = wsum(lambda r: r["floor_bpw"] * r["n"]) / n_tot
     quant_w = wsum(lambda r: r["quant"]["delta_bpw"] * r["n"]) / n_tot
     parity_max = max(rec[nm]["parity"]["abs_diff"] for nm in names)
-    if not synthetic and abs(ref_w - STZ_TARGET_BPW) > REF_WEIGHTED_TOL:
+    if (not synthetic and v1.TARGET_LAYER == 27
+            and abs(ref_w - STZ_TARGET_BPW) > REF_WEIGHTED_TOL):
         die(f"weighted stz reference {ref_w:.4f} != canonical {STZ_TARGET_BPW}")
 
     rt_blocks = wsum(lambda r: r["roundtrip"]["blocks"])
@@ -659,7 +688,10 @@ def summarize(tg: list[dict], jsonl: Path, summaryp: Path, gate_sum: dict,
         }
 
     grid = {k: agg(k) for k in keys}
-    target = base_w if synthetic else STZ_TARGET_BPW
+    # G1 target: the canonical 10.8822 is a layer-27 number; other layers gate
+    # against their own realized stz reference (numel-weighted per-tensor jsonl)
+    target = base_w if synthetic else (STZ_TARGET_BPW if v1.TARGET_LAYER == 27
+                                       else ref_w)
 
     # per-(W,T,levers) best P
     best_p = {}
@@ -738,7 +770,8 @@ def summarize(tg: list[dict], jsonl: Path, summaryp: Path, gate_sum: dict,
     scope = ("synthetic smoke -- carries no evidential weight" if synthetic
              else f"layer {v1.TARGET_LAYER} only; cross-layer transfer unvalidated")
 
-    mode = "SYNTHETIC (smoke only)" if synthetic else "REAL layer-27"
+    mode = ("SYNTHETIC (smoke only)" if synthetic
+            else f"REAL layer-{v1.TARGET_LAYER}")
     print(f"\n=== candidate 0015 v2 -- block-code overhead attack [{mode}] ===")
     print(f"targets: {len(names)} tensors, {n_tot:,} params; parity gate OK "
           f"(max |d bpw| = {parity_max:.6f}); acct stamp {ACCT_STAMP}")
@@ -888,6 +921,200 @@ def summarize(tg: list[dict], jsonl: Path, summaryp: Path, gate_sum: dict,
     return summary
 
 
+# ----------------------------------------------------------- frozen summary ---
+def summarize_frozen(tg: list[dict], jsonl: Path, summaryp: Path,
+                     gate_sum: dict, synthetic: bool):
+    """Cross-layer transfer score of the FROZEN layer-27 winner. No
+    re-selection of W/T/P/levers on this layer; per-tensor DP tier budgets are
+    re-derived per tensor (legitimate: transmitted side info, charged exactly
+    as in the full grid). The L4-ON variant (if the per-layer gate passed) is
+    reported separately and is NEVER part of the frozen score."""
+    rows = v1.load_rows(jsonl)
+    check_stamp(rows, jsonl)
+    rec = {}
+    for r in rows:
+        rec.setdefault(r["name"], r)
+    names = [t["name"] for t in tg]
+    miss = [nm for nm in names if nm not in rec]
+    if miss:
+        die(f"frozen summary requires all tensors done; {len(miss)} missing "
+            f"(first: {miss[0]}) -- re-invoke without --summary to resume")
+    need = (FROZEN_KEY,) + ((FROZEN_L4_KEY,) if gate_sum["l4_active"] else ())
+    for nm in names:
+        if rec[nm]["l4_active"] != gate_sum["l4_active"]:
+            die(f"row {nm} was computed with l4_active={rec[nm]['l4_active']} "
+                f"!= current gate decision {gate_sum['l4_active']}")
+        for k in need:
+            if k not in rec[nm]["cells"]:
+                die(f"row {nm} lacks cell {k} -- wrong artifact file?")
+    n_tot = sum(rec[nm]["n"] for nm in names)
+    wsum = lambda f: sum(f(rec[nm]) for nm in names)
+
+    base_w = wsum(lambda r: r["baseline"]["bits"]) / n_tot
+    ref_w = wsum(lambda r: r["parity"]["ref_bpw"] * r["n"]) / n_tot
+    floor_w = wsum(lambda r: r["floor_bpw"] * r["n"]) / n_tot
+    quant_w = wsum(lambda r: r["quant"]["delta_bpw"] * r["n"]) / n_tot
+    parity_max = max(rec[nm]["parity"]["abs_diff"] for nm in names)
+    if (not synthetic and v1.TARGET_LAYER == 27
+            and abs(ref_w - STZ_TARGET_BPW) > REF_WEIGHTED_TOL):
+        die(f"weighted stz reference {ref_w:.4f} != canonical {STZ_TARGET_BPW}")
+    # G1 target = realized stz on THIS layer's set; 10.8822 is layer-27 only
+    target = base_w if synthetic else ref_w
+    rt_blocks = wsum(lambda r: r["roundtrip"]["blocks"])
+    rt_ok = all(rec[nm]["roundtrip"]["bits_ok"] and rec[nm]["roundtrip"]["sha256_ok"]
+                for nm in names)
+
+    def agg(key):
+        g = lambda f: wsum(lambda r: f(r["cells"][key]))
+        sym, mant = g(lambda c: c["sym"]), g(lambda c: c["mant"])
+        parts = key.split("_")
+        W = int(parts[0][1:])
+        lev = parts[3]
+        mkey = f"{parts[0]}_L3{lev[5]}L4{lev[8]}"
+        nb = sum(rec[nm]["n"] // W for nm in names)
+        esc_n = g(lambda c: c["esc_n"])
+        return {
+            "bpw": (sym + mant) / n_tot,
+            "quant_bpw": wsum(lambda r: r["measured"][mkey]["quant_delta_bpw"]
+                              * r["n"]) / n_tot,
+            "pad_bpw": g(lambda c: c["pad"]) / n_tot,
+            "esc_bpw": g(lambda c: c["esc"]) / n_tot,
+            "esc_frac": esc_n / nb,
+            "flag_bpw": g(lambda c: c["flag"]) / n_tot,
+            "rank_bpw": (g(lambda c: c["rank"]) + g(lambda c: c["cdir"])) / n_tot,
+            "tab_bpw": g(lambda c: c["tab"]) / n_tot,
+            "align_bpw": g(lambda c: c["align"]) / n_tot,
+            "flush_bpw": FLUSH_BITS * (nb - esc_n) / n_tot,
+            "xs_bpw": g(lambda c: c["xs"]) / n_tot,
+            "mant_credit_bpw": (wsum(lambda r: pad8(7 * r["n"])) - mant) / n_tot,
+        }
+
+    fro = agg(FROZEN_KEY)
+    var = agg(FROZEN_L4_KEY) if gate_sum["l4_active"] else None
+
+    g1 = fro["bpw"] < target
+    g2 = fro["bpw"] <= floor_w + G2_SLACK
+    verdict = (f"frozen cell {'BEATS' if g1 else 'does NOT beat'} realized stz "
+               f"on this set (d = {target - fro['bpw']:+.4f} b/w); "
+               f"G2 floor+{G2_SLACK}: {'PASS' if g2 else 'FAIL'} "
+               f"(d over floor = {fro['bpw'] - floor_w:+.4f})")
+    if not rt_ok:
+        verdict = "PROVISIONAL: " + verdict
+    layer = None if synthetic else v1.TARGET_LAYER
+    scope = ("synthetic smoke -- carries no evidential weight" if synthetic
+             else f"layer {layer} expert tensors; format frozen on layer 27, "
+                  f"scored out-of-selection (per-tensor DP tier budgets are "
+                  f"transmitted side info, re-derived per tensor)")
+
+    mode = "SYNTHETIC (smoke only)" if synthetic else f"REAL layer-{layer}"
+    print(f"\n=== candidate 0015 v2 -- FROZEN-cell transfer score [{mode}] ===")
+    print(f"frozen format: {FROZEN_KEY} (W=128 bit-granular fixed stride, T=4 "
+          f"DP-optimal per-tensor tier budgets [transmitted, charged], P100 "
+          f"top budget, L1+L3 on, L4 off) -- the layer-27 winner, no "
+          f"re-selection here")
+    print(f"targets: {len(names)} tensors, {n_tot:,} params; parity gate OK "
+          f"(max |d bpw| = {parity_max:.6f}); acct stamp {ACCT_STAMP}")
+    print(f"stz realized on this set {ref_w:.4f} (recomputed {base_w:.4f}) | "
+          f"layer-27 canonical {STZ_TARGET_BPW} (context only) | floor "
+          f"H(sym)+7 = {floor_w:.4f} | G2 bar = {floor_w + G2_SLACK:.4f}")
+    print(f"round-trip: {rt_blocks} blocks, bits==accounted and SHA-256 exact: "
+          f"{'PASS' if rt_ok else 'FAIL'}; 12-bit quant delta (base tables) "
+          f"+{quant_w:.4f} b/w")
+
+    print(f"\nL4 GATE (re-measured on this layer, threshold {L4_GATE_MIN_GAIN} "
+          f"b/w): H(sym)={gate_sum['H_sym_w']:.4f}, "
+          f"H(sym|col)={gate_sum['H_col_w']:.4f} (gain {gate_sum['gain_col_w']:.4f})")
+    for W in WS:
+        pw = gate_sum["per_w"][f"W{W}"]
+        print(f"  block col-group W={W:<4} G~{pw['G_mean']:<6} "
+              f"H(sym|grp)={pw['H_grp_w']:.4f}  gain={pw['gain_w']:.4f}")
+    print(f"  best gain {gate_sum['best_gain_bpw']:.4f} b/w at "
+          f"{gate_sum['best_w']} -> gate "
+          f"{'PASS' if gate_sum['gate_pass'] else 'FAIL'}"
+          + (" [L4 forced for smoke]" if gate_sum.get("l4_forced") else ""))
+
+    out_rows = [(f"FROZEN {FROZEN_KEY}", fro)]
+    if var is not None:
+        out_rows.append((f"variant {FROZEN_L4_KEY}", var))
+    hdr = (f"{'row':>34}{'bpw':>9}{'save':>8}{'ovhd':>8}{'flush':>7}{'xs':>7}"
+           f"{'pad':>7}{'esc':>7}{'flag':>7}{'rank':>7}{'tab':>7}{'mcr':>7}")
+    print("\n" + hdr)
+    print("-" * len(hdr))
+    for label, v in out_rows:
+        ov = v["bpw"] - floor_w - v["quant_bpw"]
+        print(f"{label:>34}{v['bpw']:>9.4f}{target - v['bpw']:>+8.4f}{ov:>8.4f}"
+              f"{v['flush_bpw']:>7.4f}{v['xs_bpw']:>7.4f}{v['pad_bpw']:>7.4f}"
+              f"{v['esc_bpw']:>7.4f}{v['flag_bpw']:>7.4f}{v['rank_bpw']:>7.4f}"
+              f"{v['tab_bpw']:>7.4f}{v['mant_credit_bpw']:>7.4f}")
+    if var is not None:
+        print(f"  [L4-ON row is an OPTIONAL, clearly-separated variant -- NOT "
+              f"part of the frozen score; delta vs frozen = "
+              f"{fro['bpw'] - var['bpw']:+.4f} b/w (positive = L4 would help)]")
+    else:
+        print(f"  [L4 gate below threshold on this layer -> no L4-ON variant "
+              f"row, as pre-registered]")
+
+    print(f"\nG1 (< realized stz on this set = {target:.4f}): "
+          f"{'PASS' if g1 else 'FAIL'} (d = {target - fro['bpw']:+.4f})")
+    print(f"G2 (<= floor + {G2_SLACK} = {floor_w + G2_SLACK:.4f}): "
+          f"{'PASS' if g2 else 'FAIL'} (d over floor = "
+          f"{fro['bpw'] - floor_w:+.4f})")
+    print(f"verdict: {verdict}  [{scope}]")
+
+    summary = {
+        "mode": "synthetic-frozen" if synthetic else "real-frozen",
+        "layer": layer, "scope": scope,
+        "acct_stamp": ACCT_STAMP,
+        "frozen_format": {
+            "key": FROZEN_KEY, "W": FROZEN_W, "T": FROZEN_T, "P": FROZEN_P,
+            "L1": FROZEN_L1, "L3": FROZEN_L3, "L4": 0,
+            "note": ("frozen from the layer-27 v2 winner; per-tensor DP tier "
+                     "budgets re-derived per tensor and charged as transmitted "
+                     "side info (as in the full grid); no re-selection of "
+                     "W/T/P/levers on this layer")},
+        "targets": len(names), "total_params": int(n_tot),
+        "parity_max_abs_diff": parity_max,
+        "baseline_recomputed_bpw": round(base_w, 6),
+        "baseline_ref_weighted_bpw": round(ref_w, 6),
+        "g1_target_bpw_this_set": round(target, 6),
+        "stz_layer27_canonical_bpw": STZ_TARGET_BPW,
+        "floor_bpw_weighted": round(floor_w, 6),
+        "quant_delta_bpw_weighted": round(quant_w, 6),
+        "coder": CODER_SPEC,
+        "l4_gate": gate_sum,
+        "roundtrip": {"blocks": int(rt_blocks), "all_ok": bool(rt_ok)},
+        "frozen": {k: round(v, 6) for k, v in fro.items()},
+        "gates": {
+            "G1_vs": ("recomputed baseline (synthetic)" if synthetic else
+                      "realized stz on this layer's set (per-tensor jsonl, "
+                      "numel-weighted)"),
+            "G1_pass": bool(g1),
+            "G1_delta_bpw": round(target - fro["bpw"], 6),
+            "G2_bar_bpw": round(floor_w + G2_SLACK, 6),
+            "G2_pass": bool(g2),
+            "G2_delta_vs_floor_bpw": round(fro["bpw"] - floor_w, 6),
+        },
+        "l4_variant": (None if var is None else {
+            "key": FROZEN_L4_KEY,
+            "cells": {k: round(v, 6) for k, v in var.items()},
+            "delta_vs_frozen_bpw": round(fro["bpw"] - var["bpw"], 6),
+            "forced_for_smoke": bool(gate_sum.get("l4_forced")),
+            "note": ("OPTIONAL variant, gate "
+                     + ("forced for smoke" if gate_sum.get("l4_forced")
+                        else "passed on this layer")
+                     + "; NOT part of the frozen score")}),
+        "verdict": verdict,
+        "accounting_note": ("identical accounting to the full v2 grid (same "
+                            "stamp): measured emitted bits, per-cell "
+                            "reconciliation at build time, stz per-tensor "
+                            "parity exact, sampled round-trip per coder "
+                            "variant with SHA-256-exact BF16 reconstruction"),
+    }
+    summaryp.write_text(json.dumps(summary, indent=2))
+    print(f"\nsummary written: {summaryp}")
+    return summary
+
+
 # ---------------------------------------------------------------------- main ---
 def run(a, snap: Path, jsonl: Path, gate_jsonl: Path, gate_sump: Path,
         summaryp: Path):
@@ -920,7 +1147,11 @@ def run(a, snap: Path, jsonl: Path, gate_jsonl: Path, gate_sump: Path,
             os.fsync(f.fileno())
         gdone.add(t["name"])
     grows = v1.load_rows(gate_jsonl)
-    grows = [r for r in grows if r["name"] in set(names)]
+    gseen = {}                     # dedup by name: the gate file is shared
+    for r in grows:                # between frozen and full-grid modes
+        if r["name"] in set(names):
+            gseen.setdefault(r["name"], r)
+    grows = list(gseen.values())
     gate_sum = gate_summary_from_rows(grows, a.synthetic)
     gate_sump.write_text(json.dumps(gate_sum, indent=2))
     print(f"[gate] L4 gate complete over {len(grows)} tensors: best gain "
@@ -934,6 +1165,8 @@ def run(a, snap: Path, jsonl: Path, gate_jsonl: Path, gate_sump: Path,
         print(f"[gate] summary written: {gate_sump}")
         return
     if a.summary:
+        if a.frozen:
+            return summarize_frozen(tg, jsonl, summaryp, gate_sum, a.synthetic)
         return summarize(tg, jsonl, summaryp, gate_sum, a.synthetic)
 
     # ---- phase 2: main grid
@@ -966,7 +1199,8 @@ def run(a, snap: Path, jsonl: Path, gate_jsonl: Path, gate_sump: Path,
                   f"tensors -- progress saved, re-invoke to resume.", flush=True)
             sys.exit(0)
         raw = v1.read_raw(snap, t)
-        rec = analyze_tensor(raw, t, a.synthetic, stats_ref, gate_sum["l4_active"])
+        rec = analyze_tensor(raw, t, a.synthetic, stats_ref,
+                             gate_sum["l4_active"], a.frozen)
         with jsonl.open("a") as f:
             f.write(json.dumps(rec) + "\n")
             f.flush()
@@ -989,7 +1223,10 @@ def run(a, snap: Path, jsonl: Path, gate_jsonl: Path, gate_sump: Path,
         print(f"[gate] synthetic strong parity gate exercised on {n_reg}/{len(tg)} tensors")
 
     print(f"\nall {len(done)}/{len(tg)} tensors done ({time.time() - t0:.0f}s)")
-    summarize(tg, jsonl, summaryp, gate_sum, a.synthetic)
+    if a.frozen:
+        summarize_frozen(tg, jsonl, summaryp, gate_sum, a.synthetic)
+    else:
+        summarize(tg, jsonl, summaryp, gate_sum, a.synthetic)
 
 
 def main():
@@ -1009,17 +1246,32 @@ def main():
                          "--budget-s and is checkpointed/resumable")
     ap.add_argument("--budget-s", type=float, default=420.0,
                     help="soft wall-clock budget; exits cleanly when exceeded")
+    ap.add_argument("--layer", type=int, default=None,
+                    help="target layer for the real target set (default: the "
+                         "canonical layer 27); artifacts get a _layer<N> suffix")
+    ap.add_argument("--frozen", action="store_true",
+                    help=f"score ONLY the frozen layer-27 winning cell "
+                         f"{FROZEN_KEY} (per-tensor DP tier budgets re-derived, "
+                         f"charged as transmitted side info) plus the per-layer "
+                         f"L4 gate; if the gate passes {L4_GATE_MIN_GAIN} b/w, "
+                         f"one clearly-separated L4-ON variant row is added "
+                         f"(never mixed into the frozen score); separate "
+                         f"blockcodes_v2_frozen_* artifacts")
     a = ap.parse_args()
 
+    if a.layer is not None:
+        v1.TARGET_LAYER = a.layer      # v1.enum_targets filters on this global
     snap = SYN_SNAP if a.synthetic else REAL_SNAP
-    tag = "_synthetic" if a.synthetic else ""
+    tag = (("_synthetic" if a.synthetic else "")
+           + (f"_layer{a.layer}" if a.layer is not None else ""))
+    stem = "blockcodes_v2_frozen" if a.frozen else "blockcodes_v2"
     ART.mkdir(parents=True, exist_ok=True)
-    jsonl = ART / f"blockcodes_v2_results{tag}.jsonl"
-    gate_jsonl = ART / f"blockcodes_v2_gate{tag}.jsonl"
-    gate_sump = ART / f"blockcodes_v2_gate_summary{tag}.json"
-    summaryp = ART / f"blockcodes_v2_summary{tag}.json"
+    jsonl = ART / f"{stem}_results{tag}.jsonl"
+    gate_jsonl = ART / f"blockcodes_v2_gate{tag}.jsonl"        # shared per tag
+    gate_sump = ART / f"blockcodes_v2_gate_summary{tag}.json"  # (frozen + grid)
+    summaryp = ART / f"{stem}_summary{tag}.json"
 
-    lockp = ART / f"blockcodes_v2{tag}.lock"
+    lockp = ART / f"{stem}{tag}.lock"
     try:
         fd = os.open(lockp, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
     except FileExistsError:
