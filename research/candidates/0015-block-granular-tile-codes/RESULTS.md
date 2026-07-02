@@ -669,3 +669,146 @@ uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_emi
 Artifacts: `tests/artifacts/emission_peel_results.jsonl` (per-tensor exact accounting,
 stamp `b4e62994d250`), `tests/artifacts/emission_peel_summary.json` (per-plane
 certificates, H2 per-layer/per-C realized numbers, holdout table, gates).
+
+---
+
+# Mantissa-phase realization inside the frozen format (M1/M2/M3): RESULTS
+
+**Date:** 2026-07-02 · **Scope:** 64 real expert tensors (8 experts × {up,down}_proj ×
+layers 1, 13, 27, 40; 319,291,392 params — the emission-peel sample), frozen v2
+mechanics unchanged (W=128 bit-stride, T=4 DP tiers, P100, L1+L3, 12-bit tables), frozen
+reference recomputed on the same sample · **Accounting stamp:** `ffd4e05b2da3` ·
+**Tool:** `tools/probe_mantissa_phase.py` · **Wall:** ~4 min (~108 s compute).
+
+**Verdict: FIRES.** The emission peel's mantissa phase bias is realizable inside the
+frozen format with exact accounting: **M1 (extended symbol sym10 = sign+exp8+mantMSB,
+1024-entry table, remaining 6 mantissa bits verbatim) = 10.6973 b/w, +0.0417 vs the
+frozen 10.7390 recomputed on this sample** — more than 2× the pre-registered 0.02 gate,
+ALL side costs charged (doubled table, pad, 88-bit per-tensor phase probs where used),
+round-trip proven (256 blocks per mechanism, emitted bits == accounted bits, SHA-256
+exact BF16). M1 wins on **every** layer. Field split as frozen: u16 LE, sym = u >> 7,
+mant = u & 0x7F; O(1) block addressing and the fixed-stride contract are untouched —
+the folded MSB simply joins the block's already-sequential rANS decode.
+
+## Realized (numel-weighted, all side costs charged; delta > 0 = saves vs frozen)
+
+```
+    mech       bpw    delta    coded     pad     tab    mant    misc     bound     gap
+  frozen   10.7390  +0.0000   3.7382  0.0766  0.0002  6.9062  0.0177   10.5931  0.1459
+      M1   10.6973  +0.0417   4.6931  0.0798  0.0004  5.9062  0.0177   10.5363  0.1610
+      M2   10.8156  -0.0766  10.7113  0.0864  0.0002  0.0000  0.0177   10.5658  0.2498
+      M3   10.7171  +0.0220   5.7113  0.0810  0.0009  4.9062  0.0177   10.5192  0.1979
+```
+
+Bounds are entropy-level (no side costs): frozen H(sym)+7 = 10.5931; M1 H(sym10)+6;
+M2 the revised independent-phase floor H(sym)+Σh(pᵢ) = 10.5658 (headroom 0.0274,
+matching the peel's ~0.0287 ceiling); M3 H(sym11)+5. Per-layer M1 delta: L1 +0.0245,
+L13 +0.0434, L27 +0.0458, L40 +0.0533 — positive and above-gate everywhere, growing
+monotonically with depth.
+
+## Why M1 wins (and what M2/M3 falsify)
+
+- **M1** pays the coder's per-symbol redundancy only once per weight (coded symbols/w
+  stays 1.0; redundancy 0.051 → 0.063 b/sym going A=512 → 1024) while removing a full
+  biased bit from the verbatim plane. Crucially it also captures **sym-conditioned MSB
+  structure** the independent per-phase model cannot see: H(sym10)+6 = 10.5363 is
+  **0.0295 below** the revised independent floor 10.5658 — which is why the realized
+  +0.0417 exceeds the peel's independent-phase ceiling (~0.0287). That is not an error;
+  it means the mantissa MSB and the sign+exponent symbol are mutually informative
+  (≈ 0.036 b/w at entropy level), and folding exploits both terms at once.
+- **M2** (7 per-position binary rANS lanes) loses 0.0766 b/w *despite modeling the bias
+  directly*: coded symbols/w jumps to 7.9, and the frozen bit-by-bit-renorm coder's
+  measured +0.018 b/sym redundancy on near-fair binary symbols swamps the ~0.027 b/w
+  bias gain. Pre-registered attribution: this falsifies **per-bit binary lanes in THIS
+  coder only** — not the direction. A wider-state/multi-bit-renorm lane is a format
+  change, out of scope here.
+- **M3** (two folded bits, sym11, 2048 entries) stays positive (+0.0220) but table cost
+  plus coder redundancy growth (+0.098 b/sym at A=2048) eat most of the second bit's
+  gain. **M1 is the sweet spot**; deeper folding needs cheaper renorm first.
+
+## Bias stability (per-tensor vs global)
+
+Pooled p(1) per phase = 0.4157, 0.4584, 0.4788, 0.4900, 0.4957, 0.4984, 0.4995 —
+monotone MSB→LSB, matching the peel, effectively universal across layers 1/13/27/40 and
+both projections. Coding with pooled global constants costs +0.000099 b/w vs per-tensor
+fitted probs; transmitting 7×12-bit per-tensor probs costs 0.000018 b/w (88 bits/tensor)
+— **per-tensor fit pays for itself**, but the margin is tiny and global constants would
+lose almost nothing. Either choice is fine for a container spec.
+
+## Honest whole-model number
+
+Projected at M1: **10.6923 b/w** (= 10.7311 − 0.93 × 0.0417). Caveats, stated plainly:
+the delta is a 64-tensor sample mean (8 experts/proj on 4 layers), and M1 was selected
+on the set it is scored on. The conservative bracket — every unswept layer at the worst
+measured per-layer delta (+0.0245, layer 1) — gives **10.7083**; honest range
+**10.69–10.71 vs the frozen 10.7346 (vs stz 10.8975)**. A full 6-layer frozen-style
+re-check is **not required to accept the mechanism** (the bias was already measured
+stable across 4 layers and both projections, global constants cost +0.0001 b/w, and the
+*worst* layer still clears the gate), but a cheap frozen+M1 re-score on the existing
+transfer layers (at minimum 1, 3, 51 — the G2-fragile ones) should gate any *headline*
+whole-model claim, replacing the projection with a measured number. Note M1 also lowers
+the floor side (bound −0.0569), so the re-scoped G2 margins should be re-stated against
+H(sym10)+6 when that runs.
+
+## Should M1 be offered to the .stz container (per-weight track)? NO — with a precise reason
+
+The bias exists in any container that moves mantissas verbatim, including stz, but the
+MSB carries h(0.416) ≈ 0.98 bits — the gain is **fractional-bit** (~0.02–0.04 b/w) and
+only an entropy coder can realize it. stz's per-weight track is a fixed-width codebook
+index: folding the MSB there forces the index width up by a full bit to buy back at
+most one mantissa bit — net ≤ 0, before escape interactions. The vehicle for this win
+is the tile-format **container v3** (which the emission peel already named as stz's
+successor for expert tensors), not a stz retrofit. stz keeps its role as baseline and
+non-expert container until the tile format is extended.
+
+## Anomalies (recorded)
+
+1. **Realized gain exceeds the peel's independent ceiling** (+0.0417 > ~0.0287) —
+   explained above: sym↔MSB mutual information (≈ 0.036 b/w entropy-level) is captured
+   by folding but invisible to the independent per-phase model. The "revised floor"
+   10.5658 is therefore itself not the true floor; sym-conditioned mantissa structure
+   is worth another ~0.03 b/w at entropy level (M1 bound 10.5363; M3 bound 10.5192).
+2. **M2's loss is a coder property, not a direction falsifier** — pre-registered
+   attribution in the summary JSON (`m2_attribution`).
+3. **Gain grows with depth** (L1 +0.0245 → L40 +0.0533), opposite the frozen-vs-stz
+   delta's depth trend.
+4. Frozen recomputed on this 64-tensor sample is 10.7390, slightly above the 10.7311
+   whole-model reference (sample composition; all deltas are same-sample, unaffected).
+5. One pre-existing layer-27 row (identical stamp `ffd4e05b2da3`, round-trip PASS) was
+   seeded into the combined results file; the other 63 tensors were computed fresh.
+   Concurrent background job left untouched.
+
+## Compounding order
+
+**Confirms and extends the peel's plan — the mantissa lever is real and cashed; three
+named next steps, in order.** (i) **Fold M1 into the frozen format** as the v3-container
+spec for expert tensors (sym10, 1024-entry tables, 6-bit verbatim plane) and run the
+cheap cross-layer frozen+M1 re-score to convert 10.6923 into a measured whole-model
+number. (ii) **The next object of study is the sym↔mantissa dependence itself**: the
+run's own bounds prove ~0.03 b/w more sits in conditioning mantissa bits on the symbol
+(and M3's bound says the second bit still holds ~0.017) — probe H(mantMSB | exponent
+bin) to locate where the mutual information lives, then peel the M1 emission
+recursively (is the sym10 payload + 6-bit residual plane now random?). (iii) The
+blocking lever for any deeper fold is **coder mechanics**: bit-by-bit renorm redundancy
+grows 0.051 → 0.063 → 0.098 b/sym at A=512/1024/2048 and already ate M3; a wider-state
+/ byte-renorm variant is the named format-change probe, and it also holds ~0.06 b/w of
+M1's remaining 0.161 gap to bound. The register-tile decode kernel remains the
+runtime-credibility step.
+
+## Reproduction
+
+```
+# smoke (synthetic snapshot, seconds)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_mantissa_phase.py --synthetic
+
+# real run (resumable; self-limits per invocation and checkpoints)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_mantissa_phase.py
+
+# summary table + gate + summary JSON
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_mantissa_phase.py --summary
+```
+
+Artifacts: `tests/artifacts/mantissa_phase_results.jsonl` (per-tensor exact accounting,
+stamp `ffd4e05b2da3`), `tests/artifacts/mantissa_phase_summary.json` (realized cells,
+bounds, coder-redundancy attribution, phase stability, gate, projection),
+`tests/artifacts/mantissa_phase_run.log`.

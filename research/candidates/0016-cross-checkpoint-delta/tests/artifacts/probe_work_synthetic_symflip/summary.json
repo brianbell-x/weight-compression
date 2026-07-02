@@ -1,0 +1,124 @@
+{
+  "generated": "2026-07-02 09:28:40",
+  "results_jsonl": "C:\\dev\\compression\\research\\candidates\\0016-cross-checkpoint-delta\\tests\\artifacts\\probe_work_synthetic_symflip\\results.jsonl",
+  "pairs": {
+    "synthetic": {
+      "tensors": 38,
+      "paired_numel": 133696,
+      "pct_bit_identical_words": 96.8339,
+      "match_pct_range_per_tensor": [
+        90.625,
+        98.4375
+      ],
+      "match_mask_runs": 8233,
+      "h0_xor_sym_nonmatch_weighted": 0.3284,
+      "h0_xor_hi_byte_all_weighted": 0.0,
+      "h0_xor_mant_all_weighted": 0.193,
+      "h0_xor_mant_nonmatch_weighted": 0.3212,
+      "all_reconstructions_exact": true,
+      "delta_model_bw": 0.5977,
+      "delta_model_bw_h0mant": 0.4113,
+      "delta_model_reduction_vs_16bw_pct": 96.26,
+      "baseline_patchfrom_per_tensor_bw": 0.5791,
+      "standalone_stz_class_bw": 11.3232,
+      "model_beats_patchfrom": false,
+      "model_beats_xdelta3": "n/a (xdelta3 unavailable; see xdelta3 note in shards)",
+      "skips": [
+        {
+          "name": "backbone.layers.0.mixer.A_log",
+          "reason": "dtype pair F32(local)/F32(sibling), probe is BF16-only",
+          "bytes": 384,
+          "local_bytes": 384
+        },
+        {
+          "name": "backbone.layers.0.mixer.D",
+          "reason": "dtype pair F32(local)/F32(sibling), probe is BF16-only",
+          "bytes": 384,
+          "local_bytes": 384
+        },
+        {
+          "name": "backbone.layers.0.mixer.dt_bias",
+          "reason": "dtype pair F32(local)/F32(sibling), probe is BF16-only",
+          "bytes": 384,
+          "local_bytes": 384
+        },
+        {
+          "name": "backbone.layers.1.mixer.gate.e_score_correction_bias",
+          "reason": "dtype pair F32(local)/F32(sibling), probe is BF16-only",
+          "bytes": 32,
+          "local_bytes": 32
+        },
+        {
+          "name": "backbone.layers.3.mixer.A_log",
+          "reason": "dtype pair F32(local)/F32(sibling), probe is BF16-only",
+          "bytes": 384,
+          "local_bytes": 384
+        },
+        {
+          "name": "backbone.layers.3.mixer.D",
+          "reason": "dtype pair F32(local)/F32(sibling), probe is BF16-only",
+          "bytes": 384,
+          "local_bytes": 384
+        },
+        {
+          "name": "backbone.layers.3.mixer.dt_bias",
+          "reason": "dtype pair F32(local)/F32(sibling), probe is BF16-only",
+          "bytes": 384,
+          "local_bytes": 384
+        }
+      ],
+      "shards": {
+        "model-00001-of-00002.safetensors": {
+          "sibling_shard_bytes": 189784,
+          "sibling_header_bytes": 3256,
+          "local_shard_bytes": 189784,
+          "local_header_bytes": 3256,
+          "whole_shard_patchfrom": {
+            "compressed_bytes": 6416,
+            "desc": "python-zstandard 0.25.0 level=19 window_log=19 enable_ldm=True dict=DICT_TYPE_RAWCONTENT(base) round_trip=verified",
+            "target": "local(release) shard",
+            "base": "sibling shard"
+          },
+          "whole_shard_xdelta3": null,
+          "standalone_zstd": {
+            "compressed_bytes": 146716,
+            "desc": "python-zstandard streaming level=9 threads=-1 round_trip=verified target=local(release) shard",
+            "shard_bytes": 189784
+          },
+          "standalone_zstd19_bytes": null,
+          "xdelta3": {
+            "available": false,
+            "note": "no xdelta3 CLI or python module on this box; zstd patch-from (raw-content dict + LDM) is the delta-class baseline of record"
+          },
+          "cli_zstd": "not installed",
+          "cli_xdelta3": "not installed"
+        },
+        "model-00002-of-00002.safetensors": {
+          "sibling_shard_bytes": 84648,
+          "sibling_header_bytes": 1448,
+          "local_shard_bytes": 84648,
+          "local_header_bytes": 1448,
+          "whole_shard_patchfrom": {
+            "compressed_bytes": 2706,
+            "desc": "python-zstandard 0.25.0 level=19 window_log=18 enable_ldm=True dict=DICT_TYPE_RAWCONTENT(base) round_trip=verified",
+            "target": "local(release) shard",
+            "base": "sibling shard"
+          },
+          "whole_shard_xdelta3": null,
+          "standalone_zstd": {
+            "compressed_bytes": 65597,
+            "desc": "python-zstandard streaming level=9 threads=-1 round_trip=verified target=local(release) shard",
+            "shard_bytes": 84648
+          },
+          "standalone_zstd19_bytes": null,
+          "xdelta3": {
+            "available": false,
+            "note": "no xdelta3 CLI or python module on this box; zstd patch-from (raw-content dict + LDM) is the delta-class baseline of record"
+          },
+          "cli_zstd": "not installed",
+          "cli_xdelta3": "not installed"
+        }
+      }
+    }
+  }
+}

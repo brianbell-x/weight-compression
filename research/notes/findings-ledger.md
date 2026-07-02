@@ -369,6 +369,30 @@ from 30B to 120B essentially unchanged (30B plain-regroup ≈ 29.4%). Result:
 `0009/tests/artifacts/stream_probe_super_120b_full.json` (supersedes the 1-shard probe).
 Remaining generality scope: Ultra-550B full run, cross-modality one-shard probes, HF census.
 
+## Mantissa phase-bias exploitation FIRES — MSB folds into the coded symbol (2026-07-02)
+
+The exploitation probe (64 tensors, layers 1/13/27/40; skeptic wrote fresh independent
+decoders and reconstructed BF16 byte-exact from serialized bits — not refuted, high
+confidence) realized the corrected-mantissa finding inside the frozen tile format:
+
+- **M1 — fold the mantissa MSB into the coded symbol (sym10, 1024-entry table, remaining
+  6 mantissa bits verbatim): +0.0417 b/w vs frozen** (10.7390 → 10.6973 on the sample),
+  2× the pre-registered 0.02 gate, best on every layer, gain monotone with depth
+  (L1 +0.024 → L40 +0.053). Table side cost only +0.0004 b/w.
+- **The gain EXCEEDS the independent-phase ceiling (~0.0287)** because folding also
+  captures sym↔MSB mutual information (~0.03 b/w at entropy level): H(sym10)+6 = 10.5363
+  sits below the independent-phase floor 10.5658 — **the floor is still not final**; M3's
+  bound (10.5192) shows the second mantissa bit holds another ~0.017.
+- M2 (7 per-phase binary rANS lanes) LOSES 0.0766: bit-renorm redundancy ×7.9 coded
+  sym/w swamps the bias gain — falsifies binary lanes in THIS coder only. A byte-renorm/
+  wider-state coder could unlock ~0.06 b/w of the remaining realized-to-bound gap.
+- Bias is effectively universal (pooled p(1) = 0.416→0.500 monotone by phase); per-tensor
+  fitted probs win by a hair over global constants (both costs negligible).
+- **Projected whole-model: 10.6923 b/w ≈ 33.2%** (honest range 10.69–10.71 pending the
+  frozen+M1 cross-layer re-score). **stz is NOT a vehicle for this** (fractional-bit gain,
+  fixed-width index can't realize it) — the tile format is now the primary container
+  track; stz remains baseline + non-expert container.
+
 ## Purged tracks — do not re-open (2026-07-01)
 
 Lossy/quantization/QAT/train-time tracks (candidates 0005–0008, 0011, 0013,

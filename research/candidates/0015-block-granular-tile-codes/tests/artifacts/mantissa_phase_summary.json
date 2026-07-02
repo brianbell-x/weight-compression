@@ -1,0 +1,230 @@
+{
+  "mode": "real",
+  "scope": "sampled experts on layers [1, 13, 27, 40]; frozen reference recomputed on the same sample",
+  "acct_stamp": "ffd4e05b2da3",
+  "acct": {
+    "schema": 1,
+    "probe": "mantissa_phase",
+    "W": 128,
+    "T_MAX": 4,
+    "P": 100,
+    "L1": 1,
+    "L3": 1,
+    "L4": 0,
+    "M_LOG2": 12,
+    "FLUSH_BITS": 12,
+    "BORROW_BITS": 12,
+    "RANK_GROUP": 512,
+    "RANK_BITS": 32,
+    "HEAD_BITS": 256,
+    "CLASS_DIR_BITS": 96,
+    "GATE_BPW": 0.02,
+    "PHASE_TAB_BITS": 88,
+    "MECHS": {
+      "frozen": {
+        "A": 512,
+        "shift": 7,
+        "k_low": 7
+      },
+      "M1": {
+        "A": 1024,
+        "shift": 6,
+        "k_low": 6
+      },
+      "M2": {
+        "A": 512,
+        "shift": 7,
+        "k_low": 0
+      },
+      "M3": {
+        "A": 2048,
+        "shift": 5,
+        "k_low": 5
+      }
+    },
+    "TABLE_BITS_RULE": "pad8(A + nnz*12) per table; M2 adds pad8(7*12)",
+    "MANT_PLANE_RULE": "pad8(k_low*n - 12*nb) if k_low>0 else 0",
+    "LAYERS_REAL": [
+      1,
+      13,
+      27,
+      40
+    ],
+    "EXPERTS_PER_PROJ": 8,
+    "FROZEN_WHOLE_MODEL_BPW": 10.7311,
+    "EXPERT_FRAC": 0.93,
+    "CODER": "per-block single-lane bit-renorm rANS; M=4096 12-bit quantized table(s) (stores q-1); state in [M,2M); bit-by-bit renorm (emit x&1 while x>=2q); 12-bit flush = x_final - M; L3 seeds x0 = M + first-12-mantissa-bits (decoder final state returns them, so under L3 the first two weights of a block finalize only after the full W-symbol decode -- payload is the decoder's terminal state); L4 keys the table by column group = block_start_col // gcd(W,C); sizes are measured emitted bits, round-trip verified on samples"
+  },
+  "targets": 64,
+  "total_params": 319291392,
+  "layers": [
+    1,
+    13,
+    27,
+    40
+  ],
+  "floor7_bpw_weighted": 10.59315,
+  "floor_revised_bpw_weighted": 10.565772,
+  "floor_headroom_bpw": 0.027378,
+  "peel_ceiling_ref_bpw": 0.0287,
+  "frozen_whole_model_ref_bpw": 10.7311,
+  "realized_bpw": {
+    "frozen": 10.739047,
+    "M1": 10.697297,
+    "M2": 10.815604,
+    "M3": 10.717081
+  },
+  "delta_vs_frozen_bpw": {
+    "M1": 0.04175,
+    "M2": -0.076558,
+    "M3": 0.021965
+  },
+  "entropy_bounds_bpw": {
+    "frozen": 10.59315,
+    "M1": 10.536282,
+    "M2": 10.565772,
+    "M3": 10.51921
+  },
+  "components_bpw": {
+    "frozen": {
+      "coded_bits": 3.73823,
+      "pad_bits": 0.07661,
+      "tab_bits": 0.000227,
+      "mant_bits": 6.90625,
+      "misc_bits": 0.01773
+    },
+    "M1": {
+      "coded_bits": 4.693104,
+      "pad_bits": 0.079773,
+      "tab_bits": 0.000441,
+      "mant_bits": 5.90625,
+      "misc_bits": 0.01773
+    },
+    "M2": {
+      "coded_bits": 10.711256,
+      "pad_bits": 0.086374,
+      "tab_bits": 0.000245,
+      "mant_bits": 0.0,
+      "misc_bits": 0.017729
+    },
+    "M3": {
+      "coded_bits": 5.711272,
+      "pad_bits": 0.080973,
+      "tab_bits": 0.000856,
+      "mant_bits": 4.90625,
+      "misc_bits": 0.01773
+    }
+  },
+  "coder_redundancy": {
+    "frozen": {
+      "coded_bpw": 3.73823,
+      "info_bpw": 3.6869,
+      "redundancy_bits_per_coded_symbol": 0.05133,
+      "coded_symbols_per_weight": 1.0
+    },
+    "M1": {
+      "coded_bpw": 4.693104,
+      "info_bpw": 4.630032,
+      "redundancy_bits_per_coded_symbol": 0.063072,
+      "coded_symbols_per_weight": 1.0
+    },
+    "M2": {
+      "coded_bpw": 10.711256,
+      "info_bpw": 10.5662,
+      "redundancy_bits_per_coded_symbol": 0.018347,
+      "coded_symbols_per_weight": 7.90625
+    },
+    "M3": {
+      "coded_bpw": 5.711272,
+      "info_bpw": 5.61296,
+      "redundancy_bits_per_coded_symbol": 0.098312,
+      "coded_symbols_per_weight": 1.0
+    }
+  },
+  "m2_attribution": "M2 codes near-fair binary symbols through the frozen bit-renorm rANS (M=4096, state [M,2M), bit-by-bit renorm), whose measured per-symbol redundancy at p~0.416..0.5 (~+0.03 b/bit at the MSB, falling to ~0 at p=0.5) exceeds the MSB's entire entropy gain 1-h(0.4159)=0.0205; an M2 failure therefore falsifies 'per-bit binary lanes in the frozen bit-renorm coder', NOT the mantissa-phase direction -- extended-symbol folding (M1) is the in-format path, a wider-state/multi-bit-per-symbol lane is the format-change path",
+  "per_layer": {
+    "L1": {
+      "tensors": 16,
+      "params": 79822848,
+      "floor7": 10.699018,
+      "floor_rev": 10.670547,
+      "frozen": 10.8541,
+      "M1": 10.829603,
+      "M2": 10.933711,
+      "M3": 10.848889,
+      "best": "M1",
+      "best_delta": 0.024497
+    },
+    "L13": {
+      "tensors": 16,
+      "params": 79822848,
+      "floor7": 10.559644,
+      "floor_rev": 10.532584,
+      "frozen": 10.701111,
+      "M1": 10.657678,
+      "M2": 10.777341,
+      "M3": 10.67852,
+      "best": "M1",
+      "best_delta": 0.043433
+    },
+    "L27": {
+      "tensors": 16,
+      "params": 79822848,
+      "floor7": 10.559019,
+      "floor_rev": 10.532089,
+      "frozen": 10.699953,
+      "M1": 10.654152,
+      "M2": 10.775276,
+      "M3": 10.675265,
+      "best": "M1",
+      "best_delta": 0.045801
+    },
+    "L40": {
+      "tensors": 16,
+      "params": 79822848,
+      "floor7": 10.554919,
+      "floor_rev": 10.527869,
+      "frozen": 10.701022,
+      "M1": 10.647754,
+      "M2": 10.776088,
+      "M3": 10.66565,
+      "best": "M1",
+      "best_delta": 0.053268
+    }
+  },
+  "phase_stability": {
+    "global_p1": [
+      0.415651,
+      0.458361,
+      0.478819,
+      0.490046,
+      0.495702,
+      0.498372,
+      0.499466
+    ],
+    "per_tensor_entropy_bpw": 6.972622,
+    "global_crossentropy_bpw": 6.972721,
+    "delta_global_minus_pertensor_bpw": 9.9e-05,
+    "per_tensor_probs_side_cost_bpw": 1.8e-05,
+    "verdict": "per-tensor fit pays for itself",
+    "note": "entropy-level comparison from stored per-tensor phase counts; the realized M2 cells use the per-tensor probs with the 88-bit side cost charged either way"
+  },
+  "roundtrip": {
+    "blocks": {
+      "frozen": 256,
+      "M1": 256,
+      "M2": 256,
+      "M3": 256
+    },
+    "all_ok": true
+  },
+  "gate": {
+    "gate_bpw": 0.02,
+    "best_mech": "M1",
+    "best_delta_bpw": 0.04175,
+    "fires": true
+  },
+  "projected_whole_model_bpw": 10.692273,
+  "verdict": "MANTISSA-PHASE GATE FIRES: best mechanism M1 realizes +0.0417 b/w vs frozen (gate >= 0.02, all side costs charged, round-trip proven)",
+  "accounting_note": "all cells use the frozen v2 mechanics exactly (W=128 bit-stride, DP T=4 tier budgets over measured emitted bits, P100 no-escape, L3 12-bit flush payload, per-block class flags, u32 rank anchors per 512 blocks, 96-bit class descriptors, 32-byte header, pad8 record align); mechanism-specific charges: M1 pad8(1024+nnz*12) table + pad8(6n-12nb) verbatim plane; M2 order-0 table + pad8(7*12)=88-bit phase probs, no verbatim plane (mantissa bits are inside the measured coded blocks); M3 pad8(2048+nnz*12) table + pad8(5n-12nb) plane; frozen parity asserted per tensor against probe_emission_peel.realized_cell; every mechanism round-trip proven per tensor on sampled block ranges with SHA-256-exact BF16 reconstruction"
+}

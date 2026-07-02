@@ -1,0 +1,6 @@
+{
+  "mode": "real",
+  "repo": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-Base-BF16",
+  "revision": "97ab8012882a655dc38df4fee47422aca9caca07",
+  "local_snapshot": "C:\\dev\\compression\\models\\nvidia\\NVIDIA-Nemotron-3-Nano-30B-A3B-BF16\\hf_snapshot"
+}

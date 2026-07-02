@@ -1,0 +1,16 @@
+{
+  "snapshot": "C:\\dev\\compression\\models\\synthetic\\nemotron_tiny\\hf_snapshot",
+  "flip_frac": 0.03,
+  "flip_sym_frac": 0.002,
+  "seed": 0,
+  "shards": {
+    "model-00001-of-00002.safetensors": {
+      "mant_lsb_flips": 2767,
+      "sym_bit_flips": 183
+    },
+    "model-00002-of-00002.safetensors": {
+      "mant_lsb_flips": 1213,
+      "sym_bit_flips": 77
+    }
+  }
+}

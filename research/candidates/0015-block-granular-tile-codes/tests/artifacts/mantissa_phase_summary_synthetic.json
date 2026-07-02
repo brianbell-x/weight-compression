@@ -1,0 +1,191 @@
+{
+  "mode": "synthetic",
+  "scope": "synthetic smoke -- evidential for coder behavior: synthetic mantissas carry the SAME log-uniform phase bias as real weights (pooled MSB p(1) ~ log2(4/3) ~ 0.4159), so an M2 loss here is a transferable coder-redundancy signal; only the M1/M3 table-amortization losses are synthetic artifacts (pad8(1024/2048 + nnz*12) over 3,072-weight tensors vanishes on multi-million-weight real tensors)",
+  "acct_stamp": "ffd4e05b2da3",
+  "acct": {
+    "schema": 1,
+    "probe": "mantissa_phase",
+    "W": 128,
+    "T_MAX": 4,
+    "P": 100,
+    "L1": 1,
+    "L3": 1,
+    "L4": 0,
+    "M_LOG2": 12,
+    "FLUSH_BITS": 12,
+    "BORROW_BITS": 12,
+    "RANK_GROUP": 512,
+    "RANK_BITS": 32,
+    "HEAD_BITS": 256,
+    "CLASS_DIR_BITS": 96,
+    "GATE_BPW": 0.02,
+    "PHASE_TAB_BITS": 88,
+    "MECHS": {
+      "frozen": {
+        "A": 512,
+        "shift": 7,
+        "k_low": 7
+      },
+      "M1": {
+        "A": 1024,
+        "shift": 6,
+        "k_low": 6
+      },
+      "M2": {
+        "A": 512,
+        "shift": 7,
+        "k_low": 0
+      },
+      "M3": {
+        "A": 2048,
+        "shift": 5,
+        "k_low": 5
+      }
+    },
+    "TABLE_BITS_RULE": "pad8(A + nnz*12) per table; M2 adds pad8(7*12)",
+    "MANT_PLANE_RULE": "pad8(k_low*n - 12*nb) if k_low>0 else 0",
+    "LAYERS_REAL": [
+      1,
+      13,
+      27,
+      40
+    ],
+    "EXPERTS_PER_PROJ": 8,
+    "FROZEN_WHOLE_MODEL_BPW": 10.7311,
+    "EXPERT_FRAC": 0.93,
+    "CODER": "per-block single-lane bit-renorm rANS; M=4096 12-bit quantized table(s) (stores q-1); state in [M,2M); bit-by-bit renorm (emit x&1 while x>=2q); 12-bit flush = x_final - M; L3 seeds x0 = M + first-12-mantissa-bits (decoder final state returns them, so under L3 the first two weights of a block finalize only after the full W-symbol decode -- payload is the decoder's terminal state); L4 keys the table by column group = block_start_col // gcd(W,C); sizes are measured emitted bits, round-trip verified on samples"
+  },
+  "targets": 16,
+  "total_params": 49152,
+  "layers": [
+    1
+  ],
+  "floor7_bpw_weighted": 10.539822,
+  "floor_revised_bpw_weighted": 10.510059,
+  "floor_headroom_bpw": 0.029763,
+  "peel_ceiling_ref_bpw": 0.0287,
+  "frozen_whole_model_ref_bpw": 10.7311,
+  "realized_bpw": {
+    "frozen": 11.163086,
+    "M1": 11.3514,
+    "M2": 11.266764,
+    "M3": 11.811198
+  },
+  "delta_vs_frozen_bpw": {
+    "M1": -0.188314,
+    "M2": -0.103678,
+    "M3": -0.648112
+  },
+  "entropy_bounds_bpw": {
+    "frozen": 10.539822,
+    "M1": 10.477953,
+    "M2": 10.510059,
+    "M3": 10.44974
+  },
+  "components_bpw": {
+    "frozen": {
+      "coded_bits": 3.68221,
+      "pad_bits": 0.035787,
+      "tab_bits": 0.271973,
+      "mant_bits": 6.90625,
+      "misc_bits": 0.266866
+    },
+    "M1": {
+      "coded_bits": 4.621033,
+      "pad_bits": 0.036906,
+      "tab_bits": 0.520671,
+      "mant_bits": 5.90625,
+      "misc_bits": 0.266541
+    },
+    "M2": {
+      "coded_bits": 10.660034,
+      "pad_bits": 0.039551,
+      "tab_bits": 0.300618,
+      "mant_bits": 0.0,
+      "misc_bits": 0.266561
+    },
+    "M3": {
+      "coded_bits": 5.598592,
+      "pad_bits": 0.036092,
+      "tab_bits": 1.003092,
+      "mant_bits": 4.90625,
+      "misc_bits": 0.267171
+    }
+  },
+  "coder_redundancy": {
+    "frozen": {
+      "coded_bpw": 3.68221,
+      "info_bpw": 3.633572,
+      "redundancy_bits_per_coded_symbol": 0.048639,
+      "coded_symbols_per_weight": 1.0
+    },
+    "M1": {
+      "coded_bpw": 4.621033,
+      "info_bpw": 4.571703,
+      "redundancy_bits_per_coded_symbol": 0.04933,
+      "coded_symbols_per_weight": 1.0
+    },
+    "M2": {
+      "coded_bpw": 10.660034,
+      "info_bpw": 10.510521,
+      "redundancy_bits_per_coded_symbol": 0.018911,
+      "coded_symbols_per_weight": 7.90625
+    },
+    "M3": {
+      "coded_bpw": 5.598592,
+      "info_bpw": 5.54349,
+      "redundancy_bits_per_coded_symbol": 0.055102,
+      "coded_symbols_per_weight": 1.0
+    }
+  },
+  "m2_attribution": "M2 codes near-fair binary symbols through the frozen bit-renorm rANS (M=4096, state [M,2M), bit-by-bit renorm), whose measured per-symbol redundancy at p~0.416..0.5 (~+0.03 b/bit at the MSB, falling to ~0 at p=0.5) exceeds the MSB's entire entropy gain 1-h(0.4159)=0.0205; an M2 failure therefore falsifies 'per-bit binary lanes in the frozen bit-renorm coder', NOT the mantissa-phase direction -- extended-symbol folding (M1) is the in-format path, a wider-state/multi-bit-per-symbol lane is the format-change path",
+  "per_layer": {
+    "L1": {
+      "tensors": 16,
+      "params": 49152,
+      "floor7": 10.539822,
+      "floor_rev": 10.510059,
+      "frozen": 11.163086,
+      "M1": 11.3514,
+      "M2": 11.266764,
+      "M3": 11.811198,
+      "best": "M2",
+      "best_delta": -0.103678
+    }
+  },
+  "phase_stability": {
+    "global_p1": [
+      0.415853,
+      0.455444,
+      0.476929,
+      0.489461,
+      0.491842,
+      0.502157,
+      0.499756
+    ],
+    "per_tensor_entropy_bpw": 6.970237,
+    "global_crossentropy_bpw": 6.971674,
+    "delta_global_minus_pertensor_bpw": 0.001436,
+    "per_tensor_probs_side_cost_bpw": 0.028646,
+    "verdict": "bias is per-tensor stable: global constants suffice (per-tensor fit gains less than its 88-bit side cost)",
+    "note": "entropy-level comparison from stored per-tensor phase counts; the realized M2 cells use the per-tensor probs with the 88-bit side cost charged either way"
+  },
+  "roundtrip": {
+    "blocks": {
+      "frozen": 60,
+      "M1": 61,
+      "M2": 60,
+      "M3": 60
+    },
+    "all_ok": true
+  },
+  "gate": {
+    "gate_bpw": 0.02,
+    "best_mech": "M2",
+    "best_delta_bpw": -0.103678,
+    "fires": false
+  },
+  "projected_whole_model_bpw": 10.827521,
+  "verdict": "MANTISSA-PHASE GATE does NOT fire: best mechanism M2 realizes -0.1037 b/w vs frozen (gate >= 0.02, all side costs charged, round-trip proven)",
+  "accounting_note": "all cells use the frozen v2 mechanics exactly (W=128 bit-stride, DP T=4 tier budgets over measured emitted bits, P100 no-escape, L3 12-bit flush payload, per-block class flags, u32 rank anchors per 512 blocks, 96-bit class descriptors, 32-byte header, pad8 record align); mechanism-specific charges: M1 pad8(1024+nnz*12) table + pad8(6n-12nb) verbatim plane; M2 order-0 table + pad8(7*12)=88-bit phase probs, no verbatim plane (mantissa bits are inside the measured coded blocks); M3 pad8(2048+nnz*12) table + pad8(5n-12nb) plane; frozen parity asserted per tensor against probe_emission_peel.realized_cell; every mechanism round-trip proven per tensor on sampled block ranges with SHA-256-exact BF16 reconstruction"
+}
