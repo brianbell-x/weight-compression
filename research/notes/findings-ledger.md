@@ -303,6 +303,11 @@ blocks (gap 38,975) decoded bit-exact straight from O(1)-computed stride address
   layout-aware form (column-major blocking, ≤16-col groups) is a separate future candidate
   with ~0.02–0.03 b/w whole-model ceiling. Skeptic: not refuted, high confidence (raw-bits
   re-derivation on all 7 layers, freeze verified per row, gate re-measured from raw shard).
+- **COMPLETENESS SWEEP DONE (2026-07-02): all 23 expert layers measured — no interpolation
+  left. FULLY MEASURED whole-model: 10.7311 b/w = 32.93%** (expert plane frozen-cell,
+  non-expert 7% held at stz). G1 pass 23/23 (worst +0.157 @L51, best +0.194 @L3, smooth
+  monotone-ish decay with depth), stz parity exact 23/23, SHA-256 round-trips 23/23.
+  The bracket-min interpolation (10.7346) was conservative as designed.
 
 ## Chooser-levers pre-probe — V3 fractional-m fires everywhere, column family is one pot (2026-07-02)
 

@@ -1,0 +1,500 @@
+{
+  "mode": "real",
+  "scope": "sampled experts on layers [1, 13, 27, 40]; frozen reference recomputed on the same sample",
+  "acct_stamp": "b4e62994d250",
+  "acct": {
+    "schema": 2,
+    "probe": "emission_peel",
+    "W": 128,
+    "T_MAX": 4,
+    "P": 100,
+    "L1": 1,
+    "L3": 1,
+    "L4": 0,
+    "M_LOG2": 12,
+    "FLUSH_BITS": 12,
+    "BORROW_BITS": 12,
+    "RANK_GROUP": 512,
+    "RANK_BITS": 32,
+    "HEAD_BITS": 256,
+    "CLASS_DIR_BITS": 96,
+    "LAYERS_REAL": [
+      1,
+      13,
+      27,
+      40
+    ],
+    "EXPERTS_PER_PROJ": 8,
+    "STRUCT_EPS_BPW": 0.01,
+    "MI_LAGS": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      12,
+      16,
+      24,
+      32,
+      64,
+      128
+    ],
+    "MI_NULL_R": 16,
+    "MI_FAMILY_ALPHA": 0.01,
+    "MI_CAP_BITS": 8388608,
+    "MODEL_BITS_PER_CELL": 12,
+    "PHASE_P": 7,
+    "PHASE_MODEL_BITS": 168,
+    "MI_NATIVE_LAGS": "mant:{7,14,21,7*C,7W-12,(7W-12)*rowlag} flags:{flagb,flagb*rowlag}",
+    "MI_NULL_COPRIME": 1,
+    "CTX_HDR_BITS": "pad8(8+C+(C-1)*9)",
+    "MI_SEED": 20260702,
+    "AC_MAX_LAG": 64,
+    "AC_SIG_K": 4.0,
+    "CTXS": [
+      4,
+      8,
+      16,
+      32
+    ],
+    "H2_GATE_BPW": 0.05,
+    "CTXMAP_SYM_BITS": 9,
+    "SMOOTH_ALPHA": 0.5,
+    "FROZEN_WHOLE_MODEL_BPW": 10.7346,
+    "EXPERT_FRAC": 0.93,
+    "CODER": "per-block single-lane bit-renorm rANS; M=4096 12-bit quantized table(s) (stores q-1); state in [M,2M); bit-by-bit renorm (emit x&1 while x>=2q); 12-bit flush = x_final - M; L3 seeds x0 = M + first-12-mantissa-bits (decoder final state returns them, so under L3 the first two weights of a block finalize only after the full W-symbol decode -- payload is the decoder's terminal state); L4 keys the table by column group = block_start_col // gcd(W,C); sizes are measured emitted bits, round-trip verified on samples"
+  },
+  "targets": 64,
+  "total_params": 319291392,
+  "layers": [
+    1,
+    13,
+    27,
+    40
+  ],
+  "floor_bpw_weighted": 10.59315,
+  "frozen_bpw_weighted": 10.739047,
+  "frozen_whole_model_ref_bpw": 10.7346,
+  "roundtrip": {
+    "frozen_blocks": 256,
+    "o1_blocks": 1024,
+    "all_ok": true
+  },
+  "h1": {
+    "planes": {
+      "payload": {
+        "tensors": 64,
+        "bits": 1193584581,
+        "bpw_w": 3.73823,
+        "ceiling_bpw_w": 0.002873,
+        "tensors_mi_hit": 58,
+        "tensors_ac_hit": 0,
+        "tensors_structure": 5,
+        "verdict": "weak structure (58 MI / 0 autocorr tensor hits; ceiling 0.0029 < 0.01)"
+      },
+      "flags": {
+        "tensors": 64,
+        "bits": 4988928,
+        "bpw_w": 0.015625,
+        "ceiling_bpw_w": 0.002258,
+        "tensors_mi_hit": 64,
+        "tensors_ac_hit": 52,
+        "tensors_structure": 0,
+        "verdict": "weak structure (64 MI / 52 autocorr tensor hits; ceiling 0.0023 < 0.01)"
+      },
+      "lens": {
+        "tensors": 64,
+        "bits": 25334400,
+        "bpw_w": 0.079346,
+        "ceiling_bpw_w": 0.033478,
+        "tensors_mi_hit": 0,
+        "tensors_ac_hit": 56,
+        "tensors_structure": 64,
+        "verdict": "structure found (ceiling ~0.0335 b/w)"
+      },
+      "mant": {
+        "tensors": 64,
+        "bits": 2205106176,
+        "bpw_w": 6.90625,
+        "ceiling_bpw_w": 0.028692,
+        "tensors_mi_hit": 64,
+        "tensors_ac_hit": 0,
+        "tensors_structure": 64,
+        "verdict": "structure found (ceiling ~0.0287 b/w)"
+      }
+    },
+    "prereg": {
+      "struct_eps_bpw": 0.01,
+      "mi_lags": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        12,
+        16,
+        24,
+        32,
+        64,
+        128
+      ],
+      "mi_null_r": 16,
+      "ac_sig_k": 4.0
+    },
+    "note": "payload/mant/flags are emitted bit planes (payload excludes slot padding -- pad is already-quantified structure); lens is diagnostic (not transmitted)"
+  },
+  "h2": {
+    "per_layer": {
+      "L1": {
+        "tensors": 16,
+        "params": 79822848,
+        "floor_bpw": 10.699018,
+        "frozen_bpw": 10.8541,
+        "C4": {
+          "bpw": 10.848466,
+          "delta_bpw": 0.005635,
+          "H_cond_emp": 3.697108,
+          "reset_cost_bpw": 1.3e-05,
+          "tab_bpw": 0.001146
+        },
+        "C8": {
+          "bpw": 10.843088,
+          "delta_bpw": 0.011012,
+          "H_cond_emp": 3.693651,
+          "reset_cost_bpw": 3.4e-05,
+          "tab_bpw": 0.002002
+        },
+        "C16": {
+          "bpw": 10.834402,
+          "delta_bpw": 0.019699,
+          "H_cond_emp": 3.685087,
+          "reset_cost_bpw": 7.3e-05,
+          "tab_bpw": 0.003612
+        },
+        "C32": {
+          "bpw": 10.824936,
+          "delta_bpw": 0.029165,
+          "H_cond_emp": 3.675687,
+          "reset_cost_bpw": 0.000146,
+          "tab_bpw": 0.006362
+        },
+        "best_C": 32,
+        "best_delta_bpw": 0.029165
+      },
+      "L13": {
+        "tensors": 16,
+        "params": 79822848,
+        "floor_bpw": 10.559644,
+        "frozen_bpw": 10.701111,
+        "C4": {
+          "bpw": 10.699782,
+          "delta_bpw": 0.001329,
+          "H_cond_emp": 3.559559,
+          "reset_cost_bpw": -1e-06,
+          "tab_bpw": 0.001067
+        },
+        "C8": {
+          "bpw": 10.698726,
+          "delta_bpw": 0.002385,
+          "H_cond_emp": 3.559381,
+          "reset_cost_bpw": -2e-06,
+          "tab_bpw": 0.001873
+        },
+        "C16": {
+          "bpw": 10.698913,
+          "delta_bpw": 0.002198,
+          "H_cond_emp": 3.559079,
+          "reset_cost_bpw": -5e-06,
+          "tab_bpw": 0.003396
+        },
+        "C32": {
+          "bpw": 10.698725,
+          "delta_bpw": 0.002386,
+          "H_cond_emp": 3.55855,
+          "reset_cost_bpw": -9e-06,
+          "tab_bpw": 0.006015
+        },
+        "best_C": 32,
+        "best_delta_bpw": 0.002386
+      },
+      "L27": {
+        "tensors": 16,
+        "params": 79822848,
+        "floor_bpw": 10.559019,
+        "frozen_bpw": 10.699953,
+        "C4": {
+          "bpw": 10.698594,
+          "delta_bpw": 0.001359,
+          "H_cond_emp": 3.558955,
+          "reset_cost_bpw": -2e-06,
+          "tab_bpw": 0.001062
+        },
+        "C8": {
+          "bpw": 10.698506,
+          "delta_bpw": 0.001447,
+          "H_cond_emp": 3.558836,
+          "reset_cost_bpw": -3e-06,
+          "tab_bpw": 0.00187
+        },
+        "C16": {
+          "bpw": 10.698988,
+          "delta_bpw": 0.000965,
+          "H_cond_emp": 3.558654,
+          "reset_cost_bpw": -6e-06,
+          "tab_bpw": 0.003393
+        },
+        "C32": {
+          "bpw": 10.700113,
+          "delta_bpw": -0.00016,
+          "H_cond_emp": 3.558348,
+          "reset_cost_bpw": -1.3e-05,
+          "tab_bpw": 0.006016
+        },
+        "best_C": 8,
+        "best_delta_bpw": 0.001447
+      },
+      "L40": {
+        "tensors": 16,
+        "params": 79822848,
+        "floor_bpw": 10.554919,
+        "frozen_bpw": 10.701022,
+        "C4": {
+          "bpw": 10.697459,
+          "delta_bpw": 0.003563,
+          "H_cond_emp": 3.554876,
+          "reset_cost_bpw": -1e-06,
+          "tab_bpw": 0.001065
+        },
+        "C8": {
+          "bpw": 10.696593,
+          "delta_bpw": 0.004429,
+          "H_cond_emp": 3.554754,
+          "reset_cost_bpw": -3e-06,
+          "tab_bpw": 0.001874
+        },
+        "C16": {
+          "bpw": 10.696856,
+          "delta_bpw": 0.004166,
+          "H_cond_emp": 3.554581,
+          "reset_cost_bpw": -6e-06,
+          "tab_bpw": 0.003395
+        },
+        "C32": {
+          "bpw": 10.698007,
+          "delta_bpw": 0.003015,
+          "H_cond_emp": 3.554278,
+          "reset_cost_bpw": -2e-05,
+          "tab_bpw": 0.006016
+        },
+        "best_C": 8,
+        "best_delta_bpw": 0.004429
+      }
+    },
+    "whole_sample": {
+      "frozen_bpw": 10.739047,
+      "C4": {
+        "bpw": 10.736075,
+        "delta_bpw": 0.002971
+      },
+      "C8": {
+        "bpw": 10.734228,
+        "delta_bpw": 0.004818
+      },
+      "C16": {
+        "bpw": 10.73229,
+        "delta_bpw": 0.006757
+      },
+      "C32": {
+        "bpw": 10.730445,
+        "delta_bpw": 0.008602
+      }
+    },
+    "best_C": 32,
+    "best_delta_bpw": 0.008602,
+    "gate_bpw": 0.05,
+    "fires": false,
+    "holdout": {
+      "L1_down": {
+        "n_test_pairs": 19794432,
+        "H0_holdout": 3.579048,
+        "per_C": {
+          "C4": {
+            "H_cond_holdout": 3.579103,
+            "gain_bits_per_sym": -5.4e-05
+          },
+          "C8": {
+            "H_cond_holdout": 3.579172,
+            "gain_bits_per_sym": -0.000124
+          },
+          "C16": {
+            "H_cond_holdout": 3.579264,
+            "gain_bits_per_sym": -0.000215
+          },
+          "C32": {
+            "H_cond_holdout": 3.579414,
+            "gain_bits_per_sym": -0.000365
+          }
+        }
+      },
+      "L1_up": {
+        "n_test_pairs": 19799808,
+        "H0_holdout": 3.819712,
+        "per_C": {
+          "C4": {
+            "H_cond_holdout": 3.817016,
+            "gain_bits_per_sym": 0.002696
+          },
+          "C8": {
+            "H_cond_holdout": 3.812395,
+            "gain_bits_per_sym": 0.007316
+          },
+          "C16": {
+            "H_cond_holdout": 3.80219,
+            "gain_bits_per_sym": 0.017521
+          },
+          "C32": {
+            "H_cond_holdout": 3.781754,
+            "gain_bits_per_sym": 0.037958
+          }
+        }
+      },
+      "L13_down": {
+        "n_test_pairs": 19794432,
+        "H0_holdout": 3.562256,
+        "per_C": {
+          "C4": {
+            "H_cond_holdout": 3.562295,
+            "gain_bits_per_sym": -3.9e-05
+          },
+          "C8": {
+            "H_cond_holdout": 3.562327,
+            "gain_bits_per_sym": -7.1e-05
+          },
+          "C16": {
+            "H_cond_holdout": 3.562429,
+            "gain_bits_per_sym": -0.000173
+          },
+          "C32": {
+            "H_cond_holdout": 3.562711,
+            "gain_bits_per_sym": -0.000455
+          }
+        }
+      },
+      "L13_up": {
+        "n_test_pairs": 19799808,
+        "H0_holdout": 3.563456,
+        "per_C": {
+          "C4": {
+            "H_cond_holdout": 3.56339,
+            "gain_bits_per_sym": 6.6e-05
+          },
+          "C8": {
+            "H_cond_holdout": 3.563217,
+            "gain_bits_per_sym": 0.000239
+          },
+          "C16": {
+            "H_cond_holdout": 3.562816,
+            "gain_bits_per_sym": 0.000641
+          },
+          "C32": {
+            "H_cond_holdout": 3.562108,
+            "gain_bits_per_sym": 0.001348
+          }
+        }
+      },
+      "L27_down": {
+        "n_test_pairs": 19794432,
+        "H0_holdout": 3.559133,
+        "per_C": {
+          "C4": {
+            "H_cond_holdout": 3.559175,
+            "gain_bits_per_sym": -4.2e-05
+          },
+          "C8": {
+            "H_cond_holdout": 3.559214,
+            "gain_bits_per_sym": -8.1e-05
+          },
+          "C16": {
+            "H_cond_holdout": 3.559326,
+            "gain_bits_per_sym": -0.000193
+          },
+          "C32": {
+            "H_cond_holdout": 3.559584,
+            "gain_bits_per_sym": -0.000451
+          }
+        }
+      },
+      "L27_up": {
+        "n_test_pairs": 19799808,
+        "H0_holdout": 3.559071,
+        "per_C": {
+          "C4": {
+            "H_cond_holdout": 3.559122,
+            "gain_bits_per_sym": -5.1e-05
+          },
+          "C8": {
+            "H_cond_holdout": 3.559142,
+            "gain_bits_per_sym": -7.1e-05
+          },
+          "C16": {
+            "H_cond_holdout": 3.559277,
+            "gain_bits_per_sym": -0.000205
+          },
+          "C32": {
+            "H_cond_holdout": 3.55941,
+            "gain_bits_per_sym": -0.000338
+          }
+        }
+      },
+      "L40_down": {
+        "n_test_pairs": 19794432,
+        "H0_holdout": 3.561907,
+        "per_C": {
+          "C4": {
+            "H_cond_holdout": 3.561723,
+            "gain_bits_per_sym": 0.000184
+          },
+          "C8": {
+            "H_cond_holdout": 3.561556,
+            "gain_bits_per_sym": 0.000351
+          },
+          "C16": {
+            "H_cond_holdout": 3.561613,
+            "gain_bits_per_sym": 0.000294
+          },
+          "C32": {
+            "H_cond_holdout": 3.561895,
+            "gain_bits_per_sym": 1.2e-05
+          }
+        }
+      },
+      "L40_up": {
+        "n_test_pairs": 19799808,
+        "H0_holdout": 3.560022,
+        "per_C": {
+          "C4": {
+            "H_cond_holdout": 3.559963,
+            "gain_bits_per_sym": 5.9e-05
+          },
+          "C8": {
+            "H_cond_holdout": 3.559806,
+            "gain_bits_per_sym": 0.000216
+          },
+          "C16": {
+            "H_cond_holdout": 3.5595,
+            "gain_bits_per_sym": 0.000522
+          },
+          "C32": {
+            "H_cond_holdout": 3.558788,
+            "gain_bits_per_sym": 0.001234
+          }
+        }
+      }
+    },
+    "holdout_positive_cells": "4/8",
+    "reset_cost_bpw_bestC_weighted": 2.6e-05,
+    "projected_whole_model_bpw": 10.7266,
+    "verdict": "H2 does NOT fire: best C=32 realized delta +0.0086 b/w vs gate >= 0.05 (holdout non-overfit: 4/8 cells positive)"
+  },
+  "accounting_note": "realized cells use the frozen v2 mechanics exactly (W=128 bit-stride, DP T=4 tier budgets, P100 no-escape, L3 flush payload, per-block class flags, u32 rank anchors per 512 blocks, 96-bit class descriptors, 32-byte header, pad8 record align, pad8(7n-12nb) mantissa plane); order-1 cells charge C occupied bucket tables + the order-0 start table (each pad8(512+nnz*12)) + a pad8(8+C+(C-1)*9)-bit context header (8-bit mode/C field, C-bit table-occupancy bitmap, (C-1) 9-bit bucket-map ids); block sizes are measured emitted bits of the named coder, round-trip verified per tensor per C on sampled blocks with SHA-exact BF16 reconstruction over sampled spans"
+}

@@ -60,8 +60,9 @@ Frozen format (W128/T4/P100, bit stride + mantissa-carrying flush) beats each
 layer's own realized stz on every layer tested (7 layers; worst +0.157, mean
 +0.179). **Honest whole-model: 10.7346 b/w ≈ 32.9% (vs stz 10.8975/31.89%),
 conservative interpolation.** floor+0.15 holds mid-model only. Queue, in order:
-1. **Completeness sweep (running)**: --frozen on the 16 unswept expert layers to
-   replace interpolation with measurement; extend to the non-expert 7% later.
+1. ~~Completeness sweep~~ **DONE 2026-07-02**: all 23 expert layers measured —
+   **fully measured whole-model 10.7311 b/w = 32.93%**, G1 23/23, parity exact
+   23/23, round-trips 23/23. Non-expert 7% (held at stz) still extendable.
 2. **Peel-until-random on the v2 emission** (compounding directive's next object
    of study): tier-slot streams, 2-bit flag plane, renorm stream, mantissa plane —
    below-order-0 structure or a randomness certificate.

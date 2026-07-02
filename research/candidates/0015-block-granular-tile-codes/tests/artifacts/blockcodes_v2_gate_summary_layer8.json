@@ -1,0 +1,31 @@
+{
+  "tensors": 256,
+  "total_params": 1277165568,
+  "H_sym_w": 3.581453,
+  "H_col_w": 3.533042,
+  "gain_col_w": 0.048411,
+  "per_w": {
+    "W64": {
+      "H_grp_w": 3.578235,
+      "gain_w": 0.003218,
+      "G_mean": 35.5
+    },
+    "W128": {
+      "H_grp_w": 3.579522,
+      "gain_w": 0.001931,
+      "G_mean": 25.0
+    },
+    "W256": {
+      "H_grp_w": 3.580099,
+      "gain_w": 0.001354,
+      "G_mean": 25.0
+    }
+  },
+  "best_w": "W64",
+  "best_gain_bpw": 0.003218,
+  "threshold_bpw": 0.05,
+  "gate_pass": false,
+  "l4_active": false,
+  "l4_forced": false,
+  "note": "gate decides L4 inclusion; recorded either way"
+}

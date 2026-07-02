@@ -1,0 +1,86 @@
+{
+  "mode": "real-frozen",
+  "layer": 6,
+  "scope": "layer 6 expert tensors; format frozen on layer 27, scored out-of-selection (per-tensor DP tier budgets are transmitted side info, re-derived per tensor)",
+  "acct_stamp": "3c5e38d4c9a9",
+  "frozen_format": {
+    "key": "W128_T4_P100_L11L31L40",
+    "W": 128,
+    "T": 4,
+    "P": 100,
+    "L1": 1,
+    "L3": 1,
+    "L4": 0,
+    "note": "frozen from the layer-27 v2 winner; per-tensor DP tier budgets re-derived per tensor and charged as transmitted side info (as in the full grid); no re-selection of W/T/P/levers on this layer"
+  },
+  "targets": 256,
+  "total_params": 1277165568,
+  "parity_max_abs_diff": 0.0,
+  "baseline_recomputed_bpw": 10.949811,
+  "baseline_ref_weighted_bpw": 10.949809,
+  "g1_target_bpw_this_set": 10.949809,
+  "stz_layer27_canonical_bpw": 10.8822,
+  "floor_bpw_weighted": 10.607278,
+  "quant_delta_bpw_weighted": 0.009706,
+  "coder": "per-block single-lane bit-renorm rANS; M=4096 12-bit quantized table(s) (stores q-1); state in [M,2M); bit-by-bit renorm (emit x&1 while x>=2q); 12-bit flush = x_final - M; L3 seeds x0 = M + first-12-mantissa-bits (decoder final state returns them, so under L3 the first two weights of a block finalize only after the full W-symbol decode -- payload is the decoder's terminal state); L4 keys the table by column group = block_start_col // gcd(W,C); sizes are measured emitted bits, round-trip verified on samples",
+  "l4_gate": {
+    "tensors": 256,
+    "total_params": 1277165568,
+    "H_sym_w": 3.607278,
+    "H_col_w": 3.540304,
+    "gain_col_w": 0.066975,
+    "per_w": {
+      "W64": {
+        "H_grp_w": 3.602437,
+        "gain_w": 0.004841,
+        "G_mean": 35.5
+      },
+      "W128": {
+        "H_grp_w": 3.604461,
+        "gain_w": 0.002817,
+        "G_mean": 25.0
+      },
+      "W256": {
+        "H_grp_w": 3.605365,
+        "gain_w": 0.001913,
+        "G_mean": 25.0
+      }
+    },
+    "best_w": "W64",
+    "best_gain_bpw": 0.004841,
+    "threshold_bpw": 0.05,
+    "gate_pass": false,
+    "l4_active": false,
+    "l4_forced": false,
+    "note": "gate decides L4 inclusion; recorded either way"
+  },
+  "roundtrip": {
+    "blocks": 1022,
+    "all_ok": true
+  },
+  "frozen": {
+    "bpw": 10.761832,
+    "quant_bpw": 0.009706,
+    "pad_bpw": 0.085356,
+    "esc_bpw": 0.0,
+    "esc_frac": 0.0,
+    "flag_bpw": 0.015625,
+    "rank_bpw": 0.002053,
+    "tab_bpw": 0.000241,
+    "align_bpw": 1e-06,
+    "flush_bpw": 0.09375,
+    "xs_bpw": 0.041521,
+    "mant_credit_bpw": 0.09375
+  },
+  "gates": {
+    "G1_vs": "realized stz on this layer's set (per-tensor jsonl, numel-weighted)",
+    "G1_pass": true,
+    "G1_delta_bpw": 0.187978,
+    "G2_bar_bpw": 10.757278,
+    "G2_pass": false,
+    "G2_delta_vs_floor_bpw": 0.154553
+  },
+  "l4_variant": null,
+  "verdict": "frozen cell BEATS realized stz on this set (d = +0.1880 b/w); G2 floor+0.15: FAIL (d over floor = +0.1546)",
+  "accounting_note": "identical accounting to the full v2 grid (same stamp): measured emitted bits, per-cell reconciliation at build time, stz per-tensor parity exact, sampled round-trip per coder variant with SHA-256-exact BF16 reconstruction"
+}

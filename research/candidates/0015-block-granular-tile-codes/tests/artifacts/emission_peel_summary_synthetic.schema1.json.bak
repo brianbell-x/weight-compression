@@ -1,0 +1,252 @@
+{
+  "mode": "synthetic",
+  "scope": "synthetic smoke -- carries no evidential weight",
+  "acct_stamp": "56dd930cd649",
+  "acct": {
+    "schema": 1,
+    "probe": "emission_peel",
+    "W": 128,
+    "T_MAX": 4,
+    "P": 100,
+    "L1": 1,
+    "L3": 1,
+    "L4": 0,
+    "M_LOG2": 12,
+    "FLUSH_BITS": 12,
+    "BORROW_BITS": 12,
+    "RANK_GROUP": 512,
+    "RANK_BITS": 32,
+    "HEAD_BITS": 256,
+    "CLASS_DIR_BITS": 96,
+    "LAYERS_REAL": [
+      1,
+      13,
+      27,
+      40
+    ],
+    "EXPERTS_PER_PROJ": 8,
+    "STRUCT_EPS_BPW": 0.01,
+    "MI_LAGS": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      12,
+      16,
+      24,
+      32,
+      64,
+      128
+    ],
+    "MI_NULL_R": 16,
+    "MI_FAMILY_ALPHA": 0.01,
+    "MI_CAP_BITS": 8388608,
+    "MODEL_BITS_PER_CELL": 12,
+    "MI_SEED": 20260702,
+    "AC_MAX_LAG": 64,
+    "AC_SIG_K": 4.0,
+    "CTXS": [
+      4,
+      8,
+      16,
+      32
+    ],
+    "H2_GATE_BPW": 0.05,
+    "CTXMAP_SYM_BITS": 9,
+    "SMOOTH_ALPHA": 0.5,
+    "FROZEN_WHOLE_MODEL_BPW": 10.7346,
+    "EXPERT_FRAC": 0.93,
+    "CODER": "per-block single-lane bit-renorm rANS; M=4096 12-bit quantized table(s) (stores q-1); state in [M,2M); bit-by-bit renorm (emit x&1 while x>=2q); 12-bit flush = x_final - M; L3 seeds x0 = M + first-12-mantissa-bits (decoder final state returns them, so under L3 the first two weights of a block finalize only after the full W-symbol decode -- payload is the decoder's terminal state); L4 keys the table by column group = block_start_col // gcd(W,C); sizes are measured emitted bits, round-trip verified on samples"
+  },
+  "targets": 16,
+  "total_params": 49152,
+  "layers": [
+    1
+  ],
+  "floor_bpw_weighted": 10.539822,
+  "frozen_bpw_weighted": 11.163086,
+  "frozen_whole_model_ref_bpw": 10.7346,
+  "roundtrip": {
+    "frozen_blocks": 60,
+    "o1_blocks": 239,
+    "all_ok": true
+  },
+  "h1": {
+    "planes": {
+      "payload": {
+        "tensors": 16,
+        "bits": 180988,
+        "bpw_w": 3.68221,
+        "ceiling_bpw_w": 0.0,
+        "tensors_mi_hit": 0,
+        "tensors_ac_hit": 0,
+        "tensors_structure": 0,
+        "verdict": "random at these tests"
+      },
+      "flags": {
+        "tensors": 16,
+        "bits": 768,
+        "bpw_w": 0.015625,
+        "ceiling_bpw_w": 0.0,
+        "tensors_mi_hit": 0,
+        "tensors_ac_hit": 0,
+        "tensors_structure": 0,
+        "verdict": "random at these tests"
+      },
+      "lens": {
+        "tensors": 16,
+        "bits": 3528,
+        "bpw_w": 0.071777,
+        "ceiling_bpw_w": 0.0,
+        "tensors_mi_hit": 0,
+        "tensors_ac_hit": 0,
+        "tensors_structure": 0,
+        "verdict": "random at these tests"
+      },
+      "mant": {
+        "tensors": 16,
+        "bits": 339456,
+        "bpw_w": 6.90625,
+        "ceiling_bpw_w": 0.003947,
+        "tensors_mi_hit": 1,
+        "tensors_ac_hit": 0,
+        "tensors_structure": 0,
+        "verdict": "weak structure (1 MI / 0 autocorr tensor hits; ceiling 0.0039 < 0.01)"
+      }
+    },
+    "prereg": {
+      "struct_eps_bpw": 0.01,
+      "mi_lags": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        12,
+        16,
+        24,
+        32,
+        64,
+        128
+      ],
+      "mi_null_r": 16,
+      "ac_sig_k": 4.0
+    },
+    "note": "payload/mant/flags are emitted bit planes (payload excludes slot padding -- pad is already-quantified structure); lens is diagnostic (not transmitted)"
+  },
+  "h2": {
+    "per_layer": {
+      "L1": {
+        "tensors": 16,
+        "params": 49152,
+        "floor_bpw": 10.539822,
+        "frozen_bpw": 11.163086,
+        "C4": {
+          "bpw": 12.161947,
+          "delta_bpw": -0.998861,
+          "H_cond_emp": 3.520574,
+          "reset_cost_bpw": -0.000848,
+          "tab_bpw": 1.288249
+        },
+        "C8": {
+          "bpw": 13.096029,
+          "delta_bpw": -1.932943,
+          "H_cond_emp": 3.497525,
+          "reset_cost_bpw": -0.001525,
+          "tab_bpw": 2.244954
+        },
+        "C16": {
+          "bpw": 14.78418,
+          "delta_bpw": -3.621094,
+          "H_cond_emp": 3.461255,
+          "reset_cost_bpw": -0.00223,
+          "tab_bpw": 3.971354
+        },
+        "C32": {
+          "bpw": 16.718587,
+          "delta_bpw": -5.555501,
+          "H_cond_emp": 3.439603,
+          "reset_cost_bpw": -0.002389,
+          "tab_bpw": 5.928548
+        },
+        "best_C": 4,
+        "best_delta_bpw": -0.998861
+      }
+    },
+    "whole_sample": {
+      "frozen_bpw": 11.163086,
+      "C4": {
+        "bpw": 12.161947,
+        "delta_bpw": -0.998861
+      },
+      "C8": {
+        "bpw": 13.096029,
+        "delta_bpw": -1.932943
+      },
+      "C16": {
+        "bpw": 14.78418,
+        "delta_bpw": -3.621094
+      },
+      "C32": {
+        "bpw": 16.718587,
+        "delta_bpw": -5.555501
+      }
+    },
+    "best_C": 4,
+    "best_delta_bpw": -0.998861,
+    "gate_bpw": 0.05,
+    "fires": false,
+    "holdout": {
+      "L1_down": {
+        "n_test_pairs": 11968,
+        "H0_holdout": 3.576347,
+        "per_C": {
+          "C4": {
+            "H_cond_holdout": 3.661572,
+            "gain_bits_per_sym": -0.085225
+          },
+          "C8": {
+            "H_cond_holdout": 3.768163,
+            "gain_bits_per_sym": -0.191816
+          },
+          "C16": {
+            "H_cond_holdout": 3.909356,
+            "gain_bits_per_sym": -0.333009
+          },
+          "C32": {
+            "H_cond_holdout": 3.956252,
+            "gain_bits_per_sym": -0.379905
+          }
+        }
+      },
+      "L1_up": {
+        "n_test_pairs": 12096,
+        "H0_holdout": 3.603498,
+        "per_C": {
+          "C4": {
+            "H_cond_holdout": 3.685565,
+            "gain_bits_per_sym": -0.082068
+          },
+          "C8": {
+            "H_cond_holdout": 3.794396,
+            "gain_bits_per_sym": -0.190899
+          },
+          "C16": {
+            "H_cond_holdout": 3.938258,
+            "gain_bits_per_sym": -0.33476
+          },
+          "C32": {
+            "H_cond_holdout": 3.992346,
+            "gain_bits_per_sym": -0.388848
+          }
+        }
+      }
+    },
+    "holdout_positive_cells": "0/2",
+    "reset_cost_bpw_bestC_weighted": -0.000848,
+    "projected_whole_model_bpw": 11.663541,
+    "verdict": "H2 does NOT fire: best C=4 realized delta -0.9989 b/w vs gate >= 0.05 (holdout non-overfit: 0/2 cells positive)"
+  },
+  "accounting_note": "realized cells use the frozen v2 mechanics exactly (W=128 bit-stride, DP T=4 tier budgets, P100 no-escape, L3 flush payload, per-block class flags, u32 rank anchors per 512 blocks, 96-bit class descriptors, 32-byte header, pad8 record align, pad8(7n-12nb) mantissa plane); order-1 cells charge C occupied bucket tables + the order-0 start table (each pad8(512+nnz*12)) + a pad8(8+(C-1)*9)-bit bucket map; block sizes are measured emitted bits of the named coder, round-trip verified per tensor per C with SHA-exact BF16 reconstruction"
+}
