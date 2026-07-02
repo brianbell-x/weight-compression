@@ -358,6 +358,17 @@ from spec and round-tripped):
 - Tier/budget design headroom (diagnostic lens plane): 0.0335 b/w ceiling, realizable
   slice bounded by the actual pad slack (~0.073) — secondary mechanics probe.
 
+## Super-120B FULL validation — family claim upgraded to measured fact (2026-07-02)
+
+`stream_validate.py` completed all 50 shards of NVIDIA-Nemotron-3-Super-120B-A12B-BF16
+(230.2 GB streamed, bounded disk, survived a flaky link via checkpoint/resume):
+**ALL 42,642 BF16 tensors round-trip bit-exact lossless; regroup K15 = 28.85%
+whole-model (experts 28.79%; byte-split baseline 24.12%)**. BF16 is 100% of seen bytes;
+experts 93.5%. The exponent-concentration structure the whole project exploits transfers
+from 30B to 120B essentially unchanged (30B plain-regroup ≈ 29.4%). Result:
+`0009/tests/artifacts/stream_probe_super_120b_full.json` (supersedes the 1-shard probe).
+Remaining generality scope: Ultra-550B full run, cross-modality one-shard probes, HF census.
+
 ## Purged tracks — do not re-open (2026-07-01)
 
 Lossy/quantization/QAT/train-time tracks (candidates 0005–0008, 0011, 0013,

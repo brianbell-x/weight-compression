@@ -149,8 +149,12 @@ order-0 artifact into a context-model-certified floor, and undercuts the
 field's order-0 "Shannon-limit" claims. ~1 day probe on local tensors, then one
 mid-model shard.
 
-### G. Generality program  [viable/viable]
-Full Super-120B validation (then Ultra-550B as a multi-day background job),
+### G. Generality program  [viable/viable] — **Super-120B core DONE 2026-07-02**
+Full Super-120B streamed validation complete: **all 50 shards / 42,642 BF16
+tensors bit-exact lossless; regroup K15 = 28.85% whole-model** (230 GB seen,
+93.5% experts; `tests/artifacts/stream_probe_super_120b_full.json`). The
+30B→120B structure transfer is now measured fact, not a 1-shard estimate.
+Remaining G scope: Ultra-550B (multi-day background job),
 cross-modality one-shard probes (FLUX/diffusion, VLM, audio — needs only an
 --index-path flag), top-100 HF census (~200 s + ~4.7 GB per model, delete as you
 go) emitting per-model dtype/entropy/ratio stats. The census doubles as a
