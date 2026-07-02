@@ -55,18 +55,24 @@ against. Consequences:
 
 ## Tier 1 — new structure, strong on both verdicts
 
-### A. Block-granular entropy coding with O(1) *tile* access — **FIRED 2026-07-02 (candidate 0015 v2), cross-layer gate running**
-v2 (bit-granular stride + 4 DP tier budgets + mantissa-carrying flush; L4 column
-tables dropped by pre-registered gate — layer-27 column signal is 0.0005 b/w):
-**10.7004 b/w fusible at W=128, +0.1818 over realized stz**, floor+0.15 passed by
-0.0079. Skeptic-verified to the physical container level (independent
-encoder+decoder, O(1) stride-address decode of non-adjacent blocks, byte size ==
-accounted bits). Best any-W: W256 = 10.6722. Whole-model projection ~10.7285
-(≈32.9%) is selection-optimistic — **frozen-format cross-layer transfer check is
-the required gate before any whole-model claim** (running; also re-tests L4 on
-early layers where column structure lives). Then: compound on the v2 emission
-(peel tier-slot streams / flag plane / renorm stream), and eventually a
-register-tile decode kernel for runtime credibility (parked, kernel scope).
+### A. Block-granular entropy coding with O(1) *tile* access — **FIRED + TRANSFERRED 2026-07-02 (candidate 0015 v2)**
+Frozen format (W128/T4/P100, bit stride + mantissa-carrying flush) beats each
+layer's own realized stz on every layer tested (7 layers; worst +0.157, mean
++0.179). **Honest whole-model: 10.7346 b/w ≈ 32.9% (vs stz 10.8975/31.89%),
+conservative interpolation.** floor+0.15 holds mid-model only. Queue, in order:
+1. **Completeness sweep (running)**: --frozen on the 16 unswept expert layers to
+   replace interpolation with measurement; extend to the non-expert 7% later.
+2. **Peel-until-random on the v2 emission** (compounding directive's next object
+   of study): tier-slot streams, 2-bit flag plane, renorm stream, mantissa plane —
+   below-order-0 structure or a randomness certificate.
+3. **Layout-aware early-layer column candidate** (new lead): L1/L3 per-column sym
+   ceiling is 0.125–0.160 b/w but 64–128-col groups capture <5%; column-major
+   blocking or ≤16-col groups with O(1) address math; whole-model ceiling only
+   ~0.02–0.03 b/w (2 of 23 layers) — cheap probe, not a headline.
+4. **Container realization (E-scope)**: fold W128-T4 + the adopted chooser levers
+   (V3 fractional-m, V2-g1/colkey) into a .stz v3 as per-tensor codec choices →
+   shippable SHA-256-verified whole-model artifact at ~32.5–33%.
+5. Register-tile decode kernel (runtime credibility) — parked, kernel scope.
 
 ### B. Lossless compression of low-precision-native checkpoints  [strong/strong]
 The frontier ships FP8/FP4, not BF16: DeepSeek-V3/R1 are native FP8 (~688 GB, no

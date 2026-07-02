@@ -290,6 +290,19 @@ blocks (gap 38,975) decoded bit-exact straight from O(1)-computed stride address
 - Runtime contract caveat unchanged: O(1) block address but O(W)=128 sequential decode per
   block — a register-tile kernel prototype is the remaining runtime-credibility step
   (parked: kernel work is out of current scope).
+- **CROSS-LAYER GATE PASSED (2026-07-02)**: the frozen format (W128/T4/P100/L1+L3, per-tensor
+  DP budgets as transmitted side info) **transfers** — beats each layer's own realized stz
+  on all 6 out-of-selection layers (worst +0.157 at L51, best +0.194 at L3; out-of-selection
+  mean +0.1794 ≈ in-selection +0.1817, so selection optimism was only ~0.006 b/w).
+  **Honest whole-model number: 10.7346 b/w vs stz 10.8975 (≈32.9%), conservative
+  bracket-min over 16 unswept layers** (global-min floor variant 10.7448). Scope
+  corrections: the floor+0.15 bar holds MID-MODEL ONLY (fails by 0.0003–0.0107 at layers
+  1/3/51 — early layers have higher H(sym)); esc_frac=0 transfers everywhere. L4 re-entry
+  on early layers: NO as addressed — the per-column ceiling is real there (0.160/0.125 b/w
+  at L1/L3 in sym space) but 64–128-column address-derived groups capture <5% of it; a
+  layout-aware form (column-major blocking, ≤16-col groups) is a separate future candidate
+  with ~0.02–0.03 b/w whole-model ceiling. Skeptic: not refuted, high confidence (raw-bits
+  re-derivation on all 7 layers, freeze verified per row, gate re-measured from raw shard).
 
 ## Chooser-levers pre-probe — V3 fractional-m fires everywhere, column family is one pot (2026-07-02)
 

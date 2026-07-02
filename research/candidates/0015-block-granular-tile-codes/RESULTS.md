@@ -407,3 +407,136 @@ projection). Baseline reference unchanged:
   empty at P100); "3-bit" applies only to 5-class escape cells at P<100. The
   charged 0.015625 b/w = 2/128 was already the correct 2-bit accounting.
 Neither slip affects any total, gate, or the verdict.
+
+---
+
+# Cross-layer transfer of the frozen v2 format: RESULTS
+
+**Date:** 2026-07-02 · **Scope:** expert tensors only (128 experts × {up,down}_proj =
+256 tensors, 1,277,165,568 params per layer) on six out-of-selection layers — 1, 3
+(early/anomalous), 13, 24 (mid), 40, 51 (late) — plus the in-selection layer 27 for the
+aggregate · **Format under test (FROZEN, zero re-selection):** W=128 bit-granular
+fixed-stride blocks, T=4 DP-optimal tier budgets (per-tensor, transmitted and charged
+exactly as in v2 — legitimately per-tensor side info), P100 top budget, levers L1 + L3
+ON, L4 OFF · **Tool:** `tools/probe_block_codes_v2.py --frozen --layer N` · **Wall:**
+6 layers in parallel, ~7 min scoring wall (~35 CPU-min).
+
+**Verdict: the frozen format TRANSFERS.** G1 (beat that layer's own realized stz, all
+taxes charged) passes on **all six** out-of-selection layers; worst margin **+0.1573**
+(layer 51), best **+0.1938** (layer 3). The out-of-selection mean delta (**+0.1794**)
+is statistically indistinguishable from layer 27's in-selection **+0.1817** — the
+selection optimism v2 flagged was real but small (~0.006 b/w on the whole-model
+projection). Same evidentiary standard as v1/v2: measured emitted bits, all side costs
+charged, bits == accounted, SHA-256-exact BF16 round-trip on every layer, stz parity
+max |Δbpw| = 0.000000 on all 7 layers.
+
+**The one caveat that did NOT transfer: G2 (≤ floor + 0.15).** It holds mid/late-mid
+(13, 24, 27, 40) and fails by hair margins at layers 1 (+0.1505 over floor, 0.0005 over
+the bar), 3 (+0.1607, 0.0107 over), and 51 (+0.1503, 0.0003 over) — exactly the
+fragility the thin layer-27 margin (0.0079) predicted. Early layers have higher H(sym)
+(3.69/3.66 vs ~3.55 mid/late) and the fixed mechanics overhead sits slightly further
+from their floors. The headline is therefore re-scoped: **"frozen fusible W=128 format
+beats realized stz on every layer tested" stands unconditionally; "within 0.15 of the
+order-0 floor" holds only mid-model.**
+
+## Per-layer scores (numel-weighted per layer; equal numel per layer)
+
+```
+ layer   stz b/w  frozen b/w    delta     floor   G1    G2   L4 gate   L4 var  note
+-----------------------------------------------------------------------------------
+     1   11.0310     10.8443  +0.1867   10.6938 PASS  FAIL    0.0062       --  frozen transfer
+     3   11.0176     10.8238  +0.1938   10.6631 PASS  FAIL    0.0069       --  frozen transfer
+    13   10.8931     10.7112  +0.1819   10.5664 PASS  PASS    0.0014       --  frozen transfer
+    24   10.8842     10.7008  +0.1834   10.5592 PASS  PASS    0.0006       --  frozen transfer
+    27   10.8822     10.7004  +0.1817   10.5583 PASS  PASS    0.0005       --  in-selection
+    40   10.8706     10.6971  +0.1735   10.5533 PASS  PASS    0.0005       --  frozen transfer
+    51   10.8614     10.7041  +0.1573   10.5538 PASS  FAIL    0.0006       --  frozen transfer
+-----------------------------------------------------------------------------------
+ all-7   10.9200     10.7403  +0.1798   numel-weighted, incl. in-selection layer 27
+xfer-6   10.9263     10.7469  +0.1794   out-of-selection layers only
+```
+
+G1 = beats realized stz on that layer's own set; G2 = ≤ floor + 0.15; L4 gate = best
+block-column-group conditional gain (b/w) vs the pre-registered 0.05 threshold — FAIL
+on every layer, so no L4-ON variant row was run anywhere (as pre-registered). Delta vs
+stz declines monotone-ish with depth (+0.194 early → +0.157 late): late layers are the
+conservative bound; early layers give the *largest* absolute wins even while missing G2.
+
+## Honest whole-model number
+
+**10.7346 b/w vs stz's realized whole-model 10.8975 (−0.1629 b/w).** Method: all 23
+expert layers have identical expert numel (1,277,165,568; experts = 93.02% of model
+numel, model = 67.09% of BF16), so the expert-plane saving is the plain mean of
+per-layer deltas; the 7 measured layers use their measured delta (27 in-selection, 6
+out-of-selection), and each of the 16 unswept layers takes the **min** of its two
+bracketing measured layers' deltas (conservative — since delta is monotone-ish in
+depth, bracket-min mainly discounts the late block); the non-expert 7% of numel is held
+at stz, unchanged. Even-more-conservative floor (every unswept layer at the global
+minimum measured delta 0.1573): **10.7448**. Both bracket the honest number. v2's
+same-set selection-optimistic projection was 10.7285 — the cross-layer-validated
+estimate is ~0.006 b/w worse, i.e. selection optimism was real but small.
+
+**How the ledger should state it:** the v2 selection caveat is **resolved** for the
+main claim — "0015 v2 frozen fusible format (W=128 bit-stride, T=4 transmitted tiers,
+P100, L1+L3) beats realized stz on every layer tested, out-of-selection mean +0.179
+b/w, honest whole-model estimate 10.7346 vs 10.8975 (conservative bracket-min over 16
+unswept expert layers)". The G2/floor+0.15 claim must be stated re-scoped ("mid-model
+layers only; fails by ≤0.011 at layers 1, 3, 51"), not as a whole-model property.
+
+## Does L4 re-enter on early layers? NO for this mechanism — with a real nuance
+
+The pre-registered gate (block column-group conditional gain ≥ 0.05 b/w) **fails on
+every layer including early ones**: best gains 0.0062 (layer 1) and 0.0069 (layer 3),
+then ≤0.0014 mid/late. So no L4-ON variant ran anywhere; the frozen score is the only
+score. But the *full per-column* conditioning ceiling IS real on early layers —
+gain_col = **0.160 b/w at layer 1, 0.125 at layer 3** (0014's early-layer column signal
+confirmed in sym space) vs ~0.02–0.03 mid/late. The address-derived block column-group
+conditioning the L4 coder can actually use (group = start_col // gcd(W, C), i.e.
+64–128-column granularity) captures **<5%** of it. The 0.12–0.16 b/w early-layer column
+headroom is a layout problem: capturing it needs column-major blocking or ≤16-column
+groups — a separate future candidate with its own address math, not a cell of this
+format. Whole-model ceiling if captured perfectly: ~0.02–0.03 b/w (it lives in ~2 of 23
+layers).
+
+## Anomalies (recorded)
+
+1. **G2 does not transfer universally** — see above; the thin in-selection margin was a
+   genuine early warning, now quantified (fails by 0.0003–0.0107 at layers 1, 3, 51).
+2. **esc_frac = 0 on every layer** — the layer-27 finding that T=4 DP tiers fully
+   subsume the escape class transfers everywhere.
+3. **Benign:** layers 3 and 51 sampled 1,023 round-trip blocks instead of 1,024 (one
+   duplicate among the {first, last, argmin, argmax} sample indices). Bits == accounted
+   and SHA-256-exact reconstruction PASS on all layers regardless.
+4. **Per-tensor DP tier budgets remain legitimate out-of-selection:** they are
+   transmitted side info charged exactly as in v2; freezing the *format* while letting
+   budgets adapt per tensor is the deployment contract, not selection leakage.
+
+## Compounding order
+
+**Confirms the v2 plan; the transfer gate is now cleared.** (i) The whole-model claim
+is unblocked at 10.7346 b/w (conservative). (ii) The single next object of study, per
+the peel-until-random loop applied recursively: **the v2 emitted representation
+itself** — tier-slot streams, 2-bit flag plane, renorm bit-stream, mantissa plane — for
+below-order-0 structure (block-to-block correlation, within-block symbol order), since
+the residual 0.13–0.19 above floor is mechanics-bound and L4 is dead as-addressed on
+every layer. (iii) The early-layer column headroom (0.12–0.16 b/w at layers 1/3) is a
+real, named, but modest new-entropy source needing a layout-aware candidate of its own.
+(iv) The register-tile decode kernel remains the runtime-credibility step for the O(W)
+contract. (v) Optional cheap completeness: score the 16 unswept expert layers with the
+frozen format to replace bracket-min interpolation with a fully measured whole-model
+number.
+
+## Reproduction
+
+```
+# frozen-format transfer score on one layer (resumable, ~5-7 min each)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_block_codes_v2.py --frozen --layer 1
+# (repeat for layers 3, 13, 24, 40, 51; layer 27 reference is the v2 run itself)
+```
+
+Artifacts: `tests/artifacts/blockcodes_v2_frozen_summary_layer{1,3,13,24,40,51}.json`,
+`blockcodes_v2_frozen_results_layer{N}.jsonl` (per-tensor exact accounting),
+`blockcodes_v2_gate_summary_layer{N}.json` (per-layer L4 gate measurements), and the
+aggregate `blockcodes_v2_frozen_crosslayer_aggregate.json`. Baseline reference
+unchanged: `../0009-fusible-exponent-codebook/tests/artifacts/stz/stz_tensor_stats.jsonl`
+(parity exact on all 7 layers).
