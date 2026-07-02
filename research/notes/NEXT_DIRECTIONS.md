@@ -35,8 +35,9 @@ Verdicts shown as [soundness/value].
    measurement) is still open.
 3. ~~Predictor pathology~~ **DONE 2026-07-01**: the .stz per-tensor min-envelope chooser
    (raw16 fallback) eliminates all >16 bpw cases.
-4. `0012/brief.md` status is stale; the ledger "+0.67 pt" correction is applied
-   but wording mismatches remain between RUNTIME.md and the writeup.
+4. ~~Stale 0012 wording~~ **DONE 2026-07-01**: RUNTIME.md carries the wording
+   correction (in-memory identity check, .stz is the serialized artifact) and
+   0012/brief.md is marked complete with the realized numbers.
 
 ## Repricing note (2026-07-01, post-.stz)
 
