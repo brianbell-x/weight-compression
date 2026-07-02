@@ -1011,3 +1011,173 @@ deltas, convention, gates), `m1full_summary_layer{N}.json` × 23 (per-layer T1 a
 per-plane certificates). Stamp `bb3a86666829` throughout. Baseline reference unchanged:
 `../0009-fusible-exponent-codebook/tests/artifacts/stz/stz_tensor_stats.jsonl` (parity
 exact on all 5,888 tensors).
+
+---
+
+# Coder mechanics (R1–R4): wider-state byte-renorm rANS + the sym11 flip: RESULTS
+
+**Date:** 2026-07-02 · **Scope:** 64 tensors, ≥16 per layer, layers 1/13/27/40
+(319,291,392 params, numel-weighted — same sample convention as the mantissa probe;
+M1 reference recomputed on the identical sample with the frozen bit-renorm coder) ·
+**Format under test:** the frozen tile+M1 contract unchanged — W=128 sequential decode,
+fixed-stride blocks with O(1) block address, T=4 DP tier budgets, P100, L1+L3,
+mantissa-carrying flush — with only the entropy-coder mechanics swapped ·
+**Variants:** R1 = sym10, 32-bit state [2^24, 2^32), byte renorm, 12-bit tables ·
+R2 = R1 + sym11 (A=2048) · R3 = R1 + 14-bit tables · R4 = R2 + 14-bit tables ·
+**Accounting stamp:** `b04ffe2a19aa` · **Tool:** `tools/probe_coder_mechanics.py` ·
+**Wall:** ~8 min.
+
+**Verdict: the R-gate FIRES — R4 (sym11 + byte renorm + 14-bit tables) beats the M1
+reference by +0.0767 b/w on the sample (gate ≥ 0.02), all side costs charged,
+SHA-256-exact round-trip.** The recomputed M1 reference reproduces the standing
+10.6973 to 3e-6 (self-gate PASS); round-trip 256 blocks per variant with emitted
+bits == accounted bits. And the sym11 sub-verdict **flips**: bit-2 folding is
+**net-positive under the best coder** (R4−R3 = −0.0131 b/w realized vs 0.0171
+entropy headroom) while remaining net-negative at 12-bit tables (R2−R1 = +0.0140)
+— the blocker was table quantization *and* renorm jointly, and both had to be fixed.
+
+## Realized (numel-weighted, all side costs charged; delta > 0 = saves vs M1ref)
+
+```
+ variant       bpw    delta     bound    quant   flushN   renorm     pad     tab    misc     gap
+------------------------------------------------------------------------------------------------
+   M1ref   10.6973  +0.0000   10.5363   0.0182   0.0000   0.0449  0.0798  0.0004  0.0177  0.1610
+      R1   10.6505  +0.0468   10.5363   0.0182   0.0078   0.0118  0.0582  0.0004  0.0177  0.1143
+      R2   10.6646  +0.0327   10.5192   0.0464   0.0078   0.0122  0.0604  0.0009  0.0177  0.1454
+      R3   10.6337  +0.0636   10.5363   0.0030   0.0078   0.0118  0.0566  0.0005  0.0177  0.0974
+      R4   10.6206  +0.0767   10.5192   0.0061   0.0078   0.0122  0.0566  0.0009  0.0177  0.1014
+```
+
+(bound = H(symA)+k_low entropy level; quant = table quantization delta; flushN =
+(flush − credit)·nb/n; renorm = coded − qentropy − gross flush; components sum
+exactly to the charged bpw, asserted 1e-8 per tensor/variant.)
+
+Per-layer (best = R4 on every layer): L1 +0.1003, L13 +0.0721, L27 +0.0688,
+L40 +0.0654 — delta *declines* with depth, opposite M1's own trend: layer 1's
+higher-entropy blocks renorm more, so it gains most from cheaper renorm.
+
+## What each mechanic bought (measured, not estimated)
+
+1. **Byte renorm (R1):** renorm redundancy 0.0449 → 0.0118 b/sym — about 1/4 of
+   bit-renorm, not the naive 1/8, because the wide variants' renorm component also
+   absorbs the seed/flush state-boundary effect (31-bit seed x0 = L+d has
+   E[log2 x0] < 32 while the flush charges a full 32 bits). Unanticipated side
+   benefit: DP tier pad slack shrank 0.0798 → 0.0566–0.0604 b/w — byte-granular
+   block sizes cluster tighter, so T=4 budgets fit better.
+2. **Mantissa-carrying flush, re-derived for the 32-bit state:** max integer payload
+   is 31 bits (L + (2^31 − 1) < 256L), so the wide state carries MORE credit (31 vs
+   12) but nets +1 bit/block = 0.0078 b/w where M1ref's 12/12 cancelled exactly; the
+   renorm saving (~0.033 b/w) repays it several times over. Round-trip proves the
+   credit flows from the decoded payload (borrowed plane fields destroyed before
+   rebuild).
+3. **14-bit tables (R3):** the trigger condition was strongly met — the 12-bit quant
+   delta at A=1024 is **0.0182 b/w on this sample**, not the 0.0076 A=512 figure;
+   14-bit cuts it to 0.0030 for ~4e-5 b/w of extra table (+0.0168 over R1).
+4. **sym11 (R4−R3):** −0.0131 b/w realized of the 0.0171 entropy headroom, consistent
+   in sign on all 4 layers. At 12-bit tables, quantizing 2048 symbols into 4096 slots
+   costs 0.0464 b/w — more than the entire headroom — which is exactly why M3 died.
+   T2's "coder change is the gate; sym11 is the payload it unlocks" is now measured.
+
+## SYM11 sub-verdict
+
+**NET-POSITIVE — but only above the quantization knee.** Matched-precision pairs:
+12-bit R2−R1 = +0.0140 (loses), 14-bit R4−R3 = −0.0131 (wins). The flip is table
+precision, not renorm; renorm merely stops the redundancy from eating the win a
+second way. M3's falsification stands *for the bit-renorm 12-bit coder it tested*;
+this run supersedes it for the wide coder. Bit-2 is collected; the fold ladder ends
+here unless bit-3 (~0.005 b/w entropy by the ~3.3× decay) can be had for less than
+the A=4096 quantization cost — pre-priced as unlikely, probe only as a rider.
+
+## Honest whole-model number
+
+Mechanical projection: **10.6153 b/w** (= 10.68664 − 0.93 × 0.0767). Two honesty
+caveats, both pointing the same direction: (i) sample-selected — format cells were
+compared on the sample that selects them; (ii) the 4-layer sample gives layer 1 a
+1/4 weight vs its true 1/23, and this time L1 is the *largest*-delta layer (+0.1003
+vs +0.065–0.072 mid/late), so the projection is **optimistic** — the opposite bias
+of the M1 projection (which measured 0.0057 *better*). Taking the L13/27/40 deltas
+as the bulk estimate, the plain-23-layer mean is ≈ 0.067–0.069, landing the measured
+whole-model at **≈ 10.622–10.624**. Call the honest range **10.62–10.63**, vs the
+10.670–10.675 the T2 section had priced for sym11 alone — the coder swap collected
+its own ~0.03 b/w renorm+pad+quant dividend on top of unlocking bit-2.
+
+Remaining gap to the entropy-level bound at R4: **0.1014 b/w**, now dominated by
+**pad/tier slack 0.0566** and **misc/flags 0.0177** (class flags, rank anchors,
+headers), then renorm 0.0122, flush 0.0078, quant 0.0061, tables 0.0009. Renorm is
+no longer the blocking lever — layout slack is.
+
+## Should container v3 freeze on this coder? YES on mechanics, stamped only after the full measure
+
+The R4 mechanics (32-bit state, byte renorm, 14-bit tables, sym11 A=2048, 31-bit
+mantissa-carrying flush credit) should replace sym10+bit-renorm as the v3 spec for
+expert tensors: it wins on every layer sampled, keeps the format contract intact
+(same block addressing, same W=128, same DP tiers), and byte-granular renorm is
+*simpler* for the register-tile decode kernel than bit-by-bit (byte loads, no bit
+cursor). But the standing rule from the cross-layer section applies: **no
+whole-model claim, no ledger entry, no frozen spec without the all-23-layer
+measurement.** The M1 chapter's `measure_m1_full.py` pattern is the template —
+extend it to score R4 on all 5,888 expert tensors, run the aggregate self-gate, and
+only then stamp v3. Until that lands, 10.68664 remains the ledger number.
+
+## Anomalies (recorded)
+
+1. **A fourth variant (R4) was run beyond the three requested** — without it the
+   sym11 verdict would be pinned to the coarsest quantization and falsely read
+   net-negative. The verdict flips on table precision (R2−R1 = +0.0140 vs R4−R3 =
+   −0.0131, consistent on all 4 layers).
+2. **The 12-bit quant delta at A=1024 is 0.0182 b/w on this sample**, ~2.4× the
+   0.0076 A=512 figure previously cited — R3's trigger condition was met with margin.
+3. **Byte-renorm redundancy is ~1/4, not 1/8, of bit-renorm** (0.0118–0.0122 vs
+   0.0449 b/sym) — the component absorbs the 31-bit-seed/32-bit-flush state-boundary
+   effect, so it is not a pure per-renorm-event number; decomposition still sums
+   exactly (1e-8 assert).
+4. **Delta declines with depth** (L1 +0.1003 → L40 +0.0654), opposite M1's own depth
+   trend — early high-entropy blocks renorm more.
+5. **Pad slack shrank as a side effect** (0.0798 → 0.0566) — byte-granular sizes fit
+   T=4 budgets better; this also means a tier-budget re-tune under the byte coder
+   may find more.
+6. Pre-existing state reused, not recomputed: the probe tool, a passing synthetic
+   smoke, and one layer-27 row (identical stamp, RT PASS) predated this session from
+   an interrupted run; a `.bak` shows the pre-r4fix revision lacked R4 and could
+   nominally fire the gate on synthetic — fixed before any real evidence was
+   generated; no real-data results predate stamp `b04ffe2a19aa`.
+7. The concurrent candidate-0016 probe (`probe_ckpt_delta.py`, shards 1 and 7,
+   read-only) ran untouched throughout.
+8. Gate hygiene: the summary is rendered on the merged full 64-tensor sample (per-
+   layer rows seeded into the combined file, stamps verified) where the M1-reference
+   self-gate applies; per-layer partials cannot fire the gate by construction.
+
+## Compounding order
+
+**The coder lever — named three times (M2, M3, T2/T3) — has now paid, and it is
+retired as the blocking item.** (i) **First: the full 23-layer R4 measure** (extend
+`measure_m1_full.py`), which converts 10.6153-projected into a measured ≈10.62–10.63,
+runs the aggregate gate, and stamps container v3. (ii) **The next object of study is
+the emitted R4 representation itself** — per the compound directive: re-peel the R4
+payload plane for a randomness certificate (T3 pattern), and attack the new dominant
+residuals — **pad/tier slack (0.0566 b/w)**: T>4 tiers, byte-granular budgets, or
+per-class budget shaping now that block sizes cluster tighter; and **misc/flags
+(0.0177 b/w)**: rank-anchor spacing and class-descriptor width were set under the
+bit coder and never re-priced. (iii) Bit-3/sym12 only as a priced rider (~0.005 b/w
+entropy vs a doubling quant cost — likely negative, one cheap cell settles it).
+(iv) The register-tile decode kernel remains the runtime-credibility step, and byte
+renorm makes it easier, not harder. (v) Layer-1 residue stays parked.
+
+## Reproduction
+
+```
+# smoke (synthetic snapshot, seconds; all variants + gates)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_coder_mechanics.py --synthetic
+
+# real, one layer (resumable; layers 1/13/27/40)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_coder_mechanics.py --layer 13
+
+# summary tables + JSON + gates (requires all 64 tensors done)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_coder_mechanics.py --summary
+```
+
+Artifacts: `tests/artifacts/coder_mechanics_results.jsonl` (64 rows, per-tensor exact
+accounting, stamp `b04ffe2a19aa`), `coder_mechanics_summary.json` (realized cells,
+decomposition, sym11 verdict, gate, projection), per-layer
+`coder_mechanics_{results,summary}_layer{1,13,27,40}.*`. M1 reference: the standing
+10.6973 sample convention, reproduced in-run to 3e-6.

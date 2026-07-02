@@ -411,6 +411,26 @@ confidence) realized the corrected-mantissa finding inside the frozen tile forma
   wider-state coder (~0.06 incl. unlocking bit-2), tier-design ≤0.0335 bounded by pad
   slack, early-layer bundle ~0.02–0.03.**
 
+## Coder mechanics FIRES — byte-renorm + 14-bit tables + sym11 = R4, +0.0767 b/w (2026-07-02)
+
+The coder probe (64 tensors, layers 1/13/27/40; skeptic wrote independent decoders for BOTH
+renorm schemes, verified flush-credit arithmetic and per-variant tier re-optimization — not
+refuted, high confidence) replaced the bit-renorm coder:
+
+- **R4 — 32-bit state byte-renorm rANS, sym11 (sign+exp8+2 mantissa bits), 14-bit tables:
+  10.6206 b/w on the sample = +0.0767 vs tile+M1**, ~4× the gate, best on every layer.
+  Decomposition: renorm excess 0.0449→0.0122, quant delta 0.0182→0.0061, pad slack
+  0.0798→0.0566 (byte-granular blocks fit budgets better), net flush +0.0078 (the 32-bit
+  state carries a 31-bit mantissa payload).
+- **sym11 verdict FLIPPED to net-positive** (+0.0131 at 14-bit tables vs −0.0140 at
+  12-bit): the earlier M3/M2 losses were table quantization + renorm redundancy jointly —
+  the try-harder attribution was correct both times.
+- Surprise: the 12-bit quant delta at A=1024 was 0.0182 b/w (not the 0.0076 cited from
+  A=512) — quantization was a bigger hidden cost than assumed everywhere.
+- **Projected whole-model: 10.6153 b/w ≈ 33.65%** (selection-optimistic; full 23-layer
+  measurement running). Remaining decomposed gap to the entropy bound: ~0.10 b/w (pad
+  0.057, misc 0.018, renorm 0.012, quant 0.006, flush 0.008).
+
 ## Purged tracks — do not re-open (2026-07-01)
 
 Lossy/quantization/QAT/train-time tracks (candidates 0005–0008, 0011, 0013,

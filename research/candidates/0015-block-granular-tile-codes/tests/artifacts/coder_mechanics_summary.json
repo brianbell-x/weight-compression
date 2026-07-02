@@ -1,0 +1,257 @@
+{
+  "mode": "real",
+  "scope": "sampled experts on layers [1, 13, 27, 40]; M1 reference recomputed on the same sample with the frozen bit-renorm coder",
+  "acct_stamp": "b04ffe2a19aa",
+  "acct": {
+    "schema": 1,
+    "probe": "coder_mechanics",
+    "W": 128,
+    "T_MAX": 4,
+    "P": 100,
+    "L1": 1,
+    "L3": 1,
+    "L4": 0,
+    "M_LOG2": 12,
+    "FLUSH_BITS": 12,
+    "WIDE_LOG2_L": 24,
+    "WIDE_B_LOG2": 8,
+    "FLUSH_W_WIDE": 32,
+    "CREDIT_WIDE": 31,
+    "RANK_GROUP": 512,
+    "RANK_BITS": 32,
+    "HEAD_BITS": 256,
+    "CLASS_DIR_BITS": 96,
+    "GATE_BPW": 0.02,
+    "VARIANTS": {
+      "M1ref": {
+        "A": 1024,
+        "shift": 6,
+        "k_low": 6,
+        "coder": "bit",
+        "m_log2": 12,
+        "flush": 12,
+        "credit": 12
+      },
+      "R1": {
+        "A": 1024,
+        "shift": 6,
+        "k_low": 6,
+        "coder": "byte",
+        "m_log2": 12,
+        "flush": 32,
+        "credit": 31
+      },
+      "R2": {
+        "A": 2048,
+        "shift": 5,
+        "k_low": 5,
+        "coder": "byte",
+        "m_log2": 12,
+        "flush": 32,
+        "credit": 31
+      },
+      "R3": {
+        "A": 1024,
+        "shift": 6,
+        "k_low": 6,
+        "coder": "byte",
+        "m_log2": 14,
+        "flush": 32,
+        "credit": 31
+      },
+      "R4": {
+        "A": 2048,
+        "shift": 5,
+        "k_low": 5,
+        "coder": "byte",
+        "m_log2": 14,
+        "flush": 32,
+        "credit": 31
+      }
+    },
+    "TABLE_BITS_RULE": "pad8(A + nnz*m_log2) per table",
+    "MANT_PLANE_RULE": "pad8(k_low*n - credit*nb)",
+    "LAYERS_REAL": [
+      1,
+      13,
+      27,
+      40
+    ],
+    "EXPERTS_PER_PROJ": 8,
+    "M1_SAMPLE_REF_BPW": 10.6973,
+    "M1_WHOLE_MODEL_BPW": 10.68664,
+    "EXPERT_FRAC": 0.93,
+    "SYM11_HEADROOM_REF": 0.0171,
+    "CODER_BIT": "per-block single-lane bit-renorm rANS; M=4096 12-bit quantized table(s) (stores q-1); state in [M,2M); bit-by-bit renorm (emit x&1 while x>=2q); 12-bit flush = x_final - M; L3 seeds x0 = M + first-12-mantissa-bits (decoder final state returns them, so under L3 the first two weights of a block finalize only after the full W-symbol decode -- payload is the decoder's terminal state); L4 keys the table by column group = block_start_col // gcd(W,C); sizes are measured emitted bits, round-trip verified on samples",
+    "CODER_WIDE": "per-block single-lane byte-renorm rANS; quantized table sums to M=2^m_log2 (12 or 14); state in [L,256L), L=2^24; renorm emits x&0xFF while x >= q*(L>>m_log2)*256; encode x=(x//q)*M+cum+(x%q); flush = 32-bit final state; x0 seeded L + first-31-low-plane-bits (decoder final state returns them); sizes are measured emitted bits, round-trip verified on samples"
+  },
+  "targets": 64,
+  "total_params": 319291392,
+  "layers": [
+    1,
+    13,
+    27,
+    40
+  ],
+  "m1_sample_ref_bpw": 10.6973,
+  "m1_ref_recomputed_bpw": 10.697297,
+  "m1_ref_reproduced": "recomputed M1 reference 10.6973 reproduces the standing 10.6973 (|d|=0.000003)",
+  "realized_bpw": {
+    "M1ref": 10.697297,
+    "R1": 10.650539,
+    "R2": 10.664588,
+    "R3": 10.633713,
+    "R4": 10.620624
+  },
+  "delta_vs_m1ref_bpw": {
+    "R1": 0.046758,
+    "R2": 0.032709,
+    "R3": 0.063583,
+    "R4": 0.076673
+  },
+  "decomposition_bpw": {
+    "M1ref": {
+      "bound_bpw": 10.536282,
+      "quant_bpw": 0.01822,
+      "flush_net_bpw": 0.0,
+      "renorm_bpw": 0.044852,
+      "pad_bpw": 0.079773,
+      "tab_bpw": 0.000441,
+      "misc_bpw": 0.01773
+    },
+    "R1": {
+      "bound_bpw": 10.536282,
+      "quant_bpw": 0.01822,
+      "flush_net_bpw": 0.007812,
+      "renorm_bpw": 0.011822,
+      "pad_bpw": 0.058232,
+      "tab_bpw": 0.000441,
+      "misc_bpw": 0.017729
+    },
+    "R2": {
+      "bound_bpw": 10.51921,
+      "quant_bpw": 0.046361,
+      "flush_net_bpw": 0.007812,
+      "renorm_bpw": 0.012222,
+      "pad_bpw": 0.060397,
+      "tab_bpw": 0.000856,
+      "misc_bpw": 0.017729
+    },
+    "R3": {
+      "bound_bpw": 10.536282,
+      "quant_bpw": 0.003004,
+      "flush_net_bpw": 0.007812,
+      "renorm_bpw": 0.011812,
+      "pad_bpw": 0.056594,
+      "tab_bpw": 0.00048,
+      "misc_bpw": 0.017729
+    },
+    "R4": {
+      "bound_bpw": 10.51921,
+      "quant_bpw": 0.006085,
+      "flush_net_bpw": 0.007812,
+      "renorm_bpw": 0.01224,
+      "pad_bpw": 0.056617,
+      "tab_bpw": 0.00093,
+      "misc_bpw": 0.017729
+    }
+  },
+  "renorm_b_per_sym": {
+    "M1ref": 0.044852,
+    "R1": 0.011822,
+    "R2": 0.012222,
+    "R3": 0.011812,
+    "R4": 0.01224
+  },
+  "bit_renorm_redundancy_history_b_per_sym": {
+    "A512": 0.051,
+    "A1024": 0.063,
+    "A2048": 0.098
+  },
+  "per_layer": {
+    "L1": {
+      "tensors": 16,
+      "params": 79822848,
+      "M1ref": 10.829603,
+      "R1": 10.77048,
+      "R2": 10.786977,
+      "R3": 10.745938,
+      "R4": 10.729273,
+      "best": "R4",
+      "best_delta": 0.10033
+    },
+    "L13": {
+      "tensors": 16,
+      "params": 79822848,
+      "M1ref": 10.657678,
+      "R1": 10.611002,
+      "R2": 10.628457,
+      "R3": 10.597683,
+      "R4": 10.585588,
+      "best": "R4",
+      "best_delta": 0.07209
+    },
+    "L27": {
+      "tensors": 16,
+      "params": 79822848,
+      "M1ref": 10.654152,
+      "R1": 10.611087,
+      "R2": 10.626587,
+      "R3": 10.596984,
+      "R4": 10.585309,
+      "best": "R4",
+      "best_delta": 0.068843
+    },
+    "L40": {
+      "tensors": 16,
+      "params": 79822848,
+      "M1ref": 10.647754,
+      "R1": 10.609584,
+      "R2": 10.61633,
+      "R3": 10.59425,
+      "R4": 10.582324,
+      "best": "R4",
+      "best_delta": 0.06543
+    }
+  },
+  "roundtrip": {
+    "blocks": {
+      "M1ref": 256,
+      "R1": 256,
+      "R2": 256,
+      "R3": 256,
+      "R4": 256
+    },
+    "all_ok": true
+  },
+  "gate": {
+    "gate_bpw": 0.02,
+    "best_variant": "R4",
+    "best_delta_bpw": 0.076673,
+    "delta_meets_gate": true,
+    "full_sample": true,
+    "synthetic": false,
+    "valid": true,
+    "fires": true,
+    "evidential": true
+  },
+  "sym11": {
+    "best_sym10": "R3",
+    "best_sym11": "R4",
+    "best_sym11_minus_best_sym10_bpw": -0.01309,
+    "bit2_net_bpw": 0.01309,
+    "net_positive": true,
+    "matched_precision_pairs_bpw": {
+      "12bit_R2_minus_R1": 0.014049,
+      "14bit_R4_minus_R3": -0.01309
+    },
+    "r2_minus_r1_bpw": 0.014049,
+    "r4_minus_r3_bpw": -0.01309,
+    "entropy_headroom_bpw": 0.017072,
+    "t2_headroom_ref_bpw": 0.0171,
+    "verdict": "SYM11 under the best coder (R4 vs R3, both at 14/14-bit tables): bit-2 is NET-POSITIVE (R4 - R3 = -0.0131 b/w realized; matched-precision pairs {'12bit_R2_minus_R1': 0.014049, '14bit_R4_minus_R3': -0.01309}; entropy headroom bound(sym10)-bound(sym11) = +0.0171, T2 reference ~0.0171)"
+  },
+  "projected_whole_model_bpw": 10.615334,
+  "verdict": "R-GATE FIRES: best variant R4 realizes +0.0767 b/w vs the M1 reference (gate >= 0.02, all side costs charged; round-trip proven on sampled blocks of every tensor, all other blocks accounted via the bit-identical emitted-bit simulation)",
+  "accounting_note": "all cells use the frozen v2 mechanics exactly (W=128 bit-stride, DP T=4 tier budgets over measured emitted bits, P100 no-escape, per-block class flags, u32 rank anchors per 512 blocks, 96-bit class descriptors, 32-byte header, pad8 record align); table charged pad8(A + nnz*m_log2); low plane pad8(k_low*n - credit*nb); wide variants charge the 32-bit flush in every block's measured bits and credit exactly 31 seed-borne mantissa bits against the plane; M1ref is mp's M1 machinery verbatim (cell asserted identical); every variant round-trip proven per tensor on sampled blocks with the flush-borne plane fields destroyed before the rebuild and SHA-256-exact BF16 reconstruction over the sampled spans"
+}

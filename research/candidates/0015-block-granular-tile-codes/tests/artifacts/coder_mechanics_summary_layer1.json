@@ -1,0 +1,221 @@
+{
+  "mode": "real",
+  "scope": "sampled experts on layers [1]; M1 reference recomputed on the same sample with the frozen bit-renorm coder [PARTIAL SAMPLE -- layer-restricted; M1 reference reproduction check skipped; gate cannot fire]",
+  "acct_stamp": "b04ffe2a19aa",
+  "acct": {
+    "schema": 1,
+    "probe": "coder_mechanics",
+    "W": 128,
+    "T_MAX": 4,
+    "P": 100,
+    "L1": 1,
+    "L3": 1,
+    "L4": 0,
+    "M_LOG2": 12,
+    "FLUSH_BITS": 12,
+    "WIDE_LOG2_L": 24,
+    "WIDE_B_LOG2": 8,
+    "FLUSH_W_WIDE": 32,
+    "CREDIT_WIDE": 31,
+    "RANK_GROUP": 512,
+    "RANK_BITS": 32,
+    "HEAD_BITS": 256,
+    "CLASS_DIR_BITS": 96,
+    "GATE_BPW": 0.02,
+    "VARIANTS": {
+      "M1ref": {
+        "A": 1024,
+        "shift": 6,
+        "k_low": 6,
+        "coder": "bit",
+        "m_log2": 12,
+        "flush": 12,
+        "credit": 12
+      },
+      "R1": {
+        "A": 1024,
+        "shift": 6,
+        "k_low": 6,
+        "coder": "byte",
+        "m_log2": 12,
+        "flush": 32,
+        "credit": 31
+      },
+      "R2": {
+        "A": 2048,
+        "shift": 5,
+        "k_low": 5,
+        "coder": "byte",
+        "m_log2": 12,
+        "flush": 32,
+        "credit": 31
+      },
+      "R3": {
+        "A": 1024,
+        "shift": 6,
+        "k_low": 6,
+        "coder": "byte",
+        "m_log2": 14,
+        "flush": 32,
+        "credit": 31
+      },
+      "R4": {
+        "A": 2048,
+        "shift": 5,
+        "k_low": 5,
+        "coder": "byte",
+        "m_log2": 14,
+        "flush": 32,
+        "credit": 31
+      }
+    },
+    "TABLE_BITS_RULE": "pad8(A + nnz*m_log2) per table",
+    "MANT_PLANE_RULE": "pad8(k_low*n - credit*nb)",
+    "LAYERS_REAL": [
+      1,
+      13,
+      27,
+      40
+    ],
+    "EXPERTS_PER_PROJ": 8,
+    "M1_SAMPLE_REF_BPW": 10.6973,
+    "M1_WHOLE_MODEL_BPW": 10.68664,
+    "EXPERT_FRAC": 0.93,
+    "SYM11_HEADROOM_REF": 0.0171,
+    "CODER_BIT": "per-block single-lane bit-renorm rANS; M=4096 12-bit quantized table(s) (stores q-1); state in [M,2M); bit-by-bit renorm (emit x&1 while x>=2q); 12-bit flush = x_final - M; L3 seeds x0 = M + first-12-mantissa-bits (decoder final state returns them, so under L3 the first two weights of a block finalize only after the full W-symbol decode -- payload is the decoder's terminal state); L4 keys the table by column group = block_start_col // gcd(W,C); sizes are measured emitted bits, round-trip verified on samples",
+    "CODER_WIDE": "per-block single-lane byte-renorm rANS; quantized table sums to M=2^m_log2 (12 or 14); state in [L,256L), L=2^24; renorm emits x&0xFF while x >= q*(L>>m_log2)*256; encode x=(x//q)*M+cum+(x%q); flush = 32-bit final state; x0 seeded L + first-31-low-plane-bits (decoder final state returns them); sizes are measured emitted bits, round-trip verified on samples"
+  },
+  "targets": 16,
+  "total_params": 79822848,
+  "layers": [
+    1
+  ],
+  "m1_sample_ref_bpw": 10.6973,
+  "m1_ref_recomputed_bpw": 10.829603,
+  "m1_ref_reproduced": null,
+  "realized_bpw": {
+    "M1ref": 10.829603,
+    "R1": 10.77048,
+    "R2": 10.786977,
+    "R3": 10.745938,
+    "R4": 10.729273
+  },
+  "delta_vs_m1ref_bpw": {
+    "R1": 0.059123,
+    "R2": 0.042626,
+    "R3": 0.083665,
+    "R4": 0.10033
+  },
+  "decomposition_bpw": {
+    "M1ref": {
+      "bound_bpw": 10.639306,
+      "quant_bpw": 0.027067,
+      "flush_net_bpw": 0.0,
+      "renorm_bpw": 0.055811,
+      "pad_bpw": 0.089218,
+      "tab_bpw": 0.000472,
+      "misc_bpw": 0.017729
+    },
+    "R1": {
+      "bound_bpw": 10.639306,
+      "quant_bpw": 0.027067,
+      "flush_net_bpw": 0.007812,
+      "renorm_bpw": 0.011806,
+      "pad_bpw": 0.066288,
+      "tab_bpw": 0.000472,
+      "misc_bpw": 0.017729
+    },
+    "R2": {
+      "bound_bpw": 10.618606,
+      "quant_bpw": 0.063684,
+      "flush_net_bpw": 0.007812,
+      "renorm_bpw": 0.012065,
+      "pad_bpw": 0.066169,
+      "tab_bpw": 0.000912,
+      "misc_bpw": 0.017729
+    },
+    "R3": {
+      "bound_bpw": 10.639306,
+      "quant_bpw": 0.004422,
+      "flush_net_bpw": 0.007812,
+      "renorm_bpw": 0.011817,
+      "pad_bpw": 0.064336,
+      "tab_bpw": 0.000517,
+      "misc_bpw": 0.017729
+    },
+    "R4": {
+      "bound_bpw": 10.618606,
+      "quant_bpw": 0.008512,
+      "flush_net_bpw": 0.007812,
+      "renorm_bpw": 0.012058,
+      "pad_bpw": 0.063559,
+      "tab_bpw": 0.000996,
+      "misc_bpw": 0.017729
+    }
+  },
+  "renorm_b_per_sym": {
+    "M1ref": 0.055811,
+    "R1": 0.011806,
+    "R2": 0.012065,
+    "R3": 0.011817,
+    "R4": 0.012058
+  },
+  "bit_renorm_redundancy_history_b_per_sym": {
+    "A512": 0.051,
+    "A1024": 0.063,
+    "A2048": 0.098
+  },
+  "per_layer": {
+    "L1": {
+      "tensors": 16,
+      "params": 79822848,
+      "M1ref": 10.829603,
+      "R1": 10.77048,
+      "R2": 10.786977,
+      "R3": 10.745938,
+      "R4": 10.729273,
+      "best": "R4",
+      "best_delta": 0.10033
+    }
+  },
+  "roundtrip": {
+    "blocks": {
+      "M1ref": 64,
+      "R1": 64,
+      "R2": 64,
+      "R3": 64,
+      "R4": 64
+    },
+    "all_ok": true
+  },
+  "gate": {
+    "gate_bpw": 0.02,
+    "best_variant": "R4",
+    "best_delta_bpw": 0.10033,
+    "delta_meets_gate": true,
+    "full_sample": false,
+    "synthetic": false,
+    "valid": false,
+    "fires": false,
+    "evidential": false
+  },
+  "sym11": {
+    "best_sym10": "R3",
+    "best_sym11": "R4",
+    "best_sym11_minus_best_sym10_bpw": -0.016665,
+    "bit2_net_bpw": 0.016665,
+    "net_positive": true,
+    "matched_precision_pairs_bpw": {
+      "12bit_R2_minus_R1": 0.016496,
+      "14bit_R4_minus_R3": -0.016665
+    },
+    "r2_minus_r1_bpw": 0.016496,
+    "r4_minus_r3_bpw": -0.016665,
+    "entropy_headroom_bpw": 0.020699,
+    "t2_headroom_ref_bpw": 0.0171,
+    "verdict": "SYM11 under the best coder (R4 vs R3, both at 14/14-bit tables): bit-2 is NET-POSITIVE (R4 - R3 = -0.0167 b/w realized; matched-precision pairs {'12bit_R2_minus_R1': 0.016496, '14bit_R4_minus_R3': -0.016665}; entropy headroom bound(sym10)-bound(sym11) = +0.0207, T2 reference ~0.0171)"
+  },
+  "projected_whole_model_bpw": 10.593333,
+  "verdict": "R-GATE does NOT fire: best variant R4 realizes +0.1003 b/w vs the M1 reference (gate >= 0.02, all side costs charged; round-trip proven on sampled blocks of every tensor, all other blocks accounted via the bit-identical emitted-bit simulation) [partial sample -- delta indicative only, gate held]",
+  "accounting_note": "all cells use the frozen v2 mechanics exactly (W=128 bit-stride, DP T=4 tier budgets over measured emitted bits, P100 no-escape, per-block class flags, u32 rank anchors per 512 blocks, 96-bit class descriptors, 32-byte header, pad8 record align); table charged pad8(A + nnz*m_log2); low plane pad8(k_low*n - credit*nb); wide variants charge the 32-bit flush in every block's measured bits and credit exactly 31 seed-borne mantissa bits against the plane; M1ref is mp's M1 machinery verbatim (cell asserted identical); every variant round-trip proven per tensor on sampled blocks with the flush-borne plane fields destroyed before the rebuild and SHA-256-exact BF16 reconstruction over the sampled spans"
+}
