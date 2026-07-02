@@ -225,3 +225,185 @@ Artifacts: `tests/artifacts/blockcodes_results.jsonl` (256 rows, per-tensor exac
 accounting, stamp `5d7b9e9c4613`), `tests/artifacts/blockcodes_summary.json` (this
 table, gates, projections). Baseline reference:
 `../0009-fusible-exponent-codebook/tests/artifacts/stz/stz_tensor_stats.jsonl`.
+
+---
+
+# v2 — overhead attack (levers L1–L4): RESULTS
+
+**Date:** 2026-07-01 · **Scope:** same canonical layer-27 set (shard 7, 256 tensors,
+1,277,165,568 params) · **Accounting stamp:** `3c5e38d4c9a9` · **Wall time:** ~7 min this
+session (full grid, single invocation) + ~2 min prior invocation (L4 gate phase, resumed
+by design) · **Tool:** `tools/probe_block_codes_v2.py` (reuses v1's skeptic-verified
+loader/accounting infrastructure).
+
+**Verdict (pre-registered rule applied): DIRECTION A FIRES at tile granularity.** The
+best fusible config — **W128_T4_P100_L11L31L40 = 10.7004 b/w** (fixed *bit*-stride
+W=128 blocks, 4 DP-optimal tier budgets + 3-bit class flag, top budget = max block size,
+L3 flush-carries-mantissa-payload, L4 off by gate) — beats realized stz 10.8822 by
+**+0.1818 b/w** (v2-G1 PASS) and also clears the floor+0.15 bar 10.7083 (v2-G2 PASS,
+margin **0.0079** — real but thin, and selected on the same set it is scored on). v1's
+verdict line ("if a competent v2 with all four levers cannot get under 10.88, the
+tile-granular order-0 point is falsified") resolves the other way: the tile-granular
+order-0 point is **confirmed**, not falsified. Same evidentiary standard as v1: all side
+costs charged, measured emitted bits, per-cell reconciliation (sym-plane components must
+sum exactly to the charged total, mismatch aborts), round-trip 6,144 blocks × all coder
+variants with emitted bits == accounted bits and SHA-256-exact BF16, stz parity max
+|Δbpw| = 0.000000 (reference reproduced at 10.882182).
+
+**Fusible contract (unchanged caveat from v1 §4):** every 128-weight block is
+independently decodable at bit offset `base + block_index * slot_bits(class)`, class from
+a fixed-stride 3-bit flag plane + u32 rank anchor per class per 512 blocks (O(1) address,
+≤512-flag popcount); decode work inside a block is still O(W)=128 sequential rANS steps —
+a register-tile kernel contract, not 0009's O(1)-per-weight contract. Under L3 the first
+two weights of a block finalize only after the full block decode (the mantissa payload is
+the decoder's terminal state).
+
+## Overhead decomposition at the best fusible config (vs v1's W128_P99)
+
+```
+                              v1 W128_P99   v2 W128_T4_P100_L11L31L40
+floor (H(sym)+7)                  10.5583      10.5583
++ 12-bit table quant               0.0076       0.0076
++ flush (12b/block)                0.0938*      0.0938
+− mantissa credit (L3)                 —       −0.0938
++ coder excess (renorm)            0.0390*      0.0439
++ pad slack (tiers vs pct+byte)    0.3027       0.0727
++ escapes                         ~0.0250       0.0000   (esc_frac = 0)
++ tier flag plane                      —        0.0156
++ rank anchors + class dirs        0.0086†      0.0021
++ tables / align / header          0.0002       0.0004
+= total                           11.0349      10.7004
+overhead above floor+quant         0.4690       0.1345
+  vs beat-stz budget < 0.316         OVER        UNDER
+  vs G2 budget < 0.142               OVER        UNDER
+```
+
+\* v1 reported flush+renorm jointly as coder excess 0.1328; † v1's side tax line.
+The v2 attack cut per-block overhead **0.469 → 0.1345 b/w** — a 71% reduction, all of it
+mechanics, none of it new entropy.
+
+## Which levers carried it (marginals at the best cell, each = best-with − best-without)
+
+| Lever | Marginal (b/w) | Note |
+|---|---|---|
+| **L2 multi-tier budgets (T=4, DP-optimal)** | **0.2379** | The big lever — larger than v1's ~0.15 estimate. With 4 tiers the optimal top percentile is P100 everywhere and the escape class empties entirely (esc_frac = 0): tiers subsume both percentile slack *and* escapes. Best-without: W128_T1_P99_L11L31L40 = 10.9384. |
+| **L3 flush carries mantissa payload** | 0.0889 | Seeds the rANS state with the first 12 mantissa bits; the 12-bit flush (0.09375) is exactly refunded by the mantissa-plane credit (0.09375) — near the full 12/W theoretical max. True net cost ~0.005 b/w extra renorm excess from the larger seeded state. |
+| **L1 bit-granular fixed stride** | 0.0346 | Kills byte-ceil on slots/flags; inside v1's predicted 0.03–0.05 range. |
+| **L4 column-conditioned tables** | — (dropped by gate) | Pre-registered gate: re-measured H(sym\|column-group) directly on the 256 layer-27 tensors *before* any grid row. H(sym) = 3.5583; full per-column ceiling H(sym\|col) = 3.5365 (gain 0.0218 b/w); the block column-group conditioning the L4 coder would actually use: W64 gain 0.000535, W128 0.000334, W256 0.000273 b/w. Best 0.0005 « 0.05 threshold → **dropped as pre-registered**. The motivating H(exp\|col) = 2.486 was an early-layer property (0014's layer-identity finding confirmed); at layer 27 column-conditional sym structure is essentially absent. Immaterial to the verdict: the win margin (0.1818) dwarfs even the 0.0218 full-column ceiling. |
+
+Sum of marginals ≈ 0.36 ≈ the 11.06→10.70 movement from v1's nearest anchor; the win is
+entirely overhead mechanics (L1+L2+L3), zero new entropy (L4 dead at this layer).
+
+## Grid (numel-weighted, all taxes charged, measured coder bits; best T,P per lever combo)
+
+```
+config (best T,P per combo)         bpw     save     ovhd   flush     xs    pad    esc   flag   rank    tab    mcr    P
+----------------------------------------------------------------------------------------------------------------------
+ W64_T4_L10L30L40   10.9295  -0.0473  0.3636  0.1875  0.0340  0.1066  0.0000  0.0312  0.0040  0.0002  0.0000  100
+ W64_T4_L10L31L40   10.8141  +0.0681  0.2482  0.1875  0.0435  0.1067  0.0000  0.0312  0.0040  0.0002  0.1250  100
+ W64_T4_L11L30L40   10.9236  -0.0414  0.3577  0.1875  0.0340  0.1007  0.0000  0.0312  0.0040  0.0002  0.0000  100
+ W64_T4_L11L31L40   10.7457  +0.1365  0.1798  0.1875  0.0435  0.1008  0.0000  0.0312  0.0040  0.0002  0.1875  100
+W128_T4_L10L30L40   10.7929  +0.0893  0.2270  0.0938  0.0391  0.0762  0.0000  0.0156  0.0021  0.0002  0.0000  100
+W128_T4_L10L31L40   10.7351  +0.1471  0.1692  0.0938  0.0439  0.0761  0.0000  0.0156  0.0021  0.0002  0.0625  100
+W128_T4_L11L30L40   10.7894  +0.0928  0.2235  0.0938  0.0391  0.0727  0.0000  0.0156  0.0021  0.0002  0.0000  100
+W128_T4_L11L31L40   10.7004  +0.1818  0.1345  0.0938  0.0439  0.0727  0.0000  0.0156  0.0021  0.0002  0.0938  100  <- BEST FUSIBLE
+W256_T4_L10L30L40   10.7181  +0.1641  0.1522  0.0469  0.0416  0.0545  0.0000  0.0078  0.0011  0.0002  0.0000  100  (non-fusible bracket)
+W256_T4_L10L31L40   10.6893  +0.1929  0.1234  0.0469  0.0440  0.0546  0.0000  0.0078  0.0011  0.0002  0.0312  100
+W256_T4_L11L30L40   10.7167  +0.1655  0.1508  0.0469  0.0416  0.0531  0.0000  0.0078  0.0011  0.0002  0.0000  100
+W256_T4_L11L31L40   10.6722  +0.2100  0.1063  0.0469  0.0440  0.0531  0.0000  0.0078  0.0011  0.0002  0.0469  100  <- best any-W
+```
+
+References: stz 10.8822 (parity exact); floor 10.5583; G2 bar 10.7083; quant delta
++0.0076. `save` = vs stz; `ovhd` = above floor+quant; `mcr` = mantissa credit.
+
+**Gates:** v2-G1 (beat 10.8822 at W ≤ 128) **PASS**, Δ = +0.1818. v2-G2 (≤ floor+0.15)
+**PASS**, Δ over floor = +0.1421 (margin to bar 0.0079 — thin). Round-trip, parity,
+reconciliation: PASS.
+
+## Does the storage-leaning result change?
+
+**It stands, and improves slightly — but the storage/fusible split has nearly
+collapsed.** v2's best any-W cell (W256_T4_P100_L11L31L40 = 10.6722) edges v1's
+W16384_P100 (10.6977) at 64× finer granularity, and the *fusible* W=128 form (10.7004)
+now sits within 0.028 b/w of the best storage form. v1's conclusion "the order-0 storage
+side of this set is effectively closed" still holds — the remaining 0.1063–0.1345 above
+floor is flush/renorm/tier-slack mechanics plus the 0.0076 quantization delta, not model
+structure.
+
+## Cross-layer transfer: now REQUIRED before any whole-model claim
+
+Yes — the v2 win *raises* the need v1 only noted. Three reasons: (i) scope is still layer
+27 / shard 7 only, and the projected whole-model number at the best fusible config
+(**10.7285 b/w**) is selection-optimistic — tier budgets, best P, and the winning cell
+were all selected on the same 256 tensors they are scored on; (ii) the G2 margin (0.0079)
+is smaller than plausible cross-layer drift; (iii) 0014 proved layer identity is the
+dominant hidden variable, and the L4 gate collapse shows layer-27 statistics are *not*
+representative of early layers (where H(exp|col) = 2.486 was measured — L4 might even
+re-enter early-layer). A cheap transfer check — freeze the v2 format, run per-tensor
+DP-tier selection on 2–3 other layers (early/mid/late), score with selection held out —
+gates any whole-model headline.
+
+## Anomalies (recorded)
+
+1. **v1 anchor not exactly reproduced:** v2's nearest-v1 cell W128_T1_P99_L10L30L40 =
+   11.0561 vs v1's 11.0349 (+0.021). Explained (and printed by the script): v2 escape
+   slots are a separate fixed-stride region (not v1's slot+overflow), and v2 escapes
+   rb > bit-granular percentile while v1 escaped rb > 8·ceil(pct/8), so v1 kept blocks in
+   the percentile-to-byte-ceil gap. Not a parity failure — stz parity is exact (0.000000).
+2. **Tiers subsume escapes:** with T=4 DP tiers the optimal top percentile is P100 in
+   every winning cell and the escape class is completely empty. L2's measured marginal
+   (0.238) exceeded v1's ~0.15 estimate because it eats the escape machinery too.
+3. **Flush is storage-free under L3:** flush 0.09375 and mantissa credit 0.09375 cancel
+   exactly at the best config; the real net cost is ~0.005 b/w of extra renorm excess.
+4. **G2 pass is thin** (0.0079 b/w) and same-set-selected — see transfer check above.
+5. **The L4 gate collapse is itself a finding:** layer-27 experts have essentially no
+   column-conditional sym structure (block-group gain 0.0005, full-column ceiling
+   0.0218). The only *new-entropy* lever in the v2 plan is gone at this layer; everything
+   won here came from overhead mechanics. Further gains at W ≤ 128 on this set must come
+   from below-order-0 structure not yet identified.
+
+## Compounding order
+
+**Changes — the fusible tile point is now the frontier, and the next probe order is:**
+(i) **cross-layer transfer check first** (cheap, gates the whole-model claim, and doubles
+as an early-layer L4 re-test since that is where the column structure lives); (ii) then
+apply peel-until-random to the **v2 emitted representation itself** — tier-slot streams,
+flag plane, renorm bit-stream — since with L4 dead the residual 0.1345 at W=128 is
+mechanics-bound and any real further gain needs below-order-0 structure (block-to-block
+correlation, within-block symbol order, mantissa-plane structure) rather than more
+overhead shaving; (iii) the register-tile decode kernel remains the runtime-credibility
+step for the O(W) contract (unwritten, unbenchmarked — 0009's 24% speedup still does not
+transfer automatically). The storage-side W256 result (10.6722) stays a noted option, not
+the next object of study.
+
+## Reproduction
+
+```
+# smoke (synthetic snapshot, seconds)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_block_codes_v2.py --synthetic
+
+# L4 gate phase only (runs first regardless; recorded either way)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_block_codes_v2.py --gate-only
+
+# real run (resumable; each invocation self-limits to ~7 min and checkpoints)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_block_codes_v2.py
+
+# summary table + gates + summary JSON (auto-runs when complete)
+uv run python research/candidates/0015-block-granular-tile-codes/tools/probe_block_codes_v2.py --summary
+```
+
+Artifacts: `tests/artifacts/blockcodes_v2_results.jsonl` (per-tensor exact accounting,
+stamp `3c5e38d4c9a9`), `tests/artifacts/blockcodes_v2_gate.jsonl` +
+`blockcodes_v2_gate_summary.json` (L4 gate measurements),
+`tests/artifacts/blockcodes_v2_summary.json` (all 144 cells, marginals, gates,
+projection). Baseline reference unchanged:
+`../0009-fusible-exponent-codebook/tests/artifacts/stz/stz_tensor_stats.jsonl`.
+
+### Skeptic corrections to the v2 section (2026-07-02, reporting-level only)
+
+- `overhead_decomposition.align_and_header` is 0.000052 b/w, not 0.000225 (with
+  the correct value the components sum exactly to 10.700447).
+- The winning config realizes a **2-bit** class flag plane (cls=4, escape class
+  empty at P100); "3-bit" applies only to 5-class escape cells at P<100. The
+  charged 0.015625 b/w = 2/128 was already the correct 2-bit accounting.
+Neither slip affects any total, gate, or the verdict.

@@ -1,0 +1,31 @@
+{
+  "tensors": 16,
+  "total_params": 49152,
+  "H_sym_w": 3.539822,
+  "H_col_w": 3.287563,
+  "gain_col_w": 0.252258,
+  "per_w": {
+    "W64": {
+      "H_grp_w": 3.533556,
+      "gain_w": 0.006266,
+      "G_mean": 2.0
+    },
+    "W128": {
+      "H_grp_w": 3.533286,
+      "gain_w": 0.006535,
+      "G_mean": 2.0
+    },
+    "W256": {
+      "H_grp_w": 3.533054,
+      "gain_w": 0.006767,
+      "G_mean": 2.0
+    }
+  },
+  "best_w": "W256",
+  "best_gain_bpw": 0.006767,
+  "threshold_bpw": 0.05,
+  "gate_pass": false,
+  "l4_active": true,
+  "l4_forced": true,
+  "note": "synthetic smoke: L4 kept in the grid to exercise the machinery even though the gate gain is below threshold"
+}

@@ -1,0 +1,155 @@
+{
+  "mode": "synthetic",
+  "scope": "synthetic smoke -- no evidential weight",
+  "baseline": "realized stz (plan_regroup, parity-gated exact per tensor)",
+  "gate_model_bpw": 0.01,
+  "layers": {
+    "1": {
+      "tensors": 16,
+      "params": 49152,
+      "baseline_bpw": 11.379395,
+      "levers": {
+        "v1": {
+          "envelope_bpw": 11.379395,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v2": {
+          "envelope_bpw": 11.379395,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v3": {
+          "envelope_bpw": 11.319661,
+          "envelope_gain_bpw": 0.059733,
+          "adopt_tensors": 15,
+          "adopt_frac": 0.9375,
+          "adopt_numel_frac": 0.9375
+        }
+      },
+      "variants": {
+        "v1_g1": {
+          "bpw": 11.44401,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v1_g8": {
+          "bpw": 11.441732,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v1_g64": {
+          "bpw": 11.423991,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v2_g1": {
+          "bpw": 11.658854,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v2_g16": {
+          "bpw": 11.414551,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v2_g64": {
+          "bpw": 11.40804,
+          "envelope_gain_bpw": 0.0,
+          "adopt_tensors": 0,
+          "adopt_frac": 0.0,
+          "adopt_numel_frac": 0.0
+        },
+        "v3": {
+          "bpw": 11.319661,
+          "envelope_gain_bpw": 0.059733,
+          "adopt_tensors": 15,
+          "adopt_frac": 0.9375,
+          "adopt_numel_frac": 0.9375
+        }
+      },
+      "joint": {
+        "envelope_bpw": 11.319661,
+        "envelope_gain_bpw": 0.059733
+      }
+    }
+  },
+  "projection": {
+    "v1": {
+      "measured_layers": [
+        1
+      ],
+      "measured_gains_bpw": [
+        0.0
+      ],
+      "model_wide_gain_bpw": 0.0,
+      "passes_bar": false
+    },
+    "v2": {
+      "measured_layers": [
+        1
+      ],
+      "measured_gains_bpw": [
+        0.0
+      ],
+      "model_wide_gain_bpw": 0.0,
+      "passes_bar": false
+    },
+    "v3": {
+      "measured_layers": [
+        1
+      ],
+      "measured_gains_bpw": [
+        0.059733
+      ],
+      "model_wide_gain_bpw": 0.02196,
+      "passes_bar": true
+    },
+    "joint": {
+      "measured_layers": [
+        1
+      ],
+      "measured_gains_bpw": [
+        0.059733
+      ],
+      "model_wide_gain_bpw": 0.02196,
+      "passes_bar": true
+    }
+  },
+  "roundtrip_evidence": {
+    "v1": {
+      "roundtrips": 1,
+      "adopted_roundtrip": false,
+      "note": "priced but no ADOPTED configuration decoded yet -- not full evidence"
+    },
+    "v2": {
+      "roundtrips": 1,
+      "adopted_roundtrip": false,
+      "note": "priced but no ADOPTED configuration decoded yet -- not full evidence"
+    },
+    "v3": {
+      "roundtrips": 1,
+      "adopted_roundtrip": true,
+      "note": "OK"
+    }
+  },
+  "notes": [
+    "adoption-aware envelope: all lever side costs are per-tensor, so the per-tensor min with full side-cost charging is the achievable total",
+    "joint envelope = per-tensor min over single-lever options; lever composition (e.g. V2+V3) is not priced",
+    "V1 priced through the per-group k*n_esc + 9*n_raw conversion rule, never 9 or 16 bits per escape avoided"
+  ]
+}

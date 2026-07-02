@@ -263,6 +263,34 @@ grid point from raw integer bits to <5e-6 — not refuted, high confidence):
   tables *inside* the block coder — 0014 banned per-weight keying, not this) still can't
   get under 10.88 at W≤128, declare the tile-granular order-0 point falsified for good.
 
+## DIRECTION A FIRES — tile-granular block coding beats realized stz (candidate 0015 v2, 2026-07-02)
+
+The v2 overhead attack (same canonical layer-27 set) got fixed-stride W=128 blocks UNDER the
+realized stz baseline. Skeptic verification was maximal: every number re-derived from raw
+bits across all 36,864 cells × 256 rows; a REAL container serialized whose byte size equals
+the accounted bits exactly; an independently written encoder AND decoder; non-adjacent
+blocks (gap 38,975) decoded bit-exact straight from O(1)-computed stride addresses.
+
+- **Best fusible: 10.7004 b/w** (W=128 bit-stride blocks, 4 DP-optimal tier budgets +
+  2-bit class flag plane, mantissa-carrying flush) = **beats stz 10.8822 by +0.1818 b/w**
+  and passes the entropy-relative bar (floor+0.15 = 10.7083) by 0.0079. Best any-W:
+  W256 = 10.6722. Overhead: 0.469 (v1) → **0.1345 b/w**.
+- **Lever anatomy**: multi-tier DP budgets were the big lever (+0.238 — tiers subsume BOTH
+  percentile padding AND escapes; the escape class empties at P100), mantissa-carrying
+  flush refunds the 12-bit flush exactly (+0.089 net), bit-granular stride +0.035.
+- **The L4 gate is its own finding**: layer-27 column-conditional structure is essentially
+  ABSENT (block-group gain 0.0005 b/w; full-column ceiling 0.0218) — third independent
+  confirmation of the layer-identity result. Everything won here is coder mechanics;
+  further W≤128 gains need below-order-0 structure that is not column identity.
+- **Caveats (both pre-registered in RESULTS.md)**: G2 margin is thin (0.0079 b/w) and the
+  winning cell was selected on the set it is scored on; scope is layer 27 only. The
+  whole-model projection (~10.7285 b/w ≈ 32.9% vs stz's 31.89%) is selection-optimistic.
+  **Required gate before any whole-model claim: frozen-format cross-layer transfer check**
+  (also re-tests L4 on early layers, where column structure actually lives).
+- Runtime contract caveat unchanged: O(1) block address but O(W)=128 sequential decode per
+  block — a register-tile kernel prototype is the remaining runtime-credibility step
+  (parked: kernel work is out of current scope).
+
 ## Purged tracks — do not re-open (2026-07-01)
 
 Lossy/quantization/QAT/train-time tracks (candidates 0005–0008, 0011, 0013,

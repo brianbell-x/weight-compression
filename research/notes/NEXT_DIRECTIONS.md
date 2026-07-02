@@ -55,23 +55,18 @@ against. Consequences:
 
 ## Tier 1 — new structure, strong on both verdicts
 
-### A. Block-granular entropy coding with O(1) *tile* access — **first probe DONE 2026-07-01 (candidate 0015): PARTIAL, v2 running**
-Measured on the canonical layer-27 set (skeptic-verified): the falsifier did NOT
-trigger — per-block tails are thin (p99/p50 = 1.08 at W=128) — but the
-tile-fusible grid (W≤128) loses to stz at this operating point (best 11.0349 vs
-10.8822) purely on fixed per-block coder overhead (flush 0.094 + renorm 0.039 +
-byte-ceil pad slack 0.303 ≈ 0.47 b/w vs a 0.316 budget). Storage-leaning sizes
-BEAT stz: W16384_P100 = 10.6977, superblock-rANS format (a) = 10.7079 — the
-order-0 storage question on this set is closed (floor 10.5583; residual is coder
-mechanics). **v2 overhead-attack in flight**: bit-granular stride, two-tier
-budgets (1-bit class flag), shared flush across block groups, plus
-column-conditioned tables inside the block coder (the one named below-order-0
-source; 0014 banned per-weight keying, not this — but re-measure the column
-signal on layer 27 first: the vetting numbers were early-layer). Pre-registered
-kill rule: if v2 can't get under 10.88 at W≤128, the tile-granular order-0 point
-is falsified for good. Runtime caveat for any claim: W≤128 is a different kernel
-contract than 0009 (O(W) sequential decode per block) — needs its own benchmark
-before "runtime-real".
+### A. Block-granular entropy coding with O(1) *tile* access — **FIRED 2026-07-02 (candidate 0015 v2), cross-layer gate running**
+v2 (bit-granular stride + 4 DP tier budgets + mantissa-carrying flush; L4 column
+tables dropped by pre-registered gate — layer-27 column signal is 0.0005 b/w):
+**10.7004 b/w fusible at W=128, +0.1818 over realized stz**, floor+0.15 passed by
+0.0079. Skeptic-verified to the physical container level (independent
+encoder+decoder, O(1) stride-address decode of non-adjacent blocks, byte size ==
+accounted bits). Best any-W: W256 = 10.6722. Whole-model projection ~10.7285
+(≈32.9%) is selection-optimistic — **frozen-format cross-layer transfer check is
+the required gate before any whole-model claim** (running; also re-tests L4 on
+early layers where column structure lives). Then: compound on the v2 emission
+(peel tier-slot streams / flag plane / renorm stream), and eventually a
+register-tile decode kernel for runtime credibility (parked, kernel scope).
 
 ### B. Lossless compression of low-precision-native checkpoints  [strong/strong]
 The frontier ships FP8/FP4, not BF16: DeepSeek-V3/R1 are native FP8 (~688 GB, no
