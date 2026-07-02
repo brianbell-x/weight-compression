@@ -1,9 +1,13 @@
 # Candidate 0015 — Block-granular tile codes (NEXT_DIRECTIONS Direction A)
 
-**Status:** PROPOSED — probe authored, adversarially reviewed, coder-measured
-rewrite landed (fatal ideal-vs-realizable conflation fixed), synthetic smoke
-re-passed, first real tensor verified (2026-07-01). Full real layer-27 run not
-yet complete.
+**Status:** MEASURED, PARTIAL — full real layer-27 run complete (2026-07-01,
+256/256 tensors, all gates run). Pre-registered tile-fusible gates G1/G2 FAIL
+(best W128_P99 = 11.0349 b/w, −0.153 vs stz), but the falsifier (heavy tails)
+did NOT trigger and the storage-leaning brackets beat stz (best W16384_P100 =
+10.6977 b/w, floor + 0.139; format (a) 10.7079). Blocker at W ≤ 128 is fixed
+per-block coder overhead, not tail mass. See `RESULTS.md` for the verdict,
+full grid, overhead arithmetic, and the v2 variations this run does not
+falsify.
 
 **Constraint:** pure lossless, bit-exact reconstruction only. Exact bit
 accounting — every side structure (tables, bitmaps, indexes, headers, padding,

@@ -1,0 +1,462 @@
+{
+  "mode": "real",
+  "scope": "layer 27 only; cross-layer transfer unvalidated",
+  "acct_stamp": "5d7b9e9c4613",
+  "acct": {
+    "schema": 2,
+    "M_LOG2": 12,
+    "FLUSH_BITS": 12,
+    "WS": [
+      32,
+      64,
+      128,
+      256,
+      512,
+      1024,
+      4096,
+      16384
+    ],
+    "PS": [
+      90,
+      95,
+      97,
+      99,
+      100
+    ],
+    "SB": 4096,
+    "LANES": 32,
+    "L2_BITS": 32,
+    "L1_GROUP": 64,
+    "L1_BITS": 64,
+    "RANK_GROUP": 512,
+    "RANK_BITS": 32,
+    "HEAD_BITS": 256,
+    "HIST_BIN": 0.0625,
+    "HIST_BINS": 256,
+    "FUSIBLE_W_MAX": 128,
+    "CODER": "per-block single-lane bit-renorm rANS; M=4096 12-bit quantized table (stores q-1); state in [M,2M); bit-by-bit renorm (emit x&1 while x>=2q); 12-bit flush = x_final - M; sizes are measured emitted bits, round-trip verified on samples"
+  },
+  "targets": 256,
+  "total_params": 1277165568,
+  "parity_max_abs_diff": 0.0,
+  "baseline_recomputed_bpw": 10.882179,
+  "baseline_ref_weighted_bpw": 10.882182,
+  "stz_target_bpw": 10.8822,
+  "whole_model_baseline_bpw": 10.8975,
+  "expert_frac": 0.93,
+  "floor_bpw_weighted": 10.558344,
+  "quant_delta_bpw_weighted": 0.007563,
+  "coder": "per-block single-lane bit-renorm rANS; M=4096 12-bit quantized table (stores q-1); state in [M,2M); bit-by-bit renorm (emit x&1 while x>=2q); 12-bit flush = x_final - M; sizes are measured emitted bits, round-trip verified on samples",
+  "coder_excess_vs_qentropy_bpw": {
+    "W32": 0.398719,
+    "W64": 0.221467,
+    "W128": 0.13283,
+    "W256": 0.088517,
+    "W512": 0.06636,
+    "W1024": 0.055283,
+    "W4096": 0.046974,
+    "W16384": 0.044898
+  },
+  "roundtrip": {
+    "blocks": 10493,
+    "lanes": 512,
+    "all_ok": true
+  },
+  "ideal_tails_bw": {
+    "W32": {
+      "p50": 3.5409,
+      "p90": 3.8457,
+      "p95": 3.9429,
+      "p97": 4.0086,
+      "p99": 4.1389,
+      "max": 5.1003
+    },
+    "W64": {
+      "p50": 3.5491,
+      "p90": 3.761,
+      "p95": 3.8268,
+      "p97": 3.8711,
+      "p99": 3.9579,
+      "max": 4.6335
+    },
+    "W128": {
+      "p50": 3.5531,
+      "p90": 3.7018,
+      "p95": 3.7477,
+      "p97": 3.7785,
+      "p99": 3.8395,
+      "max": 4.3676
+    },
+    "W256": {
+      "p50": 3.5548,
+      "p90": 3.6607,
+      "p95": 3.6936,
+      "p97": 3.7161,
+      "p99": 3.7627,
+      "max": 4.2116
+    },
+    "W512": {
+      "p50": 3.5556,
+      "p90": 3.6318,
+      "p95": 3.6564,
+      "p97": 3.674,
+      "p99": 3.7132,
+      "max": 4.1167
+    },
+    "W1024": {
+      "p50": 3.5557,
+      "p90": 3.6114,
+      "p95": 3.6306,
+      "p97": 3.6455,
+      "p99": 3.6813,
+      "max": 4.0545
+    },
+    "W4096": {
+      "p50": 3.5562,
+      "p90": 3.5872,
+      "p95": 3.6,
+      "p97": 3.6099,
+      "p99": 3.632,
+      "max": 3.8085
+    },
+    "W16384": {
+      "p50": 3.5572,
+      "p90": 3.5742,
+      "p95": 3.5796,
+      "p97": 3.5839,
+      "p99": 3.5939,
+      "max": 3.6416
+    }
+  },
+  "format_b": {
+    "W32_P90": {
+      "bpw": 11.69378,
+      "esc_frac": 0.085368,
+      "pad_bpw": 0.302495,
+      "tax_bpw": 0.03348
+    },
+    "W32_P95": {
+      "bpw": 11.58507,
+      "esc_frac": 0.011464,
+      "pad_bpw": 0.536959,
+      "tax_bpw": 0.03348
+    },
+    "W32_P97": {
+      "bpw": 11.58507,
+      "esc_frac": 0.011464,
+      "pad_bpw": 0.536959,
+      "tax_bpw": 0.03348
+    },
+    "W32_P99": {
+      "bpw": 11.7476,
+      "esc_frac": 0.002709,
+      "pad_bpw": 0.73803,
+      "tax_bpw": 0.03348
+    },
+    "W32_P100": {
+      "bpw": 12.57059,
+      "esc_frac": 0.0,
+      "pad_bpw": 1.572484,
+      "tax_bpw": 0.03348
+    },
+    "W64_P90": {
+      "bpw": 11.409247,
+      "esc_frac": 0.078093,
+      "pad_bpw": 0.221889,
+      "tax_bpw": 0.01688
+    },
+    "W64_P95": {
+      "bpw": 11.229774,
+      "esc_frac": 0.018029,
+      "pad_bpw": 0.339272,
+      "tax_bpw": 0.01688
+    },
+    "W64_P97": {
+      "bpw": 11.229826,
+      "esc_frac": 0.017941,
+      "pad_bpw": 0.339751,
+      "tax_bpw": 0.01688
+    },
+    "W64_P99": {
+      "bpw": 11.281813,
+      "esc_frac": 0.003144,
+      "pad_bpw": 0.463067,
+      "tax_bpw": 0.01688
+    },
+    "W64_P100": {
+      "bpw": 11.897251,
+      "esc_frac": 0.0,
+      "pad_bpw": 1.092997,
+      "tax_bpw": 0.01688
+    },
+    "W128_P90": {
+      "bpw": 11.159927,
+      "esc_frac": 0.053921,
+      "pad_bpw": 0.179656,
+      "tax_bpw": 0.00858
+    },
+    "W128_P95": {
+      "bpw": 11.073276,
+      "esc_frac": 0.029356,
+      "pad_bpw": 0.218154,
+      "tax_bpw": 0.00858
+    },
+    "W128_P97": {
+      "bpw": 11.035777,
+      "esc_frac": 0.017527,
+      "pad_bpw": 0.240903,
+      "tax_bpw": 0.00858
+    },
+    "W128_P99": {
+      "bpw": 11.034925,
+      "esc_frac": 0.005074,
+      "pad_bpw": 0.302719,
+      "tax_bpw": 0.00858
+    },
+    "W128_P100": {
+      "bpw": 11.517125,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.809808,
+      "tax_bpw": 0.00858
+    },
+    "W256_P90": {
+      "bpw": 11.155114,
+      "esc_frac": 0.073018,
+      "pad_bpw": 0.117372,
+      "tax_bpw": 0.00443
+    },
+    "W256_P95": {
+      "bpw": 10.987841,
+      "esc_frac": 0.035307,
+      "pad_bpw": 0.146914,
+      "tax_bpw": 0.00443
+    },
+    "W256_P97": {
+      "bpw": 10.933905,
+      "esc_frac": 0.021207,
+      "pad_bpw": 0.16622,
+      "tax_bpw": 0.00443
+    },
+    "W256_P99": {
+      "bpw": 10.90166,
+      "esc_frac": 0.006913,
+      "pad_bpw": 0.207768,
+      "tax_bpw": 0.00443
+    },
+    "W256_P100": {
+      "bpw": 11.305822,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.646967,
+      "tax_bpw": 0.00443
+    },
+    "W512_P90": {
+      "bpw": 11.143391,
+      "esc_frac": 0.081385,
+      "pad_bpw": 0.081138,
+      "tax_bpw": 0.002355
+    },
+    "W512_P95": {
+      "bpw": 10.9395,
+      "esc_frac": 0.038426,
+      "pad_bpw": 0.103992,
+      "tax_bpw": 0.002355
+    },
+    "W512_P97": {
+      "bpw": 10.874727,
+      "esc_frac": 0.023294,
+      "pad_bpw": 0.118771,
+      "tax_bpw": 0.002355
+    },
+    "W512_P99": {
+      "bpw": 10.825645,
+      "esc_frac": 0.007731,
+      "pad_bpw": 0.151186,
+      "tax_bpw": 0.002355
+    },
+    "W512_P100": {
+      "bpw": 11.182531,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.547909,
+      "tax_bpw": 0.002355
+    },
+    "W1024_P90": {
+      "bpw": 11.136206,
+      "esc_frac": 0.08604,
+      "pad_bpw": 0.058192,
+      "tax_bpw": 0.001315
+    },
+    "W1024_P95": {
+      "bpw": 10.921997,
+      "esc_frac": 0.042633,
+      "pad_bpw": 0.074687,
+      "tax_bpw": 0.001315
+    },
+    "W1024_P97": {
+      "bpw": 10.8429,
+      "esc_frac": 0.025382,
+      "pad_bpw": 0.087008,
+      "tax_bpw": 0.001315
+    },
+    "W1024_P99": {
+      "bpw": 10.78201,
+      "esc_frac": 0.00851,
+      "pad_bpw": 0.11521,
+      "tax_bpw": 0.001315
+    },
+    "W1024_P100": {
+      "bpw": 11.109835,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.487331,
+      "tax_bpw": 0.001315
+    },
+    "W4096_P90": {
+      "bpw": 11.14179,
+      "esc_frac": 0.093147,
+      "pad_bpw": 0.031052,
+      "tax_bpw": 0.000539
+    },
+    "W4096_P95": {
+      "bpw": 10.900045,
+      "esc_frac": 0.046096,
+      "pad_bpw": 0.041163,
+      "tax_bpw": 0.000539
+    },
+    "W4096_P97": {
+      "bpw": 10.810388,
+      "esc_frac": 0.027892,
+      "pad_bpw": 0.048767,
+      "tax_bpw": 0.000539
+    },
+    "W4096_P99": {
+      "bpw": 10.730566,
+      "esc_frac": 0.009336,
+      "pad_bpw": 0.067866,
+      "tax_bpw": 0.000539
+    },
+    "W4096_P100": {
+      "bpw": 10.860127,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.246708,
+      "tax_bpw": 0.000539
+    },
+    "W16384_P90": {
+      "bpw": 11.145343,
+      "esc_frac": 0.095287,
+      "pad_bpw": 0.022222,
+      "tax_bpw": 0.000343
+    },
+    "W16384_P95": {
+      "bpw": 10.892362,
+      "esc_frac": 0.047387,
+      "pad_bpw": 0.026948,
+      "tax_bpw": 0.000343
+    },
+    "W16384_P97": {
+      "bpw": 10.794895,
+      "esc_frac": 0.028586,
+      "pad_bpw": 0.030546,
+      "tax_bpw": 0.000343
+    },
+    "W16384_P99": {
+      "bpw": 10.701246,
+      "esc_frac": 0.009388,
+      "pad_bpw": 0.039952,
+      "tax_bpw": 0.000343
+    },
+    "W16384_P100": {
+      "bpw": 10.697694,
+      "esc_frac": 0.0,
+      "pad_bpw": 0.086547,
+      "tax_bpw": 0.000343
+    }
+  },
+  "format_a": {
+    "bpw": 10.707929,
+    "esc_frac": 0.0,
+    "pad_bpw": 0.000854,
+    "tax_bpw": 0.008343,
+    "lane_flush_bpw": 0.09375
+  },
+  "per_w_best": {
+    "W32": {
+      "key": "W32_P95",
+      "bpw": 11.58507,
+      "g1_pass": false,
+      "fusible": true
+    },
+    "W64": {
+      "key": "W64_P95",
+      "bpw": 11.229774,
+      "g1_pass": false,
+      "fusible": true
+    },
+    "W128": {
+      "key": "W128_P99",
+      "bpw": 11.034925,
+      "g1_pass": false,
+      "fusible": true
+    },
+    "W256": {
+      "key": "W256_P99",
+      "bpw": 10.90166,
+      "g1_pass": false,
+      "fusible": false
+    },
+    "W512": {
+      "key": "W512_P99",
+      "bpw": 10.825645,
+      "g1_pass": true,
+      "fusible": false
+    },
+    "W1024": {
+      "key": "W1024_P99",
+      "bpw": 10.78201,
+      "g1_pass": true,
+      "fusible": false
+    },
+    "W4096": {
+      "key": "W4096_P99",
+      "bpw": 10.730566,
+      "g1_pass": true,
+      "fusible": false
+    },
+    "W16384": {
+      "key": "W16384_P100",
+      "bpw": 10.697694,
+      "g1_pass": true,
+      "fusible": false
+    }
+  },
+  "fusible_w_max": 128,
+  "best": {
+    "fixed_stride_fusible": {
+      "key": "W128_P99",
+      "bpw": 11.034925
+    },
+    "fixed_stride_any_w": {
+      "key": "W16384_P100",
+      "bpw": 10.697694
+    },
+    "storage_leaning_any": {
+      "key": "W16384_P100",
+      "bpw": 10.697694
+    }
+  },
+  "gates": {
+    "G1_vs": 10.8822,
+    "keyed_on": "fixed-stride grid, W<=128",
+    "G1_pass": false,
+    "G1_delta_bpw": -0.152725,
+    "G1_pass_any_format": true,
+    "G1_delta_any_format_bpw": 0.184506,
+    "G2_bar_bpw": 10.708344,
+    "G2_pass": false,
+    "G2_delta_vs_floor_bpw": 0.476581,
+    "G2_pass_any_format": true
+  },
+  "verdict": "positive (storage-leaning only: needs W>128 or superblock format (a) -- not tile-fusible)",
+  "projected_whole_model_prereg_bpw": 11.040346,
+  "projected_whole_model_best_fixed_stride_bpw": 11.039553,
+  "projection_caveat": "pre-registered = W128_P97 chosen before any real run; 'best' is selected on this same layer-27 set (selection-optimistic); cross-layer transfer unvalidated either way",
+  "accounting_note": "per-weight totals include the pad8(7n) mantissa plane; block sizes are MEASURED emitted bits of the named coder (per-block single-lane bit-renorm rANS; M=4096 12-bit quantized table (stores q-1); state in [M,2M); bit-by-bit renorm (emit x&1 while x>=2q); 12-bit flush = x_final - M; sizes are measured emitted bits, round-trip verified on samples), not an entropy bound -- no modeled component remains; format (b) charges kept blocks a full B-byte fixed-stride slot, escaped blocks max(B, ceil(9W/8)) bytes wholesale-raw, pad8(nb) escape bitmap, u32/512-blocks rank directory, pad8(512+nnz*12) quantized-table (12-bit field stores q-1, range 0..4095, so q=4096 fits), 32B header; pad_bits includes BOTH kept-slot slack and escaped-slot slack; format (a) payload = measured lane bits incl. 32x12-bit lane flushes (reported separately as lane_flush_bits, inside the payload); format (a) tax = offset index + table + header only (no double count; reconciliation asserted per tensor)"
+}

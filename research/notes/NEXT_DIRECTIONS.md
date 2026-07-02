@@ -55,23 +55,23 @@ against. Consequences:
 
 ## Tier 1 — new structure, strong on both verdicts
 
-### A. Block-granular entropy coding with O(1) *tile* access  [strong/strong]
-The ~0.7 b/w fusible-vs-storage gap is priced as "the cost of random access" —
-but the matmul reads **tiles, not single weights**, so pay the addressability tax
-per block, not per weight. Two formats: (a) 4096-symbol superblocks, 32
-interleaved rANS lanes, two-level offset index (~0.13 b/w tax), per-tensor static
-tables (the confirmed-winning granularity); (b) 64–128-weight blocks tANS-coded
-and **padded to a fixed byte budget** (fixed stride = random access), wholesale
-block-escape bitmap for overflowers. The 11.2 b/w "fusible ceiling" was only ever
-measured for per-*weight* fixed-width codes; block granularity is the single
-untested point on the project's own map (0012's probe excluded within-block
-sequential decode explicitly). Expected: ~10.65–11.0 b/w = **31.2–33.4% fusible**,
-recovering most of the 4-pt gap. First probe (~1 day, CPU): per-block ideal code
-length histograms (pure numpy) to size the padding overhead FIRST — that is the
-only genuine unknown; then exact ANS accounting, block ∈ {32..16K} × padding
-percentile ∈ {90..99}; success gate is entropy-relative (realized ≤ per-tensor
-order-0 H(sign|exp) + 0.15 b/w). Falsifier: heavy-tailed per-block code lengths
-making padding overhead eat the gain.
+### A. Block-granular entropy coding with O(1) *tile* access — **first probe DONE 2026-07-01 (candidate 0015): PARTIAL, v2 running**
+Measured on the canonical layer-27 set (skeptic-verified): the falsifier did NOT
+trigger — per-block tails are thin (p99/p50 = 1.08 at W=128) — but the
+tile-fusible grid (W≤128) loses to stz at this operating point (best 11.0349 vs
+10.8822) purely on fixed per-block coder overhead (flush 0.094 + renorm 0.039 +
+byte-ceil pad slack 0.303 ≈ 0.47 b/w vs a 0.316 budget). Storage-leaning sizes
+BEAT stz: W16384_P100 = 10.6977, superblock-rANS format (a) = 10.7079 — the
+order-0 storage question on this set is closed (floor 10.5583; residual is coder
+mechanics). **v2 overhead-attack in flight**: bit-granular stride, two-tier
+budgets (1-bit class flag), shared flush across block groups, plus
+column-conditioned tables inside the block coder (the one named below-order-0
+source; 0014 banned per-weight keying, not this — but re-measure the column
+signal on layer 27 first: the vetting numbers were early-layer). Pre-registered
+kill rule: if v2 can't get under 10.88 at W≤128, the tile-granular order-0 point
+is falsified for good. Runtime caveat for any claim: W≤128 is a different kernel
+contract than 0009 (O(W) sequential decode per block) — needs its own benchmark
+before "runtime-real".
 
 ### B. Lossless compression of low-precision-native checkpoints  [strong/strong]
 The frontier ships FP8/FP4, not BF16: DeepSeek-V3/R1 are native FP8 (~688 GB, no

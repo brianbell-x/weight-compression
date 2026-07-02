@@ -232,6 +232,37 @@ weighted numbers from raw per-tensor bits — not refuted, high confidence):
   as extreme escape-mask spatial structure (Fano ~166–178 vs ~1.0 elsewhere); localized,
   not a lever.
 
+## Block-granular coding, first probe — PARTIAL: storage fires, tile point is coder mechanics (candidate 0015, 2026-07-01)
+
+Direction A probed on the canonical shard-7 layer-27 set (256 tensors; parity vs stz exact;
+round-trip gate on 10,493 blocks + 512 rANS lanes SHA-256-exact; skeptic re-derived every
+grid point from raw integer bits to <5e-6 — not refuted, high confidence):
+
+- **The falsifier did NOT trigger: per-block code-length tails are THIN** (numel-weighted
+  p99/p50 = 1.17 at W=32, 1.08 at W=128, → 1.01 at W=16K; worst block ever 5.10 b/w).
+  Padding percentile choice moves results by only ~0.001–0.05 b/w. This was the probe's
+  one genuine unknown and it came back favorable.
+- **Tile-fusible grid (fixed stride, W≤128) FAILS both gates at this operating point**:
+  best W128_P99 = 11.0349 b/w, 0.153 WORSE than stz (10.8822). Killer = fixed per-block
+  overhead, exactly decomposed: coder excess 0.133 (12-bit flush 0.094 + renorm 0.039)
+  + byte-ceil budget slack 0.303 + taxes 0.009 ≈ 0.47 b/w vs a 0.316 budget. A mechanics
+  problem with quantified remedies (bit-granular stride ~0.03–0.05; two-tier budgets
+  0.30→~0.15; shared flush 0.094→~0.01–0.03 → projects 10.76–10.85 = under stz), NOT a
+  structural wall.
+- **Storage-leaning sizes DO beat stz**: W16384_P100 = 10.6977 b/w (−0.185 vs stz) and
+  superblock format (a) (4096-sym, 32 rANS lanes, exact two-level index tax 0.008) =
+  10.7079 — both at/under floor+0.15. **The order-0 storage question on this set is now
+  closed**: floor 10.5583, realized 10.6977, residual is coder mechanics. Further gains,
+  storage OR fusible, must come from below-order-0 structure.
+- Runtime caveat (carry into any claim): even W≤128 is a different kernel contract than
+  0009 (O(1) address, O(W) sequential decode per block); 0009's measured 24% speedup does
+  not transfer automatically.
+- Verdict: **partial — this operating point falsified, direction alive.** Pre-registered
+  v2 bar: combined per-block overhead < 0.316 b/w beats stz; if a competent
+  overhead-attack v2 (bit-stride + two-tier budgets + shared flush + column-conditioned
+  tables *inside* the block coder — 0014 banned per-weight keying, not this) still can't
+  get under 10.88 at W≤128, declare the tile-granular order-0 point falsified for good.
+
 ## Purged tracks — do not re-open (2026-07-01)
 
 Lossy/quantization/QAT/train-time tracks (candidates 0005–0008, 0011, 0013,
