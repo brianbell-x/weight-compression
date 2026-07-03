@@ -10,12 +10,12 @@
 <meta property="og:url" content="https://brianbell-x.github.io/weight-compression/" />
 <meta property="og:title" content="Lossless Model Compression Experiment" />
 <meta property="og:description" content="30% smaller so far, in storage and in VRAM. The weights reconstruct bit-for-bit, so the model computes exactly the same thing." />
-<meta property="og:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703e" />
+<meta property="og:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703f" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Progress card: lossless model compression, 30.03% smaller so far." />
+<meta property="og:image:alt" content="Flow: original Nemotron-3 BF16 weights compressed smaller (Nano 30B -30.03%, Ultra 550B -28.20%) and kept compressed in VRAM, never re-inflated." />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703e" />
+<meta name="twitter:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703f" />
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -217,6 +217,37 @@
 
   /* figure caption */
   #plate-0 .p0-gcap{
+    margin-top:14px;padding-top:8px;border-top:1px solid var(--ink);
+    font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink2);
+  }
+
+  /* ---- flow diagram (Original -> Compressed -> In VRAM) ---- */
+  #plate-0 .p0-flowfig{
+    position:relative;margin:0;border:1px solid var(--ink);background:var(--paper);
+    padding:22px clamp(14px,2.4vw,26px);overflow-x:auto;
+  }
+  #plate-0 .p0-flow{display:block;width:100%;min-width:660px;height:auto}
+  #plate-0 .p0-flow .ttl{font-family:var(--mono);font-weight:500;font-size:15px;letter-spacing:.12em;fill:var(--ink2)}
+  #plate-0 .p0-flow .big{font-family:var(--black);letter-spacing:-.03em}
+  #plate-0 .p0-flow .mn{font-family:var(--mono);font-weight:700}
+  #plate-0 .p0-flow .sub{font-family:var(--mono);font-weight:500;fill:var(--ink2)}
+
+  /* reveal choreography — armed hides, go sweeps in (staggered via inline delay) */
+  #plate-0 .p0-flowfig.p0-armed .fg{opacity:0;transform:translateY(16px)}
+  #plate-0 .p0-flowfig.p0-go .fg{
+    opacity:1;transform:translateY(0);
+    transition:opacity .55s ease, transform .75s cubic-bezier(.16,1,.3,1);
+  }
+  /* arrows keep flowing once revealed */
+  @keyframes p0flow{
+    0%{opacity:.4;transform:translateX(-5px)}
+    50%{opacity:1;transform:translateX(5px)}
+    100%{opacity:.4;transform:translateX(-5px)}
+  }
+  #plate-0 .p0-flowfig.p0-go .fa{animation:p0flow 1.7s ease-in-out infinite}
+
+  #plate-0 .p0-fcap{
     margin-top:14px;padding-top:8px;border-top:1px solid var(--ink);
     font-family:var(--mono);font-size:10px;letter-spacing:.08em;
     text-transform:uppercase;color:var(--ink2);
@@ -923,60 +954,54 @@
         </div>
       </div>
 
-      <figure class="p0-gauge" id="p0-gauge">
-        <span class="p0-x p0-xa" aria-hidden="true">+</span>
-        <span class="p0-x p0-xb" aria-hidden="true">+</span>
-        <span class="p0-x p0-xc" aria-hidden="true">+</span>
-        <span class="p0-x p0-xd" aria-hidden="true">+</span>
+      <figure class="p0-flowfig" id="p0-gauge">
+        <svg class="p0-flow" viewBox="0 0 1120 300" role="img"
+          aria-label="Compression flow. Left: the original Nemotron-3 BF16 weights, from Nano 30B up to Ultra 550B. An arrow leads to a smaller compressed block: Nano 30B minus 30.03 percent, Ultra 550B minus 28.20 percent, bit-exact. A second arrow leads to VRAM, where the block stays compressed at that same smaller size and is never re-inflated to full width before the math runs.">
 
-        <div role="img"
-          aria-label="Compression gauge, linear scale 0 to 100 percent. Red fill to 30.03 percent: achieved, and the GPU reads it in place. Tick at about 22 percent: zstd, the free baseline, which must unpack before use. Mark at about 34 percent: the measured limit, all the removable air counted, a ceiling but not a proof. Beyond the limit, 66 percent that reads as noise so far. The hunt continues.">
+          <!-- box 1: ORIGINAL weights (the family) -->
+          <g class="fg" style="transition-delay:0s">
+            <text x="16" y="36" class="ttl">ORIGINAL</text>
+            <rect x="16" y="44" width="290" height="212" fill="#E9E6DE" stroke="#141412" stroke-width="1.5"/>
+            <text x="161" y="112" text-anchor="middle" class="big" font-size="21" fill="#141412">NEMOTRON-3</text>
+            <text x="161" y="150" text-anchor="middle" class="mn" font-size="14" fill="#141412">NANO 30B</text>
+            <text x="161" y="176" text-anchor="middle" class="mn" font-size="14" fill="#141412">ULTRA 550B</text>
+            <text x="161" y="222" text-anchor="middle" class="sub" font-size="12">model.safetensors &#183; BF16</text>
+          </g>
 
-          <div class="p0-gtop">
-            <div class="p0-fl p0-fl-ach"><b>FILL TO 30.03%</b><br><span class="p0-flsub">ACHIEVED &mdash; GPU READS IT IN PLACE</span></div>
-            <div class="p0-fl p0-fl-lim"><b>MEASURED LIMIT ~34%</b><br><span class="p0-flsub">ALL THE REMOVABLE AIR, COUNTED &mdash; A CEILING, NOT A PROOF</span></div>
-          </div>
+          <!-- arrow 1 -->
+          <g class="fg" style="transition-delay:.35s">
+            <path class="fa" d="M320 138 L392 138 L392 120 L428 150 L392 180 L392 162 L320 162 Z" fill="#D92B1C"/>
+          </g>
 
-          <div class="p0-gtrack">
-            <div class="p0-noise"></div>
-            <div class="p0-gfill"></div>
-            <div class="p0-mark p0-mark-zstd"></div>
-            <div class="p0-mark p0-mark-limit"></div>
-            <div class="p0-zone"><span>BEYOND THE ~34% LIMIT: 66% THAT READS AS NOISE &mdash; SO FAR. THE HUNT CONTINUES.</span></div>
-          </div>
+          <!-- box 2: COMPRESSED, both models -->
+          <g class="fg" style="transition-delay:.5s">
+            <text x="436" y="62" class="ttl">COMPRESSED</text>
+            <rect x="436" y="70" width="300" height="160" fill="#D92B1C" stroke="#141412" stroke-width="1.5"/>
+            <text x="456" y="128" text-anchor="start" class="mn" font-size="15" fill="#F2F0EA">NANO 30B</text>
+            <text x="716" y="132" text-anchor="end" class="big" font-size="30" fill="#F2F0EA">&#8722;30.03%</text>
+            <line x1="456" y1="150" x2="716" y2="150" stroke="#F2F0EA" stroke-width="1" opacity=".4"/>
+            <text x="456" y="190" text-anchor="start" class="mn" font-size="15" fill="#F2F0EA">ULTRA 550B</text>
+            <text x="716" y="194" text-anchor="end" class="big" font-size="30" fill="#F2F0EA">&#8722;28.20%</text>
+            <text x="586" y="222" text-anchor="middle" class="mn" font-size="11" fill="#F2F0EA" opacity=".85" letter-spacing="2">SMALLER &#183; BIT-EXACT</text>
+          </g>
 
-          <div class="p0-gscale">
-            <div class="p0-tminor"></div>
-            <div class="p0-tmajor"></div>
-          </div>
+          <!-- arrow 2 -->
+          <g class="fg" style="transition-delay:.85s">
+            <path class="fa" d="M752 138 L824 138 L824 120 L860 150 L824 180 L824 162 L752 162 Z" fill="#D92B1C"/>
+          </g>
 
-          <div class="p0-gnums">
-            <span class="p0-n p0-n0" style="left:0%">0</span>
-            <span class="p0-n p0-alt" style="left:10%">10</span>
-            <span class="p0-n" style="left:20%">20</span>
-            <span class="p0-n p0-alt" style="left:30%">30</span>
-            <span class="p0-n" style="left:40%">40</span>
-            <span class="p0-n p0-alt" style="left:50%">50</span>
-            <span class="p0-n" style="left:60%">60</span>
-            <span class="p0-n p0-alt" style="left:70%">70</span>
-            <span class="p0-n" style="left:80%">80</span>
-            <span class="p0-n p0-alt" style="left:90%">90</span>
-            <span class="p0-n p0-n100" style="left:100%">100</span>
-          </div>
+          <!-- box 3: IN VRAM, stays compressed -->
+          <g class="fg" style="transition-delay:1s">
+            <text x="884" y="36" class="ttl">IN VRAM</text>
+            <rect x="884" y="44" width="210" height="212" fill="none" stroke="#141412" stroke-width="1.5" stroke-dasharray="7 7"/>
+            <rect x="884" y="96" width="210" height="112" fill="#D92B1C" stroke="#141412" stroke-width="1.5"/>
+            <text x="989" y="144" text-anchor="middle" class="big" font-size="24" fill="#F2F0EA">STILL</text>
+            <text x="989" y="172" text-anchor="middle" class="mn" font-size="14" fill="#F2F0EA">COMPRESSED</text>
+            <text x="989" y="242" text-anchor="middle" class="sub" font-size="12">NEVER RE-INFLATED</text>
+          </g>
+        </svg>
 
-          <div class="p0-gbot">
-            <div class="p0-fl p0-fl-zstd"><b>ZSTD ~22%</b><br><span class="p0-flsub">FREE &mdash; BUT MUST UNPACK<br>BEFORE THE GPU CAN USE IT</span></div>
-          </div>
-        </div>
-
-        <div class="p0-glegend">
-          <div><span class="p0-sw p0-sw-fill"></span>FILL TO 30.03% &mdash; ACHIEVED, GPU READS IT IN PLACE</div>
-          <div><span class="p0-sw p0-sw-zstd"></span>~22% &mdash; ZSTD, FREE, BUT MUST UNPACK BEFORE USE</div>
-          <div><span class="p0-sw p0-sw-limit"></span>~34% &mdash; MEASURED LIMIT: ALL THE REMOVABLE AIR, COUNTED</div>
-          <div><span class="p0-sw p0-sw-noise"></span>BEYOND ~34%: NOISE &mdash; SO FAR. THE HUNT CONTINUES.</div>
-        </div>
-
-        <figcaption class="p0-gcap">[ FIG. 00 ] COMPRESSION GAUGE &mdash; % OF ORIGINAL SIZE REMOVED, LOSSLESSLY. FILL = THE HEADLINE FORM, ITS LAYOUT KERNEL-PROVEN ON A &minus;25% SIBLING; BEST VERIFIED RANDOM-ACCESS CONTAINER: 31.89%</figcaption>
+        <figcaption class="p0-fcap">[ FIG. 00 ] COMPRESSED ONCE, STILL COMPRESSED IN VRAM &mdash; THE GPU READS IT IN PLACE, NEVER RE-INFLATED TO FULL WIDTH. WHOLE MODEL, BIT-EXACT, ACROSS THE FAMILY: NANO 30B &minus;30.03%, SUPER 120B &minus;28.85%, ULTRA 550B &minus;28.20%.</figcaption>
       </figure>
 
       <div class="p0-stats reveal" style="transition-delay:.3s">
