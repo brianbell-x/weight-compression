@@ -19,7 +19,7 @@
     <text x="161" y="88" text-anchor="middle" class="black ink" font-size="25" letter-spacing="-1">NEMOTRON-3</text>
     <text x="161" y="120" text-anchor="middle" class="black ink" font-size="25" letter-spacing="-1">ULTRA 550B</text>
     <text x="161" y="160" text-anchor="middle" class="mono ink2" font-size="14" letter-spacing="1">model.safetensors &#183; BF16</text>
-    <text x="161" y="208" text-anchor="middle" class="black ink" font-size="34" letter-spacing="-1">1,044 GiB</text>
+    <text x="161" y="208" text-anchor="middle" class="black ink" font-size="34" letter-spacing="-1">1,044 GB</text>
   </g>
   <!-- arrow 1 -->
   <path d="M414 376 L484 376 L484 358 L518 390 L484 422 L484 404 L414 404 Z" class="red"/>
@@ -28,10 +28,9 @@
     <text x="0" y="-16" class="mono ink2" font-size="16" letter-spacing="2">COMPRESSED</text>
     <rect x="0" y="0" width="280" height="180" class="red"/>
     <rect x="0" y="0" width="280" height="180" class="stroke"/>
-    <text x="140" y="68" text-anchor="middle" class="black" fill="#F2F0EA" font-size="46" letter-spacing="-3">&#8722;28.20%</text>
-    <text x="140" y="112" text-anchor="middle" class="black" fill="#F2F0EA" font-size="28" letter-spacing="-1">750 GiB</text>
-    <text x="140" y="142" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="15" letter-spacing="1">294 GiB REMOVED</text>
-    <text x="140" y="166" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="11" letter-spacing="2">BIT-EXACT</text>
+    <text x="140" y="70" text-anchor="middle" class="black" fill="#F2F0EA" font-size="48" letter-spacing="-3">&#8722;294 GB</text>
+    <text x="140" y="116" text-anchor="middle" class="black" fill="#F2F0EA" font-size="30" letter-spacing="-1">750 GB</text>
+    <text x="140" y="152" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="16" letter-spacing="1">28.20% COMPRESSION</text>
   </g>
   <!-- arrow 2 -->
   <path d="M808 376 L876 376 L876 358 L906 390 L876 422 L876 404 L808 404 Z" class="red"/>
