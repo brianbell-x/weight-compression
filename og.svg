@@ -1,36 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <defs>
-    <style>
-      .ink { fill: #141412; }
-      .ink2 { fill: #57544C; }
-      .red { fill: #D92B1C; }
-      .stroke { stroke: #141412; stroke-width: 1.5; fill: none; }
-      .mono { font-family: Consolas, "Courier New", monospace; font-weight: 700; }
-      .black { font-family: "Arial Black", Arial, sans-serif; font-weight: 900; }
-    </style>
-  </defs>
-
+  <defs><style>
+    .ink{fill:#141412}.ink2{fill:#57544C}.red{fill:#D92B1C}
+    .stroke{stroke:#141412;stroke-width:1.5;fill:none}
+    .mono{font-family:Consolas,"Courier New",monospace;font-weight:700}
+    .black{font-family:"Arial Black",Arial,sans-serif;font-weight:900}
+  </style></defs>
   <rect width="1200" height="630" fill="#F2F0EA"/>
+  <text x="72" y="80" class="mono ink2" font-size="17" letter-spacing="3">[ PUBLIC PROGRESS LOG ]</text>
+  <text x="1128" y="80" text-anchor="end" class="mono ink2" font-size="17" letter-spacing="3">ONGOING</text>
+  <line x1="72" y1="102" x2="1128" y2="102" class="stroke"/>
+  <text x="68" y="180" class="black ink" font-size="58" letter-spacing="-2">LOSSLESS MODEL COMPRESSION</text>
 
-  <text x="72" y="82" class="mono ink2" font-size="17" letter-spacing="3">[ PUBLIC PROGRESS LOG ]</text>
-  <text x="1128" y="82" text-anchor="end" class="mono ink2" font-size="17" letter-spacing="3">ONGOING</text>
-  <line x1="72" y1="104" x2="1128" y2="104" class="stroke"/>
-
-  <text x="68" y="188" class="black ink" font-size="60" letter-spacing="-2">LOSSLESS MODEL COMPRESSION</text>
-
-  <text x="60" y="392" class="black red" font-size="170" letter-spacing="-7">30.03%</text>
-  <text x="838" y="338" class="black ink" font-size="40" letter-spacing="-1">SMALLER</text>
-  <text x="838" y="384" class="black ink" font-size="40" letter-spacing="-1">SO FAR</text>
-
-  <g transform="translate(72 452)">
-    <text x="0" y="0" class="mono ink2" font-size="14" letter-spacing="2">ORIGINAL</text>
-    <rect x="0" y="12" width="1056" height="30" fill="#E9E6DE"/>
-    <rect x="0" y="12" width="1056" height="30" class="stroke"/>
-    <text x="0" y="82" class="mono ink2" font-size="14" letter-spacing="2">COMPRESSED</text>
-    <rect x="0" y="94" width="739" height="30" class="red"/>
-    <rect x="0" y="94" width="739" height="30" class="stroke"/>
-    <line x1="739" y1="12" x2="739" y2="124" stroke="#141412" stroke-width="1" stroke-dasharray="4 4"/>
+  <!-- box1 ORIGINAL full size, labeled as the real weights -->
+  <g transform="translate(72 270)">
+    <text x="0" y="-16" class="mono ink2" font-size="16" letter-spacing="2">ORIGINAL</text>
+    <rect x="0" y="0" width="322" height="240" fill="#E9E6DE"/>
+    <rect x="0" y="0" width="322" height="240" class="stroke"/>
+    <text x="161" y="104" text-anchor="middle" class="black ink" font-size="24" letter-spacing="-1">NEMOTRON-3</text>
+    <text x="161" y="134" text-anchor="middle" class="black ink" font-size="24" letter-spacing="-1">550B</text>
+    <text x="161" y="176" text-anchor="middle" class="mono ink" font-size="16" letter-spacing="1">model.safetensors</text>
+    <text x="161" y="202" text-anchor="middle" class="mono ink2" font-size="14" letter-spacing="2">BF16</text>
+  </g>
+  <!-- arrow 1 -->
+  <path d="M414 375 L486 375 L486 357 L524 390 L486 423 L486 405 L414 405 Z" class="red"/>
+  <!-- box2 COMPRESSED small -->
+  <g transform="translate(544 320)">
+    <text x="0" y="-16" class="mono ink2" font-size="16" letter-spacing="2">COMPRESSED</text>
+    <rect x="0" y="0" width="230" height="140" class="red"/>
+    <rect x="0" y="0" width="230" height="140" class="stroke"/>
+    <text x="115" y="66" text-anchor="middle" class="black" fill="#F2F0EA" font-size="40" letter-spacing="-2">30.03%</text>
+    <text x="115" y="104" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="17" letter-spacing="3">SMALLER</text>
+  </g>
+  <!-- arrow 2 -->
+  <path d="M794 375 L866 375 L866 357 L904 390 L866 423 L866 405 L794 405 Z" class="red"/>
+  <!-- box3 IN VRAM: ghost full-size outline + small red inside -->
+  <g transform="translate(924 270)">
+    <text x="0" y="-16" class="mono ink2" font-size="16" letter-spacing="2">IN VRAM</text>
+    <rect x="0" y="0" width="204" height="240" class="stroke" stroke-dasharray="7 7"/>
+    <rect x="0" y="50" width="204" height="140" class="red"/>
+    <rect x="0" y="50" width="204" height="140" class="stroke"/>
+    <text x="102" y="112" text-anchor="middle" class="black" fill="#F2F0EA" font-size="28" letter-spacing="-1">STILL</text>
+    <text x="102" y="146" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="16" letter-spacing="1">COMPRESSED</text>
+    <text x="102" y="228" text-anchor="middle" class="mono ink2" font-size="13" letter-spacing="1">NEVER RE-INFLATED</text>
   </g>
 
-  <text x="72" y="606" class="mono ink" font-size="20" letter-spacing="2">IN STORAGE AND IN VRAM &#183; BIT-EXACT &#183; IDENTICAL OUTPUTS</text>
+  <text x="72" y="588" class="mono ink" font-size="21" letter-spacing="2">BIT-EXACT &#183; IDENTICAL OUTPUTS &#183; NO QUALITY TRADEOFF</text>
 </svg>
