@@ -16,17 +16,21 @@
   <text x="1128" y="82" text-anchor="end" class="mono ink2" font-size="17" letter-spacing="3">ONGOING</text>
   <line x1="72" y1="104" x2="1128" y2="104" class="stroke"/>
 
-  <text x="68" y="196" class="black ink" font-size="60" letter-spacing="-2">LOSSLESS MODEL COMPRESSION</text>
+  <text x="68" y="188" class="black ink" font-size="60" letter-spacing="-2">LOSSLESS MODEL COMPRESSION</text>
 
-  <text x="60" y="412" class="black red" font-size="185" letter-spacing="-7">30.03%</text>
-  <text x="880" y="356" class="black ink" font-size="42" letter-spacing="-1">SMALLER</text>
-  <text x="880" y="404" class="black ink" font-size="42" letter-spacing="-1">SO FAR</text>
+  <text x="60" y="392" class="black red" font-size="170" letter-spacing="-7">30.03%</text>
+  <text x="838" y="338" class="black ink" font-size="40" letter-spacing="-1">SMALLER</text>
+  <text x="838" y="384" class="black ink" font-size="40" letter-spacing="-1">SO FAR</text>
 
-  <g transform="translate(72 474)">
-    <rect x="0" y="0" width="1056" height="42" fill="#E9E6DE"/>
-    <rect x="0" y="0" width="317" height="42" class="red"/>
-    <rect x="0" y="0" width="1056" height="42" class="stroke"/>
+  <g transform="translate(72 452)">
+    <text x="0" y="0" class="mono ink2" font-size="14" letter-spacing="2">ORIGINAL</text>
+    <rect x="0" y="12" width="1056" height="30" fill="#E9E6DE"/>
+    <rect x="0" y="12" width="1056" height="30" class="stroke"/>
+    <text x="0" y="82" class="mono ink2" font-size="14" letter-spacing="2">COMPRESSED</text>
+    <rect x="0" y="94" width="739" height="30" class="red"/>
+    <rect x="0" y="94" width="739" height="30" class="stroke"/>
+    <line x1="739" y1="12" x2="739" y2="124" stroke="#141412" stroke-width="1" stroke-dasharray="4 4"/>
   </g>
 
-  <text x="72" y="578" class="mono ink" font-size="21" letter-spacing="2">IN STORAGE AND IN VRAM &#183; BIT-EXACT &#183; IDENTICAL OUTPUTS</text>
+  <text x="72" y="606" class="mono ink" font-size="20" letter-spacing="2">IN STORAGE AND IN VRAM &#183; BIT-EXACT &#183; IDENTICAL OUTPUTS</text>
 </svg>
