@@ -824,14 +824,19 @@
     var off = document.getElementById('p0-n-off');
     var size = document.getElementById('p0-n-size');
     var pct = document.getElementById('p0-n-pct');
-    var dur = 1300, delay = 700, start = null;
+    var dur = 1300, delay = 1100, start = null;
     var ease = function(t){ return 1 - Math.pow(1 - t, 3); };
+    var comma = function(n){ return n.toLocaleString('en-US'); };
+    /* show the original, uncompressed numbers first so the count is visible */
+    if (off)  off.textContent  = '−0 GB';
+    if (size) size.textContent = comma(1044) + ' GB';
+    if (pct)  pct.textContent  = '0.00% COMPRESSION';
     function frame(ts){
       if (start === null) start = ts;
       var t = Math.min(1, Math.max(0, (ts - start - delay) / dur));
       var e = ease(t);
-      if (off)  off.textContent  = '−' + Math.round(294 * e) + ' GB';
-      if (size) size.textContent = Math.round(1044 - 294 * e) + ' GB';
+      if (off)  off.textContent  = '−' + comma(Math.round(294 * e)) + ' GB';
+      if (size) size.textContent = comma(Math.round(1044 - 294 * e)) + ' GB';
       if (pct)  pct.textContent  = (28.20 * e).toFixed(2) + '% COMPRESSION';
       if (t < 1) requestAnimationFrame(frame);
     }
