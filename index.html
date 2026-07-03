@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>The Lossless Compression Hunt: model weights, 30% smaller, bit-exact</title>
-<meta name="description" content="An ongoing hunt to compress LLM weights with zero change to what they compute. 30.03% smaller so far; the measured lossless limit is about 34%." />
+<title>30% smaller weights, bit-for-bit identical — The Lossless Compression Hunt</title>
+<meta name="description" content="Lossless compression of LLM weights: 30.03% smaller, every tensor bit-exact, in a form the GPU reads still-compressed — 24% faster on an RTX 4090. Measured limit ~34%. The hunt continues." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://brianbell-x.github.io/weight-compression/" />
 <meta property="og:title" content="Model weights 30% lighter. Lossless." />
-<meta property="og:description" content="An ongoing hunt to compress LLM weights with zero change to what they compute. 30.03% smaller so far; the measured lossless limit is about 34%." />
+<meta property="og:description" content="Bit-for-bit identical weights, 30.03% smaller — and the GPU runs them still compressed. The measured lossless limit is about 34%. The hunt continues." />
 <meta property="og:image" content="https://brianbell-x.github.io/weight-compression/og.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="Technical bulletin card: model weights 30% lighter, lossless. A 0-to-100% gauge filled to 30.03%, with the measured limit marked at about 34%." />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Model weights 30% lighter. Lossless." />
-<meta name="twitter:description" content="An ongoing hunt to compress LLM weights with zero change to what they compute. 30.03% smaller so far; the measured lossless limit is about 34%." />
+<meta name="twitter:description" content="Bit-for-bit identical weights, 30.03% smaller — and the GPU runs them still compressed. The measured lossless limit is about 34%. The hunt continues." />
 <meta name="twitter:image" content="https://brianbell-x.github.io/weight-compression/og.png" />
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -106,11 +106,6 @@
   #plate-0 h1{
     font-family:var(--black);text-transform:uppercase;
     font-size:clamp(1.9rem,4.3vw,3.2rem);line-height:.95;letter-spacing:-.02em;
-  }
-  #plate-0 .p0-strike{position:relative;white-space:nowrap}
-  #plate-0 .p0-strike::after{
-    content:"";position:absolute;left:-1%;right:-1%;top:50%;height:.09em;
-    background:var(--red);transform:translateY(-50%);
   }
   #plate-0 .p0-sub{
     margin:20px 0 0;max-width:62ch;font-family:var(--sans);font-weight:500;
@@ -268,6 +263,18 @@
     letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);line-height:1.6;
   }
 
+  /* ---- objections strip: the three questions every reader arrives with ---- */
+  #plate-0 .p0-qa{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--ink);border:1px solid var(--ink);border-top:0;
+  }
+  #plate-0 .p0-q{background:var(--paper2);padding:15px 18px 17px}
+  #plate-0 .p0-qh{
+    display:block;font-family:var(--mono);font-weight:700;font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:8px;
+  }
+  #plate-0 .p0-q p{margin:0;font-size:14px;line-height:1.5;color:var(--ink)}
+
   /* ---- title block steps down before the single-column collapse ---- */
   @media(max-width:900px){
     #plate-0 .p0-tblock{grid-template-columns:repeat(2,1fr)}
@@ -297,6 +304,8 @@
     #plate-0 .p0-alt{display:none}
     #plate-0 .p0-stats{grid-template-columns:1fr}
     #plate-0 .p0-stat{padding:14px 16px 12px}
+    #plate-0 .p0-qa{grid-template-columns:1fr}
+    #plate-0 .p0-q{padding:13px 16px 15px}
   }
 
   @media(prefers-reduced-motion:reduce){
@@ -663,7 +672,8 @@
   #plate-3 .p3-lab .s{margin-top:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink2)}
   /* ink-on-paper chip with red frame: keeps the red without 10px reversed-out text */
   #plate-3 .p3-tag{background:var(--paper);color:var(--ink);border:2px solid var(--red);font-family:var(--mono);font-style:normal;font-weight:700;font-size:10px;letter-spacing:.08em;padding:1px 6px}
-  #plate-3 .r3.p3-lab{border-left:3px solid var(--red);padding-left:15px}
+  #plate-3 .p3-tag--ink{border-color:var(--ink)}
+  #plate-3 .r4.p3-lab{border-left:3px solid var(--red);padding-left:15px}
 
   #plate-3 .p3-barcell{display:flex;align-items:center;padding:12px 16px}
   #plate-3 .p3-track{position:relative;width:100%;height:52px;background-color:var(--paper2);
@@ -674,18 +684,18 @@
   #plate-3 .p3-fill{position:absolute;top:0;bottom:0;left:0;width:var(--w);background:var(--ink)}
   #plate-3 .p3-cut{position:absolute;top:0;bottom:0;right:0;width:calc(100% - var(--w));
     background-image:repeating-linear-gradient(135deg,var(--ink2) 0,var(--ink2) 1px,transparent 1px,transparent 5px)}
-  #plate-3 .r3 .p3-cut{background-image:repeating-linear-gradient(135deg,var(--red) 0,var(--red) 1px,transparent 1px,transparent 5px)}
+  #plate-3 .r4 .p3-cut{background-image:repeating-linear-gradient(135deg,var(--red) 0,var(--red) 1px,transparent 1px,transparent 5px)}
   #plate-3 .p3-cutline{position:absolute;top:0;bottom:0;left:calc(var(--w) - 1px);width:2px;background:var(--red)}
   #plate-3 .p3-delta{position:absolute;left:calc(var(--w) + 12px);top:50%;transform:translateY(-50%);
     font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:.02em;color:var(--red);white-space:nowrap}
-  #plate-3 .r3 .p3-delta{font-size:19px}
+  #plate-3 .r4 .p3-delta{font-size:19px}
 
   #plate-3 .p3-val{padding:12px 18px;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right}
   #plate-3 .p3-val .n{font-family:var(--black);font-size:clamp(1.35rem,2.4vw,1.8rem);letter-spacing:-0.02em;line-height:1;color:var(--ink)}
   #plate-3 .p3-val .u{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.06em;color:var(--ink2)}
   #plate-3 .p3-val .d{margin-top:6px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink2)}
-  #plate-3 .r3.p3-val .n{font-size:clamp(1.7rem,3.2vw,2.5rem);color:var(--red)}
-  #plate-3 .r3.p3-val .d{color:var(--ink);font-weight:700}
+  #plate-3 .r4.p3-val .n{font-size:clamp(1.7rem,3.2vw,2.5rem);color:var(--red)}
+  #plate-3 .r4.p3-val .d{color:var(--ink);font-weight:700}
 
   #plate-3 .p3-cap{grid-column:1/-1;background:var(--paper2);display:flex;justify-content:space-between;gap:10px 24px;flex-wrap:wrap;
     padding:11px 18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink)}
@@ -728,8 +738,9 @@
   #plate-3.p3-run .p3-cut{width:calc(100% - var(--w));transition:width 1.5s cubic-bezier(.16,1,.3,1)}
   #plate-3.p3-run .r2 .p3-fill,#plate-3.p3-run .r2 .p3-cut{transition-delay:.15s}
   #plate-3.p3-run .r3 .p3-fill,#plate-3.p3-run .r3 .p3-cut{transition-delay:.3s}
+  #plate-3.p3-run .r4 .p3-fill,#plate-3.p3-run .r4 .p3-cut{transition-delay:.45s}
   #plate-3.p3-run .p3-delta,#plate-3.p3-run .p3-cutline{opacity:1;transition:opacity .5s ease 1s}
-  #plate-3.p3-run .r3 .p3-delta,#plate-3.p3-run .r3 .p3-cutline{transition-delay:1.3s}
+  #plate-3.p3-run .r4 .p3-delta,#plate-3.p3-run .r4 .p3-cutline{transition-delay:1.3s}
   @media(prefers-reduced-motion:reduce){
     #plate-3 .p3-fill{width:var(--w)!important;transition:none!important}
     #plate-3 .p3-cut{width:calc(100% - var(--w))!important;transition:none!important}
@@ -743,11 +754,11 @@
     #plate-3 .p3-hcell.lab,#plate-3 .p3-hcell.tot{display:none}
     #plate-3 .m-hide{display:none}
     #plate-3 .p3-lab{padding:13px 14px 11px}
-    #plate-3 .r3.p3-lab{padding-left:11px}
+    #plate-3 .r4.p3-lab{padding-left:11px}
     #plate-3 .p3-rul{padding:8px 14px 0}
     #plate-3 .p3-barcell{padding:10px 14px}
     #plate-3 .p3-track{height:38px}
-    #plate-3 .r3 .p3-delta{font-size:15px}
+    #plate-3 .r4 .p3-delta{font-size:15px}
     #plate-3 .p3-delta{left:calc(var(--w) + 8px)}
     #plate-3 .p3-val{padding:9px 14px 14px;flex-direction:row;justify-content:flex-start;align-items:baseline;gap:12px;text-align:left}
     #plate-3 .p3-val .d{margin-top:0}
@@ -956,9 +967,9 @@
       </div>
     </div>
 
-    <h1 class="reveal" style="transition-delay:.1s">Compressing a neural network,<br> one <span class="p0-strike">redundant</span> bit at a time.</h1>
+    <h1 class="reveal" style="transition-delay:.1s">30% smaller. Bit-for-bit identical.<br>The GPU runs it still compressed.</h1>
 
-    <p class="p0-sub reveal" style="transition-delay:.16s">A running hunt: shrink a model&rsquo;s weights without changing a single bit of what they compute. Measured on the Nemotron-3 family. The score so far:</p>
+    <p class="p0-sub reveal" style="transition-delay:.16s">A model&rsquo;s weights are one giant file of numbers &mdash; most of what a model costs to store, ship, and hold in GPU memory. This is a running hunt to shrink that file without changing a single bit: nothing rounded, nothing pruned, the same model to the last digit, in a form the GPU can read without unpacking it first. Measured on NVIDIA&rsquo;s Nemotron-3 family. The score so far:</p>
 
     <div class="p0-hero reveal" id="p0-hero" style="transition-delay:.22s">
 
@@ -977,11 +988,11 @@
         <span class="p0-x p0-xd" aria-hidden="true">+</span>
 
         <div role="img"
-          aria-label="Compression gauge, linear scale 0 to 100 percent. Red fill to 30.03 percent: achieved, GPU-readable. Tick at about 22 percent: zstd, the baseline anyone gets for free. Mark at about 34 percent: measured limit, not proven forever. The other 66 percent: irreducible so far. The hunt continues.">
+          aria-label="Compression gauge, linear scale 0 to 100 percent. Red fill to 30.03 percent: achieved, and the GPU reads it in place. Tick at about 22 percent: zstd, the free baseline, which must unpack before use. Mark at about 34 percent: the measured limit, all the removable air counted, a ceiling but not a proof. Beyond the limit, 66 percent that reads as noise so far. The hunt continues.">
 
           <div class="p0-gtop">
-            <div class="p0-fl p0-fl-ach"><b>FILL TO 30.03%</b><br><span class="p0-flsub">ACHIEVED, GPU-READABLE</span></div>
-            <div class="p0-fl p0-fl-lim"><b>MEASURED LIMIT ~34%</b><br><span class="p0-flsub">MEASURED, NOT PROVEN-FOREVER</span></div>
+            <div class="p0-fl p0-fl-ach"><b>FILL TO 30.03%</b><br><span class="p0-flsub">ACHIEVED &mdash; GPU READS IT IN PLACE</span></div>
+            <div class="p0-fl p0-fl-lim"><b>MEASURED LIMIT ~34%</b><br><span class="p0-flsub">ALL THE REMOVABLE AIR, COUNTED &mdash; A CEILING, NOT A PROOF</span></div>
           </div>
 
           <div class="p0-gtrack">
@@ -989,7 +1000,7 @@
             <div class="p0-gfill"></div>
             <div class="p0-mark p0-mark-zstd"></div>
             <div class="p0-mark p0-mark-limit"></div>
-            <div class="p0-zone"><span>THE OTHER 66% &mdash; IRREDUCIBLE SO FAR. THE HUNT CONTINUES.</span></div>
+            <div class="p0-zone"><span>BEYOND THE ~34% LIMIT: 66% THAT READS AS NOISE &mdash; SO FAR. THE HUNT CONTINUES.</span></div>
           </div>
 
           <div class="p0-gscale">
@@ -1012,18 +1023,18 @@
           </div>
 
           <div class="p0-gbot">
-            <div class="p0-fl p0-fl-zstd"><b>ZSTD ~22%</b><br><span class="p0-flsub">THE BASELINE ANYONE<br>GETS FOR FREE</span></div>
+            <div class="p0-fl p0-fl-zstd"><b>ZSTD ~22%</b><br><span class="p0-flsub">FREE &mdash; BUT MUST UNPACK<br>BEFORE THE GPU CAN USE IT</span></div>
           </div>
         </div>
 
         <div class="p0-glegend">
-          <div><span class="p0-sw p0-sw-fill"></span>FILL TO 30.03% &mdash; ACHIEVED, GPU-READABLE</div>
-          <div><span class="p0-sw p0-sw-zstd"></span>~22% &mdash; ZSTD, THE BASELINE ANYONE GETS FOR FREE</div>
-          <div><span class="p0-sw p0-sw-limit"></span>~34% &mdash; MEASURED LIMIT, NOT PROVEN-FOREVER</div>
-          <div><span class="p0-sw p0-sw-noise"></span>THE OTHER 66% &mdash; IRREDUCIBLE SO FAR. THE HUNT CONTINUES.</div>
+          <div><span class="p0-sw p0-sw-fill"></span>FILL TO 30.03% &mdash; ACHIEVED, GPU READS IT IN PLACE</div>
+          <div><span class="p0-sw p0-sw-zstd"></span>~22% &mdash; ZSTD, FREE, BUT MUST UNPACK BEFORE USE</div>
+          <div><span class="p0-sw p0-sw-limit"></span>~34% &mdash; MEASURED LIMIT: ALL THE REMOVABLE AIR, COUNTED</div>
+          <div><span class="p0-sw p0-sw-noise"></span>BEYOND ~34%: NOISE &mdash; SO FAR. THE HUNT CONTINUES.</div>
         </div>
 
-        <figcaption class="p0-gcap">[ FIG. 00 ] COMPRESSION GAUGE &mdash; LINEAR SCALE, % OF ORIGINAL SIZE REMOVED, LOSSLESSLY</figcaption>
+        <figcaption class="p0-gcap">[ FIG. 00 ] COMPRESSION GAUGE &mdash; % OF ORIGINAL SIZE REMOVED, LOSSLESSLY. FILL = THE HEADLINE FORM, ITS LAYOUT KERNEL-PROVEN ON A &minus;25% SIBLING; BEST VERIFIED RANDOM-ACCESS CONTAINER: 31.89%</figcaption>
       </figure>
 
       <div class="p0-stats reveal" style="transition-delay:.3s">
@@ -1035,12 +1046,27 @@
         <div class="p0-stat">
           <span class="p0-sid">R-02</span>
           <strong>6,174 / 6,174</strong>
-          <span class="p0-scap">BF16 TENSORS ROUND-TRIP BIT-EXACT</span>
+          <span class="p0-scap">WEIGHT BLOCKS (TENSORS) RESTORED BIT-FOR-BIT; THE 69 NON-BF16 ONES SHIP UNCHANGED</span>
         </div>
         <div class="p0-stat">
           <span class="p0-sid">R-03</span>
           <strong>24%</strong>
-          <span class="p0-scap">FASTER DECODE MEASURED ON AN RTX 4090</span>
+          <span class="p0-scap">LESS GPU-KERNEL TIME VS BF16 &mdash; MEASURED ON THE &minus;25% FORM, RTX 4090</span>
+        </div>
+      </div>
+
+      <div class="p0-qa reveal" style="transition-delay:.36s">
+        <div class="p0-q">
+          <span class="p0-qh">Q-01 &middot; Isn&rsquo;t this just zip? Or DFloat11?</span>
+          <p>Zip-style tools (zstd) get ~22% &mdash; then everything must be unpacked before the GPU can touch a weight. Published lossless codecs (DFloat11, ZipNN) reach ~30&ndash;33% with variable-length codes &mdash; no weight has a fixed address, so every read pays a decode toll. Here every weight keeps a fixed address: the GPU does its math on the compressed bytes directly.</p>
+        </div>
+        <div class="p0-q">
+          <span class="p0-qh">Q-02 &middot; Why not just quantize?</span>
+          <p>Quantization deletes bits. Usually fine &mdash; never provable: you benchmark and hope. This keeps every bit, so the outputs are identical by construction. If 8-bit quantization (Q8) satisfies you, use it; this is for when &ldquo;probably fine&rdquo; isn&rsquo;t enough. (It won&rsquo;t stack on quantized files &mdash; quantizing spends the exponent redundancy this feeds on.)</p>
+        </div>
+        <div class="p0-q">
+          <span class="p0-qh">Q-03 &middot; What&rsquo;s the catch?</span>
+          <p>The speed win is bandwidth-bound: the kernel &mdash; the small GPU program that reads weights and multiplies &mdash; takes 24% less time on a 4090, measured on the &minus;25% sibling form. On an H100 it ties: the in-register unpacking tops out near the speed plain BF16 already reads at, so you keep the full memory saving and gain no time. And this is research, not a product: no llama.cpp or vLLM loader exists yet.</p>
         </div>
       </div>
 
@@ -1057,10 +1083,13 @@
     </header>
 
     <div class="p1-head reveal">
-      <h2>Half of every weight is indistinguishable from coin&nbsp;flips.</h2>
-      <p class="p1-lead">A BF16 weight is <span class="n">16</span> bits. Measured across
-        all <span class="n">31.6</span> billion of them, the information is lopsided:
-        the exponent is hyper-concentrated, the mantissa is random noise.</p>
+      <h2>Half of every weight is coin flips. The other half is mostly&nbsp;air.</h2>
+      <p class="p1-lead">A BF16 weight is <span class="n">16</span> bits of scientific
+        notation: a sign, an exponent (the number&rsquo;s size), a mantissa (its fine
+        detail). Measured across all <span class="n">31.6</span> billion weights, the
+        mantissa is a hair from pure noise &mdash; while the exponent field is so
+        repetitive it is mostly empty space. Essentially every point of compression
+        comes from that emptiness.</p>
     </div>
 
     <figure class="p1-panel reveal" aria-label="Figure 1: bit anatomy of a BF16 weight, measured entropy, exponent concentration, and the in-register decode">
@@ -1112,34 +1141,38 @@
           <div class="p1-dimlab">
             <div>
               <b class="s1">Sign + exponent &mdash; 9 bits</b>
-              <span class="s2">Structured &mdash; the ore</span>
+              <span class="s2">Exponent mostly air &mdash; the sign a coin flip</span>
             </div>
             <div>
               <b class="s1">Mantissa &mdash; 7 bits</b>
-              <span class="s2">Noise &mdash; rides along verbatim</span>
+              <span class="s2">Noise &mdash; ships verbatim</span>
             </div>
           </div>
 
           <div class="p1-link">
-            <span class="t">Information actually present &mdash; measured Shannon entropy, same 16-bit scale</span>
-            <span class="b9" aria-hidden="true">9/16</span>
+            <span class="t">How much information those fields actually hold &mdash; measured, same 16-bit scale</span>
+            <span class="b9" aria-hidden="true">9 BITS | 7 BITS</span>
           </div>
 
           <div class="p1-strip">
-            <div class="p1-seg real"><span class="v">~3.8</span></div>
-            <div class="p1-seg air"><span class="v">5.2</span></div>
+            <div class="p1-seg real"><span class="v">~3.7</span></div>
+            <div class="p1-seg air"><span class="v">~5.3</span></div>
             <div class="p1-seg noise"><span class="v">~7</span></div>
           </div>
           <div class="p1-legend">
-            <span><span class="sw real" aria-hidden="true"></span>~3.8 bits real</span>
-            <span><span class="sw air" aria-hidden="true"></span>5.2 bits of air</span>
-            <span><span class="sw noise" aria-hidden="true"></span>~7 bits pure noise</span>
+            <span><span class="sw real" aria-hidden="true"></span>~3.7 bits real &mdash; must keep</span>
+            <span><span class="sw air" aria-hidden="true"></span>~5.3 bits air &mdash; free to remove</span>
+            <span><span class="sw noise" aria-hidden="true"></span>~7 bits noise &mdash; must keep, verbatim</span>
           </div>
 
-          <p class="p1-cap">The empty middle is the entire game: every point of compression
-            on this page comes from it. The mantissa carries <span class="n">6.99</span> of
-            <span class="n">7</span> bits; it rides along verbatim, and it is why the meter
-            can never reach <span class="n">50%</span>.</p>
+          <p class="p1-cap">Compression can only take the air. Counted value by value it is
+            <span class="n">~5.3</span> of <span class="n">16</span> bits; let neighboring
+            exponents predict each other and it stretches to <span class="n">~5.5</span> &mdash;
+            and <span class="n">5.5&thinsp;/&thinsp;16&nbsp;&asymp;&nbsp;34%</span>, the limit on
+            the gauge. Everything else stays: the mantissa carries <span class="n">6.99</span>
+            of its <span class="n">7</span> bits, the sign is a coin flip, and both have read
+            as random to almost every predictor tried &mdash; one hairline crack, sheet 5 &mdash;
+            which parks the limit near a third, nowhere near half.</p>
         </div>
 
         <!-- concentration + decode -->
@@ -1147,32 +1180,35 @@
 
           <div class="p1-mod p1-conc">
             <h3>&gt;&gt;&gt; Exponent concentration</h3>
-            <span class="sub">Of 512 possible sign+exponent values &mdash; share of all weights covered</span>
+            <span class="sub">Of 512 possible sign+exponent values &mdash; share of weights covered &middot; probed on the largest tensors</span>
 
             <div class="p1-row">
-              <span class="k">Top 4</span>
-              <span class="p1-track"><span class="p1-fill" style="width:77.7%;--d:0s"></span></span>
-              <span class="v">77.7%</span>
-            </div>
-            <div class="p1-row">
               <span class="k">Top 8</span>
-              <span class="p1-track"><span class="p1-fill" style="width:96.1%;--d:.12s"></span></span>
-              <span class="v">96.1%</span>
+              <span class="p1-track"><span class="p1-fill" style="width:81%;--d:0s"></span></span>
+              <span class="v">81.0%</span>
             </div>
             <div class="p1-row key">
               <span class="k">Top 16</span>
+              <span class="p1-track"><span class="p1-fill" style="width:97.6%;--d:.12s"></span></span>
+              <span class="v">97.6%</span>
+            </div>
+            <div class="p1-row">
+              <span class="k">Top 32</span>
               <span class="p1-track"><span class="p1-fill" style="width:99.9%;--d:.24s"></span></span>
               <span class="v">99.9%</span>
             </div>
             <div class="p1-row">
-              <span class="k">Top 32</span>
+              <span class="k">All 512</span>
               <span class="p1-track"><span class="p1-fill" style="width:100%;--d:.36s"></span></span>
-              <span class="v">~100%</span>
+              <span class="v">100%</span>
             </div>
 
-            <p class="p1-point"><strong>The whole model uses ~<span class="n">16</span> exponents.</strong>
-              <span class="n">16</span> of <span class="n">512</span> values cover
-              <span class="n">99.9%</span> of all weights.</p>
+            <p class="p1-point"><strong>The model leans on ~<span class="n">16</span> exponents.</strong>
+              <span class="n">16</span> of <span class="n">512</span> possible values cover
+              ~<span class="n">98%</span> of weights &mdash; a 4-bit code names them, and the
+              ~<span class="n">2%</span> that miss ride the escape list. Training simply never
+              uses BF16&rsquo;s astronomic range: nearly every weight sits within a few powers
+              of two of zero.</p>
           </div>
 
           <div class="p1-mod p1-code">
@@ -1180,13 +1216,16 @@
             <span class="sub">Per weight &middot; at matmul time &middot; in-register</span>
 
             <pre class="p1-pre"><code><span class="c"># per weight, at matmul time, in-register</span>
-sign_exp = codebook[idx]          <span class="c"># 4-bit index -&gt; 9-bit field</span>
+sign_exp = codebook[idx]          <span class="c"># 4-bit code -&gt; 9-bit sign+exp</span>
 bf16     = (sign_exp &lt;&lt; 7) | mantissa
-<span class="c"># rare values ride a sparse escape stream</span>
-if is_escape: bf16 = escapes.next()</code></pre>
+<span class="c"># the ~2% outside the codebook "escape":</span>
+<span class="c"># stored full-width in a side list, indexed per row</span>
+if is_escape: bf16 = escapes[row_base + k]</code></pre>
 
-            <p class="p1-cap">Fixed bit-offsets, so the GPU reads the compressed form in
-              place. Full BF16 exists only inside a register.</p>
+            <p class="p1-cap">Every field has a fixed width, so weight <span class="n">(i,&nbsp;j)</span>
+              has a computable address: the GPU reads the compressed form in place, and full
+              BF16 exists only for an instant, inside a register. INT4 kernels (FLUTE, Marlin)
+              already ship this exact pattern &mdash; here it rebuilds the exact original.</p>
           </div>
 
         </div>
@@ -1230,8 +1269,8 @@ if is_escape: bf16 = escapes.next()</code></pre>
         </div>
         <div class="p2-bodyc">
           <h3 class="p2-h3">zstd the raw file. Everyone&rsquo;s first move.</h3>
-          <p class="p2-p">About 22%. Blind, though: interleaved sign, exponent, and
-          mantissa bytes camouflage each other.</p>
+          <p class="p2-p">About 22%, free. But blind: sign, exponent, and mantissa
+          bytes sit interleaved in the file, and each camouflages the others.</p>
         </div>
         <div class="p2-res">
           <span class="lbl">RESULT</span>
@@ -1248,11 +1287,14 @@ if is_escape: bf16 = escapes.next()</code></pre>
           <span class="p2-stepname">THE SPLIT</span>
         </div>
         <div class="p2-bodyc">
-          <h3 class="p2-h3">Separate the ore from the static.</h3>
+          <h3 class="p2-h3">Split the repetitive half from the noise. Compress it alone.</h3>
           <p class="p2-p">Split each tensor into an exponent plane and a mantissa
-          plane; entropy-code the first, ship the second verbatim. 32%, exact
-          round-trip. One problem: a variable-length stream has no fixed offset per
-          weight, so a GPU can&rsquo;t read it in place. Great archive, useless at
+          plane; entropy-code the first &mdash; fewer bits for more frequent values
+          &mdash; and ship the second verbatim. 32%, bit-exact, squarely on the
+          published plateau (DFloat11 ~30%, ZipNN ~33%). And here is the wall they
+          all share: a variable-length stream gives no weight a fixed address, so
+          the math cannot read it in place &mdash; it must be re-inflated first,
+          wholesale or block-by-block, paying in time. A great archive. Useless at
           runtime.</p>
           <a class="p2-cand" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates/0001-bf16-exponent-plane">CANDIDATE 0001 -&gt;</a>
         </div>
@@ -1278,7 +1320,7 @@ if is_escape: bf16 = escapes.next()</code></pre>
         <div class="p2-tomb">
           <span class="p2-stamp" aria-hidden="true">FALSIFIED</span>
           <span class="p2-gid">ENTRY G-01</span>
-          <p class="p2-hyp">&ldquo;The 128 experts must be similar.&rdquo;</p>
+          <p class="p2-hyp">&ldquo;The model&rsquo;s 128 specialist sub-networks (&lsquo;experts&rsquo;) must be similar.&rdquo;</p>
           <p class="p2-verd"><span class="p2-arr">-&gt;</span> Correlation 0.03.
           They share a distribution, not values.</p>
         </div>
@@ -1286,14 +1328,15 @@ if is_escape: bf16 = escapes.next()</code></pre>
           <span class="p2-stamp" aria-hidden="true">FALSIFIED</span>
           <span class="p2-gid">ENTRY G-02</span>
           <p class="p2-hyp">&ldquo;Fold the sign bit into the exponent.&rdquo;</p>
-          <p class="p2-verd"><span class="p2-arr">-&gt;</span> Entropy went UP.</p>
+          <p class="p2-verd"><span class="p2-arr">-&gt;</span> The folded field coded
+          WORSE, not better. Cost went UP.</p>
         </div>
         <div class="p2-tomb">
           <span class="p2-stamp" aria-hidden="true">FALSIFIED</span>
           <span class="p2-gid">ENTRY G-03</span>
-          <p class="p2-hyp">&ldquo;The vocab tail must be untrained.&rdquo;</p>
-          <p class="p2-verd"><span class="p2-arr">-&gt;</span> All 131,072 tokens
-          are real. Zero dead rows.</p>
+          <p class="p2-hyp">&ldquo;The rarest vocabulary rows must be untrained filler.&rdquo;</p>
+          <p class="p2-verd"><span class="p2-arr">-&gt;</span> All 131,072 token rows
+          are trained. Zero dead rows.</p>
         </div>
         <div class="p2-tomb">
           <span class="p2-stamp" aria-hidden="true">FALSIFIED</span>
@@ -1322,18 +1365,24 @@ if is_escape: bf16 = escapes.next()</code></pre>
         </div>
         <div class="p2-bodyc">
           <h3 class="p2-h3">Trade 2 points of storage for random access.</h3>
-          <p class="p2-p">Replace the variable-length code with a fixed-width 4-bit
-          index into a per-tensor codebook, plus a sparse escape stream. Same
-          structure, re-expressed so the matmul can address it. On an RTX 4090, in
-          the memory-bound regime where MoE decode lives, the fused kernel runs 24%
-          faster than BF16: smaller AND faster, losslessly.</p>
+          <p class="p2-p">Re-express the same structure as a fixed-width 4-bit code
+          per weight &mdash; an index into that tensor&rsquo;s codebook &mdash; plus a
+          small escape list for the values that miss it. Now every weight has a
+          computable address: the GPU reads the compressed bytes in place and rebuilds
+          BF16 inside a register. Fewer bytes means faster in a bandwidth-bound job: a
+          fused kernel over the byte-split sibling (12 bits/weight, receipts row 03)
+          took 24% less time than plain BF16 on an RTX 4090; the &minus;30% headline
+          form shares the same fixed-address layout but hasn&rsquo;t been re-benchmarked.
+          On an H100 the kernel ties BF16 &mdash; full VRAM cut, zero speed tax &mdash;
+          where DFloat11&rsquo;s variable-length decode runs 1.4&ndash;2x slower at
+          small batch (its own numbers).</p>
           <a class="p2-cand" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates/0009-fusible-exponent-codebook">CANDIDATE 0009 -&gt;</a>
         </div>
         <div class="p2-res">
           <span class="lbl">RESULT</span>
           <span class="p2-stat p2-stat--red">&minus;30.03%</span>
-          <span class="p2-flag p2-flag--solid">GPU-READABLE</span>
-          <span class="p2-sub">0.756x DECODE TIME</span>
+          <span class="p2-flag p2-flag--solid">GPU READS IT IN PLACE</span>
+          <span class="p2-sub">KERNEL: 24% LESS TIME &middot; &minus;25% SIBLING</span>
           <div class="p2-bar" style="--v:75.1%"><i class="p2-fill p2-fill--red"></i></div>
           <div class="p2-scale"><span style="left:0">0</span><span style="left:25%">10</span><span style="left:50%">20</span><span style="left:75%">30</span><span style="left:100%">40</span></div>
         </div>
@@ -1346,9 +1395,10 @@ if is_escape: bf16 = escapes.next()</code></pre>
         </div>
         <div class="p2-bodyc">
           <h3 class="p2-h3">Interrogate all 6,243 tensors for anything left.</h3>
-          <p class="p2-p">An adversarial survey re-derived everything from raw
-          bytes. No duplicate tensors, no near-duplicates that survive scrutiny,
-          mantissa wall triple-confirmed.</p>
+          <p class="p2-p">An adversarial survey re-derived everything from the raw
+          bytes of all 6,243 tensors (6,174 BF16 + 69 F32). No duplicate tensors.
+          No near-duplicates that survive scrutiny. And the mantissa read as noise
+          to every predictor of that sweep.</p>
           <a class="p2-cand" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates/0010-similarity-survey">CANDIDATE 0010 -&gt;</a>
         </div>
         <div class="p2-res">
@@ -1365,16 +1415,18 @@ if is_escape: bf16 = escapes.next()</code></pre>
         </div>
         <div class="p2-bodyc">
           <h3 class="p2-h3">Find the wall on purpose.</h3>
-          <p class="p2-p">Exponents have 2-D spatial structure worth ~4 more
-          points; a working codec reaches 33.7% bit-exact. Add up what is provably
-          random and the lossless limit is ~34% storage, ~30% GPU-readable. The
-          meter sits a half-step from the wall.</p>
+          <p class="p2-p">Add up everything that must stay &mdash; the sign, the
+          mantissa, the exponent&rsquo;s real information &mdash; and the lossless
+          limit lands at ~34%. A storage-only codec already reaches 33.7% by
+          exploiting how neighboring exponents correlate. Random access takes some
+          of it back: the best verified fixed-address container sits at 31.89%, the
+          headline form at 30.03. Closing the rest is open item 01.</p>
           <a class="p2-cand" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates/0012-lossless-ceiling">CANDIDATE 0012 -&gt;</a>
         </div>
         <div class="p2-res">
           <span class="lbl">RESULT</span>
           <span class="p2-stat">&minus;33.7%</span>
-          <span class="p2-sub">CODEC</span>
+          <span class="p2-sub">STORAGE-ONLY CODEC</span>
           <span class="p2-limit"><i aria-hidden="true"></i>LIMIT ~34%</span>
           <div class="p2-bar" style="--v:84.25%">
             <i class="p2-fill p2-fill--hatch"></i>
@@ -1398,13 +1450,13 @@ if is_escape: bf16 = escapes.next()</code></pre>
 
     <div class="p3-intro reveal">
       <h2>The receipts.</h2>
-      <p class="p3-lead">Every number is an exact round-trip on the real checkpoint. Identical bits compute identical logits; there is nothing to eval.</p>
+      <p class="p3-lead">The headline numbers are exact round-trips on the real checkpoint &mdash; the shipped weight file: compress, restore, compare bit for bit. Identical bits give identical answers, so there is no quality score to argue about. Where a figure is projected or estimated instead, its card says so.</p>
     </div>
 
-    <!-- A · FOOTPRINT — three variants, hatched = removed -->
+    <!-- A · FOOTPRINT — four forms, hatched = removed -->
     <div class="p3-panel reveal">
       <div class="p3-pbar">
-        <span class="lbl">&gt;&gt;&gt; FOOTPRINT · THREE VARIANTS · NEMOTRON-3 NANO 30B</span>
+        <span class="lbl">&gt;&gt;&gt; FOOTPRINT · FOUR FORMS · NEMOTRON-3 NANO 30B</span>
         <div class="p3-key">
           <span><i class="k1" aria-hidden="true"></i>STORED</span>
           <span><i class="k2" aria-hidden="true"></i>REMOVED (LOSSLESS)</span>
@@ -1417,7 +1469,7 @@ if is_escape: bf16 = escapes.next()</code></pre>
 
         <div class="p3-grid">
           <!-- header row -->
-          <div class="p3-hcell lab">VARIANT</div>
+          <div class="p3-hcell lab">FORM</div>
           <div class="p3-rul" aria-hidden="true">
             <div class="p3-rulin">
               <span class="z" style="left:0">0</span><b style="left:0"></b>
@@ -1445,29 +1497,46 @@ if is_escape: bf16 = escapes.next()</code></pre>
             <div class="n">58.82 <span class="u">GiB</span></div>
           </div>
 
-          <!-- row 2 · conservative -->
+          <!-- row 2 · zstd, the free baseline -->
           <div class="p3-lab r2">
-            <div class="v"><span class="ix">02</span>CONSERVATIVE VARIANT</div>
-            <div class="s">12.0 B/W · 0.06% ESCAPES</div>
+            <div class="v"><span class="ix">02</span>ZSTD, THE FREE BASELINE <em class="p3-tag p3-tag--ink">MUST UNPACK TO RUN</em></div>
+            <div class="s">NO FIXED ADDRESS PER WEIGHT &mdash; ARCHIVE ONLY &middot; ESTIMATED FROM A SAMPLE</div>
           </div>
           <div class="p3-barcell r2">
+            <div class="p3-track" style="--w:78%">
+              <i class="p3-fill" aria-hidden="true"></i>
+              <i class="p3-cut" aria-hidden="true"></i>
+              <span class="p3-delta">&minus;~22%</span>
+            </div>
+          </div>
+          <div class="p3-val r2">
+            <div class="n">~45.9 <span class="u">GiB</span></div>
+            <div class="d">&minus;~12.9 GiB</div>
+          </div>
+
+          <!-- row 3 · byte-split, the kernel-proven form -->
+          <div class="p3-lab r3">
+            <div class="v"><span class="ix">03</span>BYTE-SPLIT CODE <em class="p3-tag p3-tag--ink">RAN THE 24% KERNEL</em></div>
+            <div class="s">12.0 BITS/WEIGHT &middot; HIGH BYTE CODED, LOW BYTE RAW</div>
+          </div>
+          <div class="p3-barcell r3">
             <div class="p3-track" style="--w:75.04%">
               <i class="p3-fill" aria-hidden="true"></i>
               <i class="p3-cut" aria-hidden="true"></i>
               <span class="p3-delta">&minus;24.95%</span>
             </div>
           </div>
-          <div class="p3-val r2">
+          <div class="p3-val r3">
             <div class="n"><span class="p3-count" data-from="58.82" data-to="44.14">44.14</span> <span class="u">GiB</span></div>
             <div class="d">&minus;14.68 GiB</div>
           </div>
 
-          <!-- row 3 · bit-regrouped (the headline) -->
-          <div class="p3-lab r3">
-            <div class="v"><span class="ix">03</span>BIT-REGROUPED <em class="p3-tag">THE HEADLINE</em></div>
-            <div class="s">11.3 B/W</div>
+          <!-- row 4 · regrouped code (the headline) -->
+          <div class="p3-lab r4">
+            <div class="v"><span class="ix">04</span>REGROUPED CODE <em class="p3-tag">THE HEADLINE</em></div>
+            <div class="s">~11.2 BITS/WEIGHT &middot; SIGN+EXP CODED, MANTISSA RAW &middot; ~2% ESCAPES</div>
           </div>
-          <div class="p3-barcell r3">
+          <div class="p3-barcell r4">
             <div class="p3-track" style="--w:69.98%">
               <i class="p3-fill" aria-hidden="true"></i>
               <i class="p3-cut" aria-hidden="true"></i>
@@ -1475,14 +1544,14 @@ if is_escape: bf16 = escapes.next()</code></pre>
               <span class="p3-delta">&minus;30.03%</span>
             </div>
           </div>
-          <div class="p3-val r3">
+          <div class="p3-val r4">
             <div class="n"><span class="p3-count" data-from="58.82" data-to="41.16">41.16</span> <span class="u">GiB</span></div>
             <div class="d">&minus;17.66 GiB</div>
           </div>
 
           <!-- caption row -->
           <div class="p3-cap">
-            <span>/// ALL 6,174 BF16 TENSORS ROUND-TRIP BIT-EXACT. NOT A SAMPLED SUBSET.</span>
+            <span>/// ROWS 03&ndash;04: EVERY WEIGHT AT A FIXED ADDRESS &mdash; THE GPU READS EITHER FORM IN PLACE. ROW 04&rsquo;S OWN KERNEL RUN IS PENDING. ALL 6,174 BF16 TENSORS RESTORED BIT-FOR-BIT (69 SMALL F32 TENSORS SHIP UNCHANGED). FOR SCALE: LOSSY 8-BIT SITS NEAR 8 BITS/WEIGHT &mdash; LOSSLESS CANNOT GO THERE.</span>
             <span class="m">METHOD: BIT-EXACT ROUND-TRIP (SHA-256)</span>
           </div>
         </div>
@@ -1510,45 +1579,47 @@ if is_escape: bf16 = escapes.next()</code></pre>
 
           <div class="p3-fam">
             <div class="p3-fam-top"><b>SUPER</b><span>120B</span></div>
-            <div class="p3-fam-pct">&minus;29.63%</div>
-            <p class="p3-fam-desc">~230 -&gt; ~162 GiB projected.</p>
-            <div class="p3-fam-stamp">[ 684 / 684 TENSORS IN PROBE ]</div>
+            <div class="p3-fam-pct">&minus;28.85%</div>
+            <p class="p3-fam-desc">~230 -&gt; ~164 GiB. All 42,642 tensors, all 50 shards, bit-for-bit.</p>
+            <div class="p3-fam-stamp">[ WHOLE MODEL, BIT-EXACT ]</div>
           </div>
 
           <div class="p3-fam">
             <div class="p3-fam-top"><b>ULTRA</b><span>550B</span></div>
             <div class="p3-fam-pct">&minus;29.29%</div>
             <p class="p3-fam-desc">~1,044 -&gt; ~738 GiB projected: 306 GiB off one checkpoint.</p>
-            <div class="p3-fam-stamp">[ 106 / 106 TENSORS IN PROBE ]</div>
+            <div class="p3-fam-stamp">[ 1-SHARD PROBE, 106 TENSORS &mdash; ALL PROJECTED ]</div>
           </div>
 
           <!-- magnified spread: the three reductions on one zoomed scale -->
           <div class="p3-spread">
             <div class="p3-sp-head">
               <span class="lbl">DETAIL · REDUCTION ACROSS THE FAMILY</span>
-              <span class="lbl">SCALE MAGNIFIED · 29.0 – 30.5 %</span>
+              <span class="lbl">SCALE MAGNIFIED · 28.5 – 30.5 %</span>
             </div>
             <div class="p3-sp-track">
               <i class="p3-sp-min" style="left:0" aria-hidden="true"></i>
-              <span class="p3-sp-minlab z" style="left:0" aria-hidden="true">29.0</span>
-              <i class="p3-sp-min" style="left:33.33%" aria-hidden="true"></i>
-              <span class="p3-sp-minlab" style="left:33.33%" aria-hidden="true">29.5</span>
-              <i class="p3-sp-min" style="left:66.67%" aria-hidden="true"></i>
-              <span class="p3-sp-minlab" style="left:66.67%" aria-hidden="true">30.0</span>
+              <span class="p3-sp-minlab z" style="left:0" aria-hidden="true">28.5</span>
+              <i class="p3-sp-min" style="left:25%" aria-hidden="true"></i>
+              <span class="p3-sp-minlab" style="left:25%" aria-hidden="true">29.0</span>
+              <i class="p3-sp-min" style="left:50%" aria-hidden="true"></i>
+              <span class="p3-sp-minlab" style="left:50%" aria-hidden="true">29.5</span>
+              <i class="p3-sp-min" style="left:75%" aria-hidden="true"></i>
+              <span class="p3-sp-minlab" style="left:75%" aria-hidden="true">30.0</span>
               <i class="p3-sp-min" style="left:calc(100% - 1px)" aria-hidden="true"></i>
               <span class="p3-sp-minlab max" style="left:100%" aria-hidden="true">30.5</span>
 
-              <i class="p3-sp-mark" style="left:19.33%" aria-hidden="true"></i>
-              <span class="p3-sp-marklab" style="left:19.33%">ULTRA<b>29.29</b></span>
-              <i class="p3-sp-mark" style="left:42%" aria-hidden="true"></i>
-              <span class="p3-sp-marklab" style="left:42%">SUPER<b>29.63</b></span>
-              <i class="p3-sp-mark hero" style="left:68.67%" aria-hidden="true"></i>
-              <span class="p3-sp-marklab hero" style="left:68.67%">NANO<b>30.03</b></span>
+              <i class="p3-sp-mark" style="left:17.5%" aria-hidden="true"></i>
+              <span class="p3-sp-marklab" style="left:17.5%">SUPER<b>28.85</b></span>
+              <i class="p3-sp-mark" style="left:39.5%" aria-hidden="true"></i>
+              <span class="p3-sp-marklab" style="left:39.5%">ULTRA<b>29.29</b></span>
+              <i class="p3-sp-mark hero" style="left:76.5%" aria-hidden="true"></i>
+              <span class="p3-sp-marklab hero" style="left:76.5%">NANO<b>30.03</b></span>
             </div>
           </div>
 
           <div class="p3-famnote">
-            <p>Flat within a point across an 18x size span: the win comes from how the family stores BF16, not from any one model.</p>
+            <p>Within 1.2 points across an 18x size span, two of the three measured wall-to-wall: the win comes from how BF16 stores a trained network, not from any one model.</p>
           </div>
         </div>
       </div>
@@ -1576,8 +1647,8 @@ if is_escape: bf16 = escapes.next()</code></pre>
           <span class="p4-stamp">OPEN</span>
         </div>
         <h3>The gap we can see</h3>
-        <p>The 33.7% codec exists but isn&rsquo;t GPU-readable yet. Closing that is a layout problem, and a layout problem is exactly what step&nbsp;3 solved.</p>
-        <div class="p4-item-foot">Status: layout problem &middot; Precedent: step 3</div>
+        <p>A storage-only codec reaches 33.7%; random access costs points back. The gap is closing: a verified container with per-weight random access sits at 31.89%, and a tile format &mdash; coding small blocks of weights instead of single weights &mdash; measures 33.2%, decoding one block at a time. What&rsquo;s open is carrying that into a kernel-proven form. Step&nbsp;3 already solved one problem of exactly this species.</p>
+        <div class="p4-item-foot">Status: layout problem &middot; Best verified: 31.89% &middot; Precedent: step 3</div>
       </article>
 
       <article class="p4-item p4-item--wall reveal">
@@ -1585,9 +1656,9 @@ if is_escape: bf16 = escapes.next()</code></pre>
           <span class="lbl">Open item 02 &middot; Hypothesis</span>
           <span class="p4-stamp">OPEN</span>
         </div>
-        <h3>The wall we might be wrong about</h3>
-        <p>&ldquo;The mantissa is random&rdquo; means &ldquo;random to every tool we aimed at it.&rdquo; A new hypothesis about how training sculpts those 7 bits would reopen the hunt past 34%.</p>
-        <div class="p4-item-foot">Status: awaiting hypothesis &middot; Stakes: past 34%</div>
+        <h3>The wall that already cracked &mdash; a hairline</h3>
+        <p>&ldquo;The mantissa is random&rdquo; only ever meant &ldquo;random to every tool we aimed at it.&rdquo; Proof: a fresh look found a faint, exponent-driven bias in its top bit &mdash; measured, then cashed for ~0.04 bits/weight. A hair off the total; the ~34% limit stands. But the lesson does too: &ldquo;random&rdquo; is a verdict on our tools, never on the bits. The next hypothesis is welcome.</p>
+        <div class="p4-item-foot">Status: bias found &amp; cashed (+0.04 bits/weight) &middot; Stakes: the next crack</div>
       </article>
     </div>
 
@@ -1595,7 +1666,7 @@ if is_escape: bf16 = escapes.next()</code></pre>
       <div class="p4-run-l">
         <span class="lbl">&gt;&gt;&gt; Reproduction protocol</span>
         <h3>Don&rsquo;t trust it. <em>Run it.</em></h3>
-        <p>One script, numpy only, no GPU. Everything on this page is reproducible from the repo.</p>
+        <p>One script, numpy only, no GPU. It rebuilds every tensor and checks the hashes &mdash; the sizes and the bit-exactness, the whole claim except kernel speed (that harness is in the repo too). Bring the original checkpoint from Hugging Face (~59 GiB).</p>
         <a class="p4-btn" href="https://github.com/brianbell-x/weight-compression/blob/main/research/candidates/0009-fusible-exponent-codebook/REPRODUCE.md">Open REPRODUCE.md -&gt;</a>
       </div>
       <div class="p4-run-r">
@@ -1607,21 +1678,23 @@ if is_escape: bf16 = escapes.next()</code></pre>
         <ul class="p4-spec">
           <li><span class="k">Deps</span><span class="v">numpy only</span></li>
           <li><span class="k">GPU</span><span class="v">not required</span></li>
+          <li><span class="k">Input</span><span class="v">the BF16 checkpoint (~59 GiB)</span></li>
           <li><span class="k">Method</span><span class="v">bit-exact round-trip (SHA-256)</span></li>
+          <li><span class="k">Kernel bench</span><span class="v">tests/GPU_RUN.md, same repo</span></li>
         </ul>
       </div>
     </div>
 
     <footer class="p4-colophon reveal">
       <div class="p4-col-grid">
-        <p class="p4-col-note">All figures are measured on the NVIDIA Nemotron-3 family, anchored by <a href="https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16">nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16</a>. Methods and artifacts live in this repository under <span class="mono">research/</span>.</p>
+        <p class="p4-col-note">All figures are measured on the NVIDIA Nemotron-3 family, anchored by <a href="https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16">nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16</a>. Methods and artifacts live in this repository under <span class="mono">research/</span>. Found something &mdash; or have a hypothesis about those 7 bits? Open an issue on the repo.</p>
         <div class="p4-field">
           <span class="lbl">Doc</span>
           <span class="val">brianbell-x/weight-compression</span>
         </div>
         <div class="p4-field">
           <span class="lbl">Status</span>
-          <span class="val">Ongoing</span>
+          <span class="val">Ongoing &mdash; July 2026</span>
         </div>
         <div class="p4-field">
           <span class="lbl">Subject</span>
