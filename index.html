@@ -79,28 +79,8 @@
   }
 </style>
 <style data-plate="0">
-  /* ============ PLATE 0 — MASTHEAD + GAUGE ============ */
+  /* ============ PLATE 0 — GAUGE ============ */
   #plate-0{padding-top:36px}
-
-  /* ---- title block (drawing header) ---- */
-  #plate-0 .p0-tblock{
-    display:grid;grid-template-columns:1.15fr 1.55fr 1.5fr 1.35fr .78fr;
-    gap:1px;background:var(--ink);border:1px solid var(--ink);margin-bottom:52px;
-  }
-  #plate-0 .p0-cell{background:var(--paper);padding:10px 14px 12px}
-  #plate-0 .p0-l{
-    display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--ink2);
-  }
-  #plate-0 .p0-v{
-    display:block;margin-top:6px;font-family:var(--mono);font-size:12px;
-    letter-spacing:.04em;color:var(--ink);font-weight:500;
-    font-variant-numeric:tabular-nums;overflow-wrap:break-word;
-  }
-  #plate-0 .p0-v a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
-  #plate-0 .p0-v a:hover{color:var(--red)}
-  #plate-0 .p0-dot{display:inline-block;width:9px;height:9px;background:var(--red);margin-right:8px;vertical-align:baseline}
-  #plate-0 .p0-cell--status .p0-v{font-weight:700}
 
   /* ---- headline ---- */
   #plate-0 h1{
@@ -275,12 +255,6 @@
   }
   #plate-0 .p0-q p{margin:0;font-size:14px;line-height:1.5;color:var(--ink)}
 
-  /* ---- title block steps down before the single-column collapse ---- */
-  @media(max-width:900px){
-    #plate-0 .p0-tblock{grid-template-columns:repeat(2,1fr)}
-    #plate-0 .p0-cell--status{grid-column:1/-1}
-  }
-
   /* ---- annotations collapse before mobile (flags need room) ---- */
   @media(max-width:960px){
     #plate-0 .p0-gtop,#plate-0 .p0-gbot,#plate-0 .p0-zone{display:none}
@@ -292,7 +266,6 @@
   /* ---- mobile ---- */
   @media(max-width:720px){
     #plate-0{padding-top:24px}
-    #plate-0 .p0-tblock{grid-template-columns:1fr;margin-bottom:36px}
     #plate-0 h1{text-wrap:balance}
     #plate-0 h1 br{display:none}
     #plate-0 .p0-hero{margin-top:36px}
@@ -936,36 +909,6 @@
 
 <section class="plate" id="plate-0">
   <div class="wrap">
-
-    <header class="phead">
-      <span class="fig">PLATE 0</span>
-      <span>TECHNICAL BULLETIN — THE LOSSLESS COMPRESSION HUNT</span>
-      <span>SHEET 1 / 5</span>
-    </header>
-
-    <!-- drawing title block -->
-    <div class="p0-tblock reveal" style="transition-delay:.04s">
-      <div class="p0-cell">
-        <span class="p0-l">DOC</span>
-        <span class="p0-v">brianbell-x/weight-compression</span>
-      </div>
-      <div class="p0-cell">
-        <span class="p0-l">SUBJECT</span>
-        <span class="p0-v">LOSSLESS COMPRESSION OF LLM WEIGHTS</span>
-      </div>
-      <div class="p0-cell">
-        <span class="p0-l">SPECIMEN</span>
-        <span class="p0-v"><a href="https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16">NVIDIA NEMOTRON-3 FAMILY (BF16)</a></span>
-      </div>
-      <div class="p0-cell">
-        <span class="p0-l">METHOD</span>
-        <span class="p0-v">BIT-EXACT ROUND-TRIP (SHA-256)</span>
-      </div>
-      <div class="p0-cell p0-cell--status">
-        <span class="p0-l">STATUS</span>
-        <span class="p0-v"><span class="p0-dot" aria-hidden="true"></span>ONGOING</span>
-      </div>
-    </div>
 
     <h1 class="reveal" style="transition-delay:.1s">30% smaller. Bit-for-bit identical.<br>The GPU runs it still compressed.</h1>
 
