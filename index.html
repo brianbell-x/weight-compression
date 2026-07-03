@@ -642,14 +642,6 @@
 
     <div class="p0-hero reveal" id="p0-hero" style="transition-delay:.22s">
 
-      <div class="p0-score">
-        <p class="p0-big"><span class="p0-cwrap"><span class="p0-ghost" aria-hidden="true">30.03</span><span id="p0-count">30.03</span></span><span class="p0-pct">%</span></p>
-        <div class="p0-scorelbl">
-          <div class="p0-slword">Smaller,<br>losslessly</div>
-          <p class="p0-ctx">NVIDIA NEMOTRON-3 NANO 30B &middot; 58.82 GiB -&gt; 41.16 GiB &middot; BIT-EXACT</p>
-        </div>
-      </div>
-
       <figure class="p0-flowfig" id="p0-gauge">
         <svg class="p0-flow" viewBox="0 0 740 300" role="img"
           aria-label="Compression flow. Left: the original Nemotron-3 Ultra 550B BF16 weights, 1,044 GB. An arrow leads to VRAM, where the weights sit as a smaller compressed block: 750 GB, 294 GB removed, 28.20 percent compression, bit-exact. A dashed outline marks the full 1,044 GB size it would otherwise expand back to, but it is never re-inflated to full width before the math runs.">
@@ -823,13 +815,10 @@
 <script data-plate="0">
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var hero  = document.getElementById('p0-hero');
-  var count = document.getElementById('p0-count');
   var gauge = document.getElementById('p0-gauge');
-  if (reduce || !('IntersectionObserver' in window) || !hero || !count || !gauge) return;
+  if (reduce || !('IntersectionObserver' in window) || !gauge) return;
 
   gauge.classList.add('p0-armed');
-  count.textContent = '00.00';
 
   var fired = false;
   var io = new IntersectionObserver(function(entries){
@@ -837,17 +826,7 @@
       if (!en.isIntersecting || fired) return;
       fired = true;
       io.disconnect();
-      gauge.classList.add('p0-go');            /* fill sweeps 0 -> 30.03% (CSS transition) */
-      var D = 2200, t0 = performance.now();
-      var step = function(now){
-        var t = Math.min((now - t0) / D, 1);
-        var e = 1 - Math.pow(1 - t, 4);        /* easeOutQuart */
-        var v = 30.03 * e;
-        count.textContent = (v < 10 ? '0' : '') + v.toFixed(2);
-        if (t < 1) requestAnimationFrame(step);
-        else count.textContent = '30.03';
-      };
-      requestAnimationFrame(step);
+      gauge.classList.add('p0-go');            /* reveals the flow diagram + shrink animation */
     });
   }, {threshold:.3});
   /* observe the gauge itself — the tall hero can make a ratio threshold unreachable */
