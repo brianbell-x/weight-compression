@@ -10,12 +10,12 @@
 <meta property="og:url" content="https://brianbell-x.github.io/weight-compression/" />
 <meta property="og:title" content="Lossless Model Compression Experiment" />
 <meta property="og:description" content="30% smaller so far, in storage and in VRAM. The weights reconstruct bit-for-bit, so the model computes exactly the same thing." />
-<meta property="og:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703d" />
+<meta property="og:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703e" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="Progress card: lossless model compression, 30.03% smaller so far." />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703d" />
+<meta name="twitter:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703e" />
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1528,40 +1528,42 @@ if is_escape: bf16 = escapes[row_base + k]</code></pre>
 
           <div class="p3-fam">
             <div class="p3-fam-top"><b>ULTRA</b><span>550B</span></div>
-            <div class="p3-fam-pct">&minus;29.29%</div>
-            <p class="p3-fam-desc">~1,044 -&gt; ~738 GiB projected: 306 GiB off one checkpoint.</p>
-            <div class="p3-fam-stamp">[ 1-SHARD PROBE, 106 TENSORS &mdash; ALL PROJECTED ]</div>
+            <div class="p3-fam-pct">&minus;28.20%</div>
+            <p class="p3-fam-desc">~1,044 -&gt; ~750 GiB: 294 GiB off one checkpoint. All 50,974 tensors, all 225 shards, bit-for-bit.</p>
+            <div class="p3-fam-stamp">[ WHOLE MODEL, BIT-EXACT ]</div>
           </div>
 
           <!-- magnified spread: the three reductions on one zoomed scale -->
           <div class="p3-spread">
             <div class="p3-sp-head">
               <span class="lbl">DETAIL · REDUCTION ACROSS THE FAMILY</span>
-              <span class="lbl">SCALE MAGNIFIED · 28.5 – 30.5 %</span>
+              <span class="lbl">SCALE MAGNIFIED · 28.0 – 30.5 %</span>
             </div>
             <div class="p3-sp-track">
               <i class="p3-sp-min" style="left:0" aria-hidden="true"></i>
-              <span class="p3-sp-minlab z" style="left:0" aria-hidden="true">28.5</span>
-              <i class="p3-sp-min" style="left:25%" aria-hidden="true"></i>
-              <span class="p3-sp-minlab" style="left:25%" aria-hidden="true">29.0</span>
-              <i class="p3-sp-min" style="left:50%" aria-hidden="true"></i>
-              <span class="p3-sp-minlab" style="left:50%" aria-hidden="true">29.5</span>
-              <i class="p3-sp-min" style="left:75%" aria-hidden="true"></i>
-              <span class="p3-sp-minlab" style="left:75%" aria-hidden="true">30.0</span>
+              <span class="p3-sp-minlab z" style="left:0" aria-hidden="true">28.0</span>
+              <i class="p3-sp-min" style="left:20%" aria-hidden="true"></i>
+              <span class="p3-sp-minlab" style="left:20%" aria-hidden="true">28.5</span>
+              <i class="p3-sp-min" style="left:40%" aria-hidden="true"></i>
+              <span class="p3-sp-minlab" style="left:40%" aria-hidden="true">29.0</span>
+              <i class="p3-sp-min" style="left:60%" aria-hidden="true"></i>
+              <span class="p3-sp-minlab" style="left:60%" aria-hidden="true">29.5</span>
+              <i class="p3-sp-min" style="left:80%" aria-hidden="true"></i>
+              <span class="p3-sp-minlab" style="left:80%" aria-hidden="true">30.0</span>
               <i class="p3-sp-min" style="left:calc(100% - 1px)" aria-hidden="true"></i>
               <span class="p3-sp-minlab max" style="left:100%" aria-hidden="true">30.5</span>
 
-              <i class="p3-sp-mark" style="left:17.5%" aria-hidden="true"></i>
-              <span class="p3-sp-marklab" style="left:17.5%">SUPER<b>28.85</b></span>
-              <i class="p3-sp-mark" style="left:39.5%" aria-hidden="true"></i>
-              <span class="p3-sp-marklab" style="left:39.5%">ULTRA<b>29.29</b></span>
-              <i class="p3-sp-mark hero" style="left:76.5%" aria-hidden="true"></i>
-              <span class="p3-sp-marklab hero" style="left:76.5%">NANO<b>30.03</b></span>
+              <i class="p3-sp-mark" style="left:8%" aria-hidden="true"></i>
+              <span class="p3-sp-marklab" style="left:8%">ULTRA<b>28.20</b></span>
+              <i class="p3-sp-mark" style="left:34%" aria-hidden="true"></i>
+              <span class="p3-sp-marklab" style="left:34%">SUPER<b>28.85</b></span>
+              <i class="p3-sp-mark hero" style="left:81.2%" aria-hidden="true"></i>
+              <span class="p3-sp-marklab hero" style="left:81.2%">NANO<b>30.03</b></span>
             </div>
           </div>
 
           <div class="p3-famnote">
-            <p>Within 1.2 points across an 18x size span, two of the three measured wall-to-wall: the win comes from how BF16 stores a trained network, not from any one model.</p>
+            <p>Under 2 points across an 18x size span, and now all three measured wall-to-wall &mdash; whole model, bit-for-bit: the win comes from how BF16 stores a trained network, not from any one model.</p>
           </div>
         </div>
       </div>
