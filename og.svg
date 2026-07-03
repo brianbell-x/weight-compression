@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <pattern id="noise" width="8" height="8" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r=".55" fill="#57544C" opacity=".28"/>
+      <circle cx="6" cy="4" r=".45" fill="#57544C" opacity=".2"/>
+    </pattern>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="7" stroke="#57544C" stroke-width="1" opacity=".55"/>
+    </pattern>
+    <style>
+      .paper { fill: #F2F0EA; }
+      .paper2 { fill: #E9E6DE; }
+      .ink { fill: #141412; }
+      .ink2 { fill: #57544C; }
+      .red { fill: #D92B1C; }
+      .stroke { stroke: #141412; stroke-width: 1.5; fill: none; }
+      .stroke-red { stroke: #D92B1C; stroke-width: 2; fill: none; }
+      .mono { font-family: Consolas, "Courier New", monospace; font-weight: 700; letter-spacing: 4px; }
+      .mono-small { font-family: Consolas, "Courier New", monospace; font-weight: 700; letter-spacing: 2px; }
+      .black { font-family: "Arial Black", Arial, sans-serif; font-weight: 900; letter-spacing: -3px; }
+    </style>
+  </defs>
+
+  <rect class="paper" width="1200" height="630"/>
+  <rect width="1200" height="630" fill="url(#noise)" opacity=".22"/>
+
+  <text x="22" y="28" class="mono-small ink" font-size="13">+</text>
+  <text x="1172" y="28" class="mono-small ink" font-size="13">+</text>
+  <text x="22" y="610" class="mono-small ink" font-size="13">+</text>
+  <text x="1172" y="610" class="mono-small ink" font-size="13">+</text>
+
+  <text x="56" y="58" class="mono ink" font-size="18">[ PUBLIC PROGRESS LOG ]</text>
+  <text x="1144" y="58" text-anchor="end" class="mono-small ink" font-size="16">ONGOING</text>
+  <line x1="56" y1="78" x2="1144" y2="78" class="stroke"/>
+
+  <text x="56" y="170" class="black ink" font-size="76">LOSSLESS MODEL</text>
+  <text x="56" y="252" class="black ink" font-size="76">COMPRESSION</text>
+  <text x="56" y="334" class="black red" font-size="76">EXPERIMENT</text>
+
+  <g transform="translate(782 118)">
+    <rect x="0" y="0" width="362" height="242" class="red"/>
+    <text x="181" y="132" text-anchor="middle" class="black paper" font-size="86">30.03%</text>
+    <text x="181" y="178" text-anchor="middle" class="mono-small paper" font-size="24">SO FAR</text>
+  </g>
+
+  <g transform="translate(56 394)">
+    <rect x="0" y="0" width="260" height="72" class="paper2"/>
+    <rect x="0" y="0" width="260" height="72" class="stroke"/>
+    <text x="22" y="46" class="mono-small ink" font-size="24">STORAGE + VRAM</text>
+  </g>
+
+  <g transform="translate(336 394)">
+    <rect x="0" y="0" width="220" height="72" class="paper2"/>
+    <rect x="0" y="0" width="220" height="72" class="stroke"/>
+    <text x="22" y="46" class="mono-small ink" font-size="24">BIT-EXACT</text>
+  </g>
+
+  <g transform="translate(576 394)">
+    <rect x="0" y="0" width="286" height="72" class="paper2"/>
+    <rect x="0" y="0" width="286" height="72" class="stroke"/>
+    <text x="22" y="46" class="mono-small ink" font-size="24">QUALITY UNCHANGED</text>
+  </g>
+
+  <g transform="translate(882 394)">
+    <rect x="0" y="0" width="262" height="72" class="paper2"/>
+    <rect x="0" y="0" width="262" height="72" class="stroke"/>
+    <text x="22" y="46" class="mono-small ink" font-size="24">NEMOTRON-3 FAMILY</text>
+  </g>
+
+  <g transform="translate(56 518)">
+    <rect x="0" y="0" width="1088" height="42" class="paper"/>
+    <rect x="0" y="0" width="1088" height="42" class="stroke"/>
+    <rect x="0" y="0" width="327" height="42" class="red"/>
+    <rect x="370" y="0" width="718" height="42" fill="url(#hatch)" opacity=".8"/>
+    <line x1="327" y1="-9" x2="327" y2="52" class="stroke"/>
+    <line x1="370" y1="-9" x2="370" y2="52" class="stroke-red" stroke-dasharray="6 6"/>
+  </g>
+
+  <text x="56" y="592" class="mono-small ink2" font-size="15">MEASURED LIMIT ~34%</text>
+</svg>
