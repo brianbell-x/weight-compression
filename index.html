@@ -666,9 +666,9 @@
             <rect x="430" y="40" width="300" height="240" fill="none" stroke="#141412" stroke-width="1.5" stroke-dasharray="7 7"/>
             <g class="sq">
               <rect x="455" y="78" width="250" height="164" fill="#D92B1C" stroke="#141412" stroke-width="1.5"/>
-              <text x="580" y="132" text-anchor="middle" class="big" font-size="40" fill="#F2F0EA">&#8722;294 GB</text>
-              <text x="580" y="170" text-anchor="middle" class="big" font-size="26" fill="#F2F0EA">750 GB</text>
-              <text x="580" y="204" text-anchor="middle" class="mn" font-size="13" fill="#F2F0EA">28.20% COMPRESSION</text>
+              <text id="p0-n-off" x="580" y="132" text-anchor="middle" class="big" font-size="40" fill="#F2F0EA">&#8722;294 GB</text>
+              <text id="p0-n-size" x="580" y="170" text-anchor="middle" class="big" font-size="26" fill="#F2F0EA">750 GB</text>
+              <text id="p0-n-pct" x="580" y="204" text-anchor="middle" class="mn" font-size="13" fill="#F2F0EA">28.20% COMPRESSION</text>
             </g>
             <text x="580" y="270" text-anchor="middle" class="sub" font-size="12">NEVER RE-INFLATED</text>
           </g>
@@ -813,10 +813,30 @@
       fired = true;
       io.disconnect();
       gauge.classList.add('p0-go');            /* reveals the flow diagram + shrink animation */
+      countNumbers();
     });
   }, {threshold:.3});
   /* observe the gauge itself — the tall hero can make a ratio threshold unreachable */
   io.observe(gauge);
+
+  /* count the compressed-box numbers up/down as the block shrinks into place */
+  function countNumbers(){
+    var off = document.getElementById('p0-n-off');
+    var size = document.getElementById('p0-n-size');
+    var pct = document.getElementById('p0-n-pct');
+    var dur = 1300, delay = 700, start = null;
+    var ease = function(t){ return 1 - Math.pow(1 - t, 3); };
+    function frame(ts){
+      if (start === null) start = ts;
+      var t = Math.min(1, Math.max(0, (ts - start - delay) / dur));
+      var e = ease(t);
+      if (off)  off.textContent  = '−' + Math.round(294 * e) + ' GB';
+      if (size) size.textContent = Math.round(1044 - 294 * e) + ' GB';
+      if (pct)  pct.textContent  = (28.20 * e).toFixed(2) + '% COMPRESSION';
+      if (t < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
 })();
 </script>
 <script data-plate="3">
