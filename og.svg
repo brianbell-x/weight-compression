@@ -35,5 +35,5 @@
     <text x="165" y="278" text-anchor="middle" class="mono ink2" font-size="14" letter-spacing="1">NEVER RE-INFLATED</text>
   </g>
 
-  <text x="72" y="566" class="mono ink" font-size="23" letter-spacing="2">READ IN PLACE ON THE GPU &#183; SHA-256 MATCH &#183; NO QUALITY TRADEOFF</text>
+  <text x="600" y="566" text-anchor="middle" class="mono ink" font-size="23" letter-spacing="2">READ IN PLACE ON THE GPU &#183; SHA-256 MATCH &#183; NO QUALITY TRADEOFF</text>
 </svg>
