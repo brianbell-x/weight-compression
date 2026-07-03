@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>30% smaller weights, bit-for-bit identical — The Lossless Compression Hunt</title>
-<meta name="description" content="Lossless compression of LLM weights: 30.03% smaller, every tensor bit-exact, in a form the GPU reads still-compressed — 24% faster on an RTX 4090. Measured limit ~34%. The hunt continues." />
+<title>The Lossless Weight Compression Notebook</title>
+<meta name="description" content="A running notebook on making model weights smaller without changing what they compute. Lossless compression means bit-for-bit identical weights, identical outputs, and no quality tradeoff." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://brianbell-x.github.io/weight-compression/" />
-<meta property="og:title" content="Model weights 30% lighter. Lossless." />
-<meta property="og:description" content="Bit-for-bit identical weights, 30.03% smaller — and the GPU runs them still compressed. The measured lossless limit is about 34%. The hunt continues." />
+<meta property="og:title" content="The Lossless Weight Compression Notebook" />
+<meta property="og:description" content="A running notebook on making model weights smaller without changing what they compute: bit-for-bit identical weights, identical outputs, and no quality tradeoff." />
 <meta property="og:image" content="https://brianbell-x.github.io/weight-compression/og.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Technical bulletin card: model weights 30% lighter, lossless. A 0-to-100% gauge filled to 30.03%, with the measured limit marked at about 34%." />
+<meta property="og:image:alt" content="Technical bulletin card for The Lossless Weight Compression Notebook, with a 0-to-100% compression gauge filled to 30.03% and the measured limit marked at about 34%." />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Model weights 30% lighter. Lossless." />
-<meta name="twitter:description" content="Bit-for-bit identical weights, 30.03% smaller — and the GPU runs them still compressed. The measured lossless limit is about 34%. The hunt continues." />
+<meta name="twitter:title" content="The Lossless Weight Compression Notebook" />
+<meta name="twitter:description" content="A running notebook on making model weights smaller without changing what they compute: bit-for-bit identical weights, identical outputs, and no quality tradeoff." />
 <meta name="twitter:image" content="https://brianbell-x.github.io/weight-compression/og.png" />
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -910,9 +910,9 @@
 <section class="plate" id="plate-0">
   <div class="wrap">
 
-    <h1 class="reveal" style="transition-delay:.1s">30% smaller. Bit-for-bit identical.<br>The GPU runs it still compressed.</h1>
+    <h1 class="reveal" style="transition-delay:.1s">The Lossless Weight<br>Compression Notebook</h1>
 
-    <p class="p0-sub reveal" style="transition-delay:.16s">A model&rsquo;s weights are one giant file of numbers &mdash; most of what a model costs to store, ship, and hold in GPU memory. This is a running hunt to shrink that file without changing a single bit: nothing rounded, nothing pruned, the same model to the last digit, in a form the GPU can read without unpacking it first. Measured on NVIDIA&rsquo;s Nemotron-3 family. The score so far:</p>
+    <p class="p0-sub reveal" style="transition-delay:.16s">A running notebook on making model weights smaller without changing what they compute. Most model compression trades bits for quality; lossless avoids that trade entirely: nothing rounded, nothing pruned, the same model to the last digit. Measured on NVIDIA&rsquo;s Nemotron-3 family. Current progress:</p>
 
     <div class="p0-hero reveal" id="p0-hero" style="transition-delay:.22s">
 
