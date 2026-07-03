@@ -16,10 +16,9 @@
     <text x="0" y="-16" class="mono ink2" font-size="16" letter-spacing="2">ORIGINAL</text>
     <rect x="0" y="0" width="322" height="240" fill="#E9E6DE"/>
     <rect x="0" y="0" width="322" height="240" class="stroke"/>
-    <text x="161" y="88" text-anchor="middle" class="black ink" font-size="25" letter-spacing="-1">NEMOTRON-3</text>
-    <text x="161" y="120" text-anchor="middle" class="black ink" font-size="25" letter-spacing="-1">ULTRA 550B</text>
-    <text x="161" y="160" text-anchor="middle" class="mono ink2" font-size="14" letter-spacing="1">model.safetensors &#183; BF16</text>
-    <text x="161" y="208" text-anchor="middle" class="black ink" font-size="34" letter-spacing="-1">1,044 GB</text>
+    <text x="161" y="74" text-anchor="middle" class="mono ink" font-size="16" letter-spacing="1">NEMOTRON-3 ULTRA 550B</text>
+    <text x="161" y="150" text-anchor="middle" class="black ink" font-size="52" letter-spacing="-2">1,044 GB</text>
+    <text x="161" y="196" text-anchor="middle" class="mono ink2" font-size="13" letter-spacing="1">model.safetensors &#183; BF16</text>
   </g>
   <!-- arrow 1 -->
   <path d="M414 376 L484 376 L484 358 L518 390 L484 422 L484 404 L414 404 Z" class="red"/>
