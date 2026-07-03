@@ -10,12 +10,12 @@
 <meta property="og:url" content="https://brianbell-x.github.io/weight-compression/" />
 <meta property="og:title" content="Lossless Model Compression Experiment" />
 <meta property="og:description" content="30% smaller so far, in storage and in VRAM. The weights reconstruct bit-for-bit, so the model computes exactly the same thing." />
-<meta property="og:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703f" />
+<meta property="og:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703g" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Flow: original Nemotron-3 BF16 weights compressed smaller (Nano 30B -30.03%, Ultra 550B -28.20%) and kept compressed in VRAM, never re-inflated." />
+<meta property="og:image:alt" content="Flow: Nemotron-3 Ultra 550B BF16 weights, 1,044 GiB, compressed 28.20% to 750 GiB, and kept compressed in VRAM, never re-inflated." />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703f" />
+<meta name="twitter:image" content="https://brianbell-x.github.io/weight-compression/og.png?v=20260703g" />
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1616,8 +1616,8 @@ if is_escape: bf16 = escapes[row_base + k]</code></pre>
           <span class="p4-stamp">OPEN</span>
         </div>
         <h3>The gap we can see</h3>
-        <p>A storage-only codec reaches 33.7%; random access costs points back. The gap is closing: a verified container with per-weight random access sits at 31.89%, and a tile format &mdash; coding small blocks of weights instead of single weights &mdash; measures 33.2%, decoding one block at a time. What&rsquo;s open is carrying that into a kernel-proven form. Step&nbsp;3 already solved one problem of exactly this species.</p>
-        <div class="p4-item-foot">Status: layout problem &middot; Best verified: 31.89% &middot; Precedent: step 3</div>
+        <p>A storage-only codec reaches 33.7%; random access costs points back. The gap is closing: a verified container with per-weight random access sits at 31.89%, and a tile format &mdash; coding small blocks of weights instead of single weights &mdash; measures 33.2% end-to-end, 33.6% with a sharper coder: essentially the ~34% ceiling, realized and round-trip-verified, decoding one block at a time. What&rsquo;s open is carrying that block-addressable form into a kernel. Step&nbsp;3 already solved one problem of exactly this species.</p>
+        <div class="p4-item-foot">Status: layout problem &middot; Per-weight best: 31.89% &middot; Block-granular best: 33.6% &middot; Precedent: step 3</div>
       </article>
 
       <article class="p4-item p4-item--wall reveal">
