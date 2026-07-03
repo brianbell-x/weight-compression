@@ -23,11 +23,9 @@
   <text x="880" y="404" class="black ink" font-size="42" letter-spacing="-1">SO FAR</text>
 
   <g transform="translate(72 474)">
-    <rect x="0" y="0" width="1056" height="42" class="stroke"/>
+    <rect x="0" y="0" width="1056" height="42" fill="#E9E6DE"/>
     <rect x="0" y="0" width="317" height="42" class="red"/>
-    <rect x="359" y="0" width="697" height="42" fill="#E9E6DE"/>
-    <line x1="359" y1="-9" x2="359" y2="51" stroke="#D92B1C" stroke-width="2" stroke-dasharray="6 6"/>
-    <text x="359" y="-19" text-anchor="middle" class="mono ink2" font-size="15" letter-spacing="2">MEASURED LIMIT ~34%</text>
+    <rect x="0" y="0" width="1056" height="42" class="stroke"/>
   </g>
 
   <text x="72" y="578" class="mono ink" font-size="21" letter-spacing="2">IN STORAGE AND IN VRAM &#183; BIT-EXACT &#183; IDENTICAL OUTPUTS</text>
