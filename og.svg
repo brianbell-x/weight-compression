@@ -11,38 +11,38 @@
   <line x1="72" y1="102" x2="1128" y2="102" class="stroke"/>
   <text x="68" y="180" class="black ink" font-size="58" letter-spacing="-2">LOSSLESS MODEL COMPRESSION</text>
 
-  <!-- box1 ORIGINAL: Ultra 550B weights -->
+  <!-- box1 ORIGINAL: Ultra 550B weights (full size) -->
   <g transform="translate(72 270)">
     <text x="0" y="-16" class="mono ink2" font-size="16" letter-spacing="2">ORIGINAL</text>
-    <rect x="0" y="0" width="322" height="240" fill="#E9E6DE"/>
-    <rect x="0" y="0" width="322" height="240" class="stroke"/>
-    <text x="161" y="74" text-anchor="middle" class="mono ink" font-size="16" letter-spacing="1">NEMOTRON-3 ULTRA 550B</text>
-    <text x="161" y="150" text-anchor="middle" class="black ink" font-size="52" letter-spacing="-2">1,044 GB</text>
-    <text x="161" y="196" text-anchor="middle" class="mono ink2" font-size="13" letter-spacing="1">model.safetensors &#183; BF16</text>
+    <rect x="0" y="0" width="300" height="240" fill="#E9E6DE"/>
+    <rect x="0" y="0" width="300" height="240" class="stroke"/>
+    <text x="150" y="68" text-anchor="middle" class="mono ink" font-size="16" letter-spacing="1">NEMOTRON-3 ULTRA 550B</text>
+    <text x="150" y="150" text-anchor="middle" class="black ink" font-size="50" letter-spacing="-2">1,044 GB</text>
+    <text x="150" y="196" text-anchor="middle" class="mono ink2" font-size="13" letter-spacing="1">model.safetensors &#183; BF16</text>
   </g>
   <!-- arrow 1 -->
-  <path d="M414 376 L484 376 L484 358 L518 390 L484 422 L484 404 L414 404 Z" class="red"/>
-  <!-- box2 COMPRESSED -->
-  <g transform="translate(520 300)">
+  <path d="M388 378 L444 378 L444 360 L474 390 L444 420 L444 402 L388 402 Z" class="red"/>
+  <!-- box2 COMPRESSED (compressed size) -->
+  <g transform="translate(478 300)">
     <text x="0" y="-16" class="mono ink2" font-size="16" letter-spacing="2">COMPRESSED</text>
-    <rect x="0" y="0" width="280" height="180" class="red"/>
-    <rect x="0" y="0" width="280" height="180" class="stroke"/>
-    <text x="140" y="70" text-anchor="middle" class="black" fill="#F2F0EA" font-size="48" letter-spacing="-3">&#8722;294 GB</text>
-    <text x="140" y="116" text-anchor="middle" class="black" fill="#F2F0EA" font-size="30" letter-spacing="-1">750 GB</text>
-    <text x="140" y="152" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="16" letter-spacing="1">28.20% COMPRESSION</text>
+    <rect x="0" y="0" width="260" height="180" class="red"/>
+    <rect x="0" y="0" width="260" height="180" class="stroke"/>
+    <text x="130" y="70" text-anchor="middle" class="black" fill="#F2F0EA" font-size="46" letter-spacing="-3">&#8722;294 GB</text>
+    <text x="130" y="116" text-anchor="middle" class="black" fill="#F2F0EA" font-size="30" letter-spacing="-1">750 GB</text>
+    <text x="130" y="152" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="15" letter-spacing="1">28.20% COMPRESSION</text>
   </g>
   <!-- arrow 2 -->
-  <path d="M808 376 L876 376 L876 358 L906 390 L876 422 L876 404 L808 404 Z" class="red"/>
-  <!-- box3 IN VRAM: stays compressed -->
-  <g transform="translate(908 270)">
+  <path d="M748 378 L804 378 L804 360 L824 390 L804 420 L804 402 L748 402 Z" class="red"/>
+  <!-- box3 IN VRAM: dashed ghost = original full size; red = same compressed size as box2 -->
+  <g transform="translate(828 270)">
     <text x="0" y="-16" class="mono ink2" font-size="16" letter-spacing="2">IN VRAM</text>
-    <rect x="0" y="0" width="204" height="240" class="stroke" stroke-dasharray="7 7"/>
-    <rect x="0" y="50" width="204" height="140" class="red"/>
-    <rect x="0" y="50" width="204" height="140" class="stroke"/>
-    <text x="102" y="112" text-anchor="middle" class="black" fill="#F2F0EA" font-size="26" letter-spacing="-1">STILL</text>
-    <text x="102" y="142" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="14" letter-spacing="1">COMPRESSED</text>
-    <text x="102" y="226" text-anchor="middle" class="mono ink2" font-size="12" letter-spacing="1">NEVER RE-INFLATED</text>
+    <rect x="0" y="0" width="300" height="240" class="stroke" stroke-dasharray="7 7"/>
+    <rect x="20" y="30" width="260" height="180" class="red"/>
+    <rect x="20" y="30" width="260" height="180" class="stroke"/>
+    <text x="150" y="112" text-anchor="middle" class="black" fill="#F2F0EA" font-size="26" letter-spacing="-1">STILL</text>
+    <text x="150" y="142" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="14" letter-spacing="1">COMPRESSED</text>
+    <text x="150" y="230" text-anchor="middle" class="mono ink2" font-size="12" letter-spacing="1">NEVER RE-INFLATED</text>
   </g>
 
-  <text x="72" y="590" class="mono ink" font-size="20" letter-spacing="2">READ IN PLACE ON THE GPU &#183; IDENTICAL OUTPUTS &#183; NO QUALITY TRADEOFF</text>
+  <text x="72" y="590" class="mono ink" font-size="20" letter-spacing="2">READ IN PLACE ON THE GPU &#183; SHA-256 MATCH &#183; NO QUALITY TRADEOFF</text>
 </svg>
