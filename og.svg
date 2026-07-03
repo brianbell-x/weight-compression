@@ -11,36 +11,28 @@
   <line x1="72" y1="132" x2="1128" y2="132" class="stroke"/>
 
   <!-- box1 ORIGINAL: Ultra 550B weights (full size) -->
-  <g transform="translate(72 210)">
+  <g transform="translate(150 200)">
     <text x="0" y="-14" class="mono ink2" font-size="18" letter-spacing="2">ORIGINAL</text>
-    <rect x="0" y="0" width="300" height="280" fill="#E9E6DE"/>
-    <rect x="0" y="0" width="300" height="280" class="stroke"/>
-    <text x="150" y="76" text-anchor="middle" class="mono ink" font-size="18" letter-spacing="1">NEMOTRON-3 ULTRA 550B</text>
-    <text x="150" y="172" text-anchor="middle" class="black ink" font-size="56" letter-spacing="-2">1,044 GB</text>
-    <text x="150" y="230" text-anchor="middle" class="mono ink2" font-size="15" letter-spacing="1">model.safetensors &#183; BF16</text>
+    <rect x="0" y="0" width="330" height="290" fill="#E9E6DE"/>
+    <rect x="0" y="0" width="330" height="290" class="stroke"/>
+    <text x="165" y="82" text-anchor="middle" class="mono ink" font-size="18" letter-spacing="1">NEMOTRON-3 ULTRA 550B</text>
+    <text x="165" y="182" text-anchor="middle" class="black ink" font-size="58" letter-spacing="-2">1,044 GB</text>
+    <text x="165" y="244" text-anchor="middle" class="mono ink2" font-size="15" letter-spacing="1">model.safetensors &#183; BF16</text>
   </g>
-  <!-- arrow 1 -->
-  <path d="M384 338 L438 338 L438 318 L466 350 L438 382 L438 362 L384 362 Z" class="red"/>
-  <!-- box2 COMPRESSED (compressed size) -->
-  <g transform="translate(468 250)">
-    <text x="0" y="-14" class="mono ink2" font-size="18" letter-spacing="2">COMPRESSED</text>
-    <rect x="0" y="0" width="260" height="200" class="red"/>
-    <rect x="0" y="0" width="260" height="200" class="stroke"/>
-    <text x="130" y="78" text-anchor="middle" class="black" fill="#F2F0EA" font-size="52" letter-spacing="-3">&#8722;294 GB</text>
-    <text x="130" y="130" text-anchor="middle" class="black" fill="#F2F0EA" font-size="34" letter-spacing="-1">750 GB</text>
-    <text x="130" y="170" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="16" letter-spacing="1">28.20% COMPRESSION</text>
-  </g>
-  <!-- arrow 2 -->
-  <path d="M744 338 L780 338 L780 318 L806 350 L780 382 L780 362 L744 362 Z" class="red"/>
-  <!-- box3 IN VRAM: dashed ghost = full original size; red = same compressed size as box2 -->
-  <g transform="translate(808 210)">
+
+  <!-- arrow -->
+  <path d="M520 333 L588 333 L588 311 L626 345 L588 379 L588 357 L520 357 Z" class="red"/>
+
+  <!-- box2 IN VRAM: dashed ghost = full original size; red = compressed block holding the numbers -->
+  <g transform="translate(680 200)">
     <text x="0" y="-14" class="mono ink2" font-size="18" letter-spacing="2">IN VRAM</text>
-    <rect x="0" y="0" width="320" height="280" class="stroke" stroke-dasharray="7 7"/>
-    <rect x="30" y="40" width="260" height="200" class="red"/>
-    <rect x="30" y="40" width="260" height="200" class="stroke"/>
-    <text x="160" y="134" text-anchor="middle" class="black" fill="#F2F0EA" font-size="34" letter-spacing="-1">STILL</text>
-    <text x="160" y="168" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="16" letter-spacing="1">COMPRESSED</text>
-    <text x="160" y="266" text-anchor="middle" class="mono ink2" font-size="14" letter-spacing="1">NEVER RE-INFLATED</text>
+    <rect x="0" y="0" width="330" height="290" class="stroke" stroke-dasharray="7 7"/>
+    <rect x="35" y="45" width="260" height="200" class="red"/>
+    <rect x="35" y="45" width="260" height="200" class="stroke"/>
+    <text x="165" y="123" text-anchor="middle" class="black" fill="#F2F0EA" font-size="52" letter-spacing="-3">&#8722;294 GB</text>
+    <text x="165" y="173" text-anchor="middle" class="black" fill="#F2F0EA" font-size="34" letter-spacing="-1">750 GB</text>
+    <text x="165" y="213" text-anchor="middle" class="mono" fill="#F2F0EA" font-size="16" letter-spacing="1">28.20% COMPRESSION</text>
+    <text x="165" y="278" text-anchor="middle" class="mono ink2" font-size="14" letter-spacing="1">NEVER RE-INFLATED</text>
   </g>
 
   <text x="72" y="566" class="mono ink" font-size="23" letter-spacing="2">READ IN PLACE ON THE GPU &#183; SHA-256 MATCH &#183; NO QUALITY TRADEOFF</text>
