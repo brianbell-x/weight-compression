@@ -90,6 +90,16 @@
     margin:20px 0 0;max-width:62ch;font-family:var(--sans);font-weight:500;
     font-size:16.5px;line-height:1.55;color:var(--ink);
   }
+  /* headline + intro sit side by side so the intro doesn't eat a full-width band */
+  #plate-0 .p0-top{
+    display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+    gap:clamp(24px,4.5vw,60px);align-items:end;
+  }
+  #plate-0 .p0-top .p0-sub{margin:0}
+  @media(max-width:760px){
+    #plate-0 .p0-top{grid-template-columns:1fr;gap:14px;align-items:start}
+    #plate-0 .p0-top .p0-sub{margin-top:2px}
+  }
 
   /* ---- score row: giant numeral + label ---- */
   #plate-0 .p0-hero{margin-top:52px}
@@ -625,9 +635,10 @@
 <section class="plate" id="plate-0">
   <div class="wrap">
 
-    <h1 class="reveal" style="transition-delay:.1s">Model Weights,<br>Losslessly Compressed</h1>
-
-    <p class="p0-sub reveal" style="transition-delay:.16s">A running project on making model weights smaller without changing what they compute. Most model compression trades bits for quality; lossless avoids that trade entirely: nothing rounded, nothing pruned, the same model to the last digit. Measured on NVIDIA&rsquo;s Nemotron-3 family. Current progress:</p>
+    <div class="p0-top">
+      <h1 class="reveal" style="transition-delay:.1s">Model Weights,<br>Losslessly Compressed</h1>
+      <p class="p0-sub reveal" style="transition-delay:.16s">A running project on making model weights smaller without changing what they compute. Most model compression trades bits for quality; lossless avoids that trade entirely: nothing rounded, nothing pruned, the same model to the last digit. Measured on NVIDIA&rsquo;s Nemotron-3 family. Current progress:</p>
+    </div>
 
     <div class="p0-hero reveal" id="p0-hero" style="transition-delay:.22s">
 
