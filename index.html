@@ -292,6 +292,13 @@
     #plate-0 .p0-glegend div{white-space:normal}
   }
 
+  /* ---- flow figure: once the viewport can't hold its 660px min-width, let the
+         SVG scale to fit instead of clipping / forcing a sideways scroll ---- */
+  @media(max-width:760px){
+    #plate-0 .p0-flowfig{overflow-x:hidden}
+    #plate-0 .p0-flow{min-width:0}
+  }
+
   /* ---- mobile ---- */
   @media(max-width:720px){
     #plate-0{padding-top:24px}
@@ -302,6 +309,7 @@
     #plate-0 .p0-scorelbl{padding-bottom:0}
     #plate-0 .p0-ctx{white-space:normal}
     #plate-0 .p0-gauge{padding:14px 12px 10px}
+    #plate-0 .p0-flowfig{padding:16px 12px}
     #plate-0 .p0-gtrack{height:64px}
     #plate-0 .p0-alt{display:none}
     #plate-0 .p0-stats{grid-template-columns:1fr}
