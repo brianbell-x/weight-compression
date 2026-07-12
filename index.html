@@ -301,10 +301,14 @@
        boosted to stay legible at ~0.45 scale, and the fine print moves to the caption */
     #plate-0 .p0-flowfig{padding:14px 10px}
     #plate-0 .p0-flow{min-width:0}
-    #plate-0 .p0-flow .ttl{font-size:26px}
+    #plate-0 .p0-flow .ttl{font-size:16px}
     #plate-0 #p0-n-pct{display:none}
     #plate-0 #p0-chip rect{y:130px;height:58px}
     #plate-0 #p0-n-off{transform:translateY(16px)}
+  }
+  /* below ~480px the SVG scale drops enough that the labels need a bigger boost */
+  @media(max-width:480px){
+    #plate-0 .p0-flow .ttl{font-size:24px}
     #plate-0 .p0-stats{grid-template-columns:1fr}
     #plate-0 .p0-stat{padding:14px 16px 12px}
     #plate-0 .p0-qa{grid-template-columns:1fr}
