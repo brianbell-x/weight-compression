@@ -511,6 +511,14 @@
 
     <div class="p0-hero" id="p0-hero">
 
+      <div class="p0-score">
+        <p class="p0-big"><span class="p0-cwrap"><span class="p0-ghost">30.17</span><span id="p0-count">30.17</span></span><span class="p0-pct">%</span></p>
+        <div class="p0-scorelbl">
+          <div class="p0-slword">Smaller.<br>Bit-exact.</div>
+          <p class="p0-ctx">1,403 GB -&gt; 980 GB &#183; IN VRAM, NOT JUST ON DISK</p>
+        </div>
+      </div>
+
       <figure class="p0-flowfig" id="p0-gauge">
         <svg class="p0-flow" id="p0-net" viewBox="0 0 740 290" role="img"
           aria-label="A neural network drawn at its original footprint, 1,403 GB of GLM-5.2 753B BF16 weights, compresses in place: the whole net folds to 70% of its width, and the freed zone fills with hatching marked minus 423 GB, leaving 980 GB, 30.17 percent compression, bit-exact. A dashed outline marks the full size it never re-inflates back to.">
@@ -685,6 +693,7 @@
   var size = document.getElementById('p0-n-size');
   var sizeBg = document.getElementById('p0-size-bg');
   var pct = document.getElementById('p0-n-pct');
+  var count = document.getElementById('p0-count');
   var comma = function(n){ return n.toLocaleString('en-US'); };
 
   /* e = 0 → full-width net; e = 1 → folded to S of its width */
@@ -711,6 +720,7 @@
     chip.setAttribute('opacity', Math.max(0, (e - .45) / .55));
     off.textContent = '−' + comma(Math.round(423 * e)) + ' GB';
     pct.textContent = (30.17 * e).toFixed(2) + '% COMPRESSION';
+    count.textContent = (30.17 * e).toFixed(2);
   }
 
   if (reduce || !('IntersectionObserver' in window)){
