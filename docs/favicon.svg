@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#F2F0EA"/>
+  <!-- the compressed model: ink block ending at 70% -->
+  <rect x="6" y="6" width="39" height="52" fill="#141412"/>
+  <!-- the freed 30%: red band -->
+  <rect x="45" y="6" width="13" height="52" fill="#D92B1C"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#141412" stroke-width="3"/>
+</svg>
