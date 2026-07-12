@@ -1,0 +1,15 @@
+"""Entry point for the lossless verifier, so the public command stays short.
+
+    uv run verify.py <org>/<repo>       # stream a model from Hugging Face
+    uv run verify.py --model <path>     # verify a local .safetensors file/dir
+
+Streaming (an HF repo id) runs stream_validate.py: one shard on disk at a time,
+bit-exact check on every BF16 tensor, running bit accounting. A local --model
+path runs reproduce.py: full encode + decode round-trip, SHA-256 checked.
+"""
+import runpy, sys
+
+C9 = "research/candidates/0009-fusible-exponent-codebook/tools"
+script = f"{C9}/reproduce.py" if "--model" in sys.argv else f"{C9}/stream_validate.py"
+sys.argv[0] = script
+runpy.run_path(script, run_name="__main__")

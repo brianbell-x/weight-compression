@@ -10,12 +10,12 @@
 <meta property="og:url" content="https://brianbell-x.github.io/weight-compression/" />
 <meta property="og:title" content="Lossless Model Compression Experiment" />
 <meta property="og:description" content="30% smaller so far, in storage and in VRAM. The weights reconstruct bit-for-bit, so the model computes exactly the same thing." />
-<meta property="og:image" content="https://brianbell-x.github.io/weight-compression/og-net.png?v=1" />
+<meta property="og:image" content="https://brianbell-x.github.io/weight-compression/og-net.png?v=2" />
 <meta property="og:image:width" content="2400" />
 <meta property="og:image:height" content="1260" />
-<meta property="og:image:alt" content="A neural network folded to 72% of its original footprint: Nemotron-3 Ultra 550B BF16 weights at 750 GB, with the freed zone marked minus 294 GB, 28.20% smaller, never re-inflated in VRAM." />
+<meta property="og:image:alt" content="A neural network folded to 70% of its original footprint: GLM-5.2 753B BF16 weights at 980 GB, with the freed zone marked minus 423 GB, 30.17% smaller, never re-inflated in VRAM." />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://brianbell-x.github.io/weight-compression/og-net.png?v=1" />
+<meta name="twitter:image" content="https://brianbell-x.github.io/weight-compression/og-net.png?v=2" />
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,6 +37,7 @@
   body{
     margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
     font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+    -webkit-text-size-adjust:100%;text-size-adjust:100%;
   }
   /* paper grain — fixed, non-interactive, very low opacity */
   body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:60;opacity:.04;
@@ -64,16 +65,11 @@
   .phead .fig::before{content:"[ "}
   .phead .fig::after{content:" ]"}
 
-  /* reveal system (global — do not redefine in plates) */
-  .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s cubic-bezier(.16,1,.3,1)}
-  .reveal.in{opacity:1;transform:none}
-
   @media(max-width:720px){
     .plate{padding:44px 0 60px}
     .phead{flex-wrap:wrap;margin-bottom:28px}
   }
   @media(prefers-reduced-motion:reduce){
-    .reveal{opacity:1;transform:none;transition:none}
     html{scroll-behavior:auto}
   }
 </style>
@@ -90,19 +86,9 @@
     margin:20px 0 0;max-width:62ch;font-family:var(--sans);font-weight:500;
     font-size:16.5px;line-height:1.55;color:var(--ink);
   }
-  /* headline + intro sit side by side so the intro doesn't eat a full-width band */
-  #plate-0 .p0-top{
-    display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
-    gap:clamp(24px,4.5vw,60px);align-items:end;
-  }
-  #plate-0 .p0-top .p0-sub{margin:0}
-  @media(max-width:760px){
-    #plate-0 .p0-top{grid-template-columns:1fr;gap:14px;align-items:start}
-    #plate-0 .p0-top .p0-sub{margin-top:2px}
-  }
 
   /* ---- score row: giant numeral + label ---- */
-  #plate-0 .p0-hero{margin-top:52px}
+  #plate-0 .p0-hero{margin-top:28px}
   #plate-0 .p0-score{display:flex;align-items:flex-end;gap:clamp(18px,3vw,40px);flex-wrap:wrap;margin-bottom:20px}
   #plate-0 .p0-big{
     margin:0;font-family:var(--black);color:var(--red);
@@ -110,7 +96,7 @@
     font-variant-numeric:tabular-nums;
   }
   #plate-0 .p0-pct{font-size:.45em}
-  /* width-reserved counter: hidden "30.03" twin holds the box so the count-up never jitters */
+  /* width-reserved counter: hidden "30.17" twin holds the box so the count-up never jitters */
   #plate-0 .p0-cwrap{position:relative;display:inline-block}
   #plate-0 .p0-ghost{visibility:hidden}
   #plate-0 #p0-count{position:absolute;top:0;right:0;text-align:right;white-space:nowrap}
@@ -162,12 +148,12 @@
   }
   /* solid red = achieved, GPU-readable (hatch is reserved for removed/storage-only zones) */
   #plate-0 .p0-gfill{
-    position:absolute;left:0;top:0;bottom:0;width:30.03%;
+    position:absolute;left:0;top:0;bottom:0;width:30.17%;
     background-color:var(--red);
     z-index:1;
   }
   #plate-0 .p0-gauge.p0-armed .p0-gfill{width:0}
-  #plate-0 .p0-gauge.p0-go .p0-gfill{width:30.03%;transition:width 2.2s cubic-bezier(.16,1,.3,1)}
+  #plate-0 .p0-gauge.p0-go .p0-gfill{width:30.17%;transition:width 2.2s cubic-bezier(.16,1,.3,1)}
   #plate-0 .p0-mark{position:absolute;top:0;bottom:0;z-index:2}
   #plate-0 .p0-mark-zstd{left:22%;width:1px;background:var(--ink);bottom:-34px}
   #plate-0 .p0-mark-limit{
@@ -304,7 +290,7 @@
     #plate-0{padding-top:24px}
     #plate-0 h1{text-wrap:balance}
     #plate-0 h1 br{display:none}
-    #plate-0 .p0-hero{margin-top:36px}
+    #plate-0 .p0-hero{margin-top:24px}
     #plate-0 .p0-score{flex-direction:column;align-items:flex-start;gap:14px}
     #plate-0 .p0-scorelbl{padding-bottom:0}
     #plate-0 .p0-ctx{white-space:normal}
@@ -312,6 +298,14 @@
     #plate-0 .p0-flowfig{padding:16px 12px}
     #plate-0 .p0-gtrack{height:64px}
     #plate-0 .p0-alt{display:none}
+    /* the figure scales to the screen instead of side-scrolling; in-SVG type is
+       boosted to stay legible at ~0.45 scale, and the fine print moves to the caption */
+    #plate-0 .p0-flowfig{padding:14px 10px}
+    #plate-0 .p0-flow{min-width:0}
+    #plate-0 .p0-flow .ttl{font-size:26px}
+    #plate-0 .p0-flow .sub{font-size:22px}
+    #plate-0 #p0-n-pct{display:none}
+    #plate-0 #p0-n-off{font-size:34px}
     #plate-0 .p0-stats{grid-template-columns:1fr}
     #plate-0 .p0-stat{padding:14px 16px 12px}
     #plate-0 .p0-qa{grid-template-columns:1fr}
@@ -319,152 +313,7 @@
   }
 
   @media(prefers-reduced-motion:reduce){
-    #plate-0 .p0-gfill{width:30.03%!important;transition:none!important}
-  }
-</style>
-<style data-plate="3">
-  /* ============ PLATE 3 — THE RECEIPTS ============ */
-  #plate-3{font-variant-numeric:tabular-nums;--p3-tick:color-mix(in srgb,var(--ink) 12%,transparent)}
-
-  /* intro: headline left, lead right */
-  #plate-3 .p3-intro{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:24px 56px;align-items:end;margin-bottom:48px}
-  #plate-3 .p3-lead{margin:0;max-width:52ch;font-size:16px;line-height:1.55;color:var(--ink)}
-
-  /* panel chrome: micro header row + registration-marked frame */
-  #plate-3 .p3-panel{margin-bottom:64px}
-  #plate-3 .p3-panel:last-child{margin-bottom:0}
-  #plate-3 .p3-pbar{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-  #plate-3 .p3-frame{position:relative}
-  #plate-3 .p3-cross{position:absolute;font-family:var(--mono);font-style:normal;font-size:13px;line-height:1;color:var(--ink2);pointer-events:none;user-select:none}
-  #plate-3 .p3-cross.tl{top:0;left:0;transform:translate(-50%,-50%)}
-  #plate-3 .p3-cross.tr{top:0;right:0;transform:translate(50%,-50%)}
-  #plate-3 .p3-cross.bl{bottom:0;left:0;transform:translate(-50%,50%)}
-  #plate-3 .p3-cross.br{bottom:0;right:0;transform:translate(50%,50%)}
-
-  /* legend */
-  #plate-3 .p3-key{display:flex;gap:18px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
-  #plate-3 .p3-key span{display:inline-flex;align-items:center;gap:7px}
-  #plate-3 .p3-key i{width:16px;height:10px;flex:none}
-  #plate-3 .p3-key .k1{background:var(--ink)}
-  #plate-3 .p3-key .k2{border:1px solid var(--ink2);background-image:repeating-linear-gradient(135deg,var(--ink2) 0,var(--ink2) 1px,transparent 1px,transparent 4px)}
-
-  /* ---- A. footprint form: hairline compartments ---- */
-  #plate-3 .p3-grid{display:grid;grid-template-columns:minmax(150px,230px) minmax(0,1fr) minmax(130px,190px);gap:1px;background:var(--ink);border:1px solid var(--ink)}
-  #plate-3 .p3-grid>*{background:var(--paper);min-width:0}
-  #plate-3 .p3-hcell{background:var(--paper2);font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);display:flex;align-items:flex-end;padding:10px 18px 8px}
-  #plate-3 .p3-hcell.tot{justify-content:flex-end}
-
-  /* ruler header — same horizontal padding as bar cells so ticks align */
-  #plate-3 .p3-rul{background:var(--paper2);padding:8px 16px 0}
-  #plate-3 .p3-rulin{position:relative;height:32px}
-  #plate-3 .p3-rulin b{position:absolute;bottom:0;width:1px;height:6px;background:var(--ink2)}
-  #plate-3 .p3-rulin span{position:absolute;bottom:9px;transform:translateX(-50%);font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:var(--ink2)}
-  #plate-3 .p3-rulin span.z{transform:none}
-  #plate-3 .p3-rulin span.max{transform:translateX(-100%);color:var(--ink);font-weight:700}
-  #plate-3 .p3-rulin b.max{background:var(--ink)}
-
-  /* row cells */
-  #plate-3 .p3-lab{padding:16px 18px;display:flex;flex-direction:column;justify-content:center}
-  #plate-3 .p3-lab .v{font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-  #plate-3 .p3-lab .ix{color:var(--ink2);font-weight:400}
-  #plate-3 .p3-lab .s{margin-top:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink2)}
-  /* ink-on-paper chip with red frame: keeps the red without 10px reversed-out text */
-  #plate-3 .p3-tag{background:var(--paper);color:var(--ink);border:2px solid var(--red);font-family:var(--mono);font-style:normal;font-weight:700;font-size:10px;letter-spacing:.08em;padding:1px 6px}
-  #plate-3 .p3-tag--ink{border-color:var(--ink)}
-  #plate-3 .r4.p3-lab{border-left:3px solid var(--red);padding-left:15px}
-
-  #plate-3 .p3-barcell{display:flex;align-items:center;padding:12px 16px}
-  #plate-3 .p3-track{position:relative;width:100%;height:52px;background-color:var(--paper2);
-    background-image:linear-gradient(var(--p3-tick),var(--p3-tick)),linear-gradient(var(--p3-tick),var(--p3-tick)),linear-gradient(var(--p3-tick),var(--p3-tick)),linear-gradient(var(--p3-tick),var(--p3-tick)),linear-gradient(var(--p3-tick),var(--p3-tick));
-    background-repeat:no-repeat;
-    background-position:17% 0,34% 0,51% 0,68% 0,85% 0;
-    background-size:1px 100%,1px 100%,1px 100%,1px 100%,1px 100%}
-  #plate-3 .p3-fill{position:absolute;top:0;bottom:0;left:0;width:var(--w);background:var(--ink)}
-  #plate-3 .p3-cut{position:absolute;top:0;bottom:0;right:0;width:calc(100% - var(--w));
-    background-image:repeating-linear-gradient(135deg,var(--ink2) 0,var(--ink2) 1px,transparent 1px,transparent 5px)}
-  #plate-3 .r4 .p3-cut{background-image:repeating-linear-gradient(135deg,var(--red) 0,var(--red) 1px,transparent 1px,transparent 5px)}
-  #plate-3 .p3-cutline{position:absolute;top:0;bottom:0;left:calc(var(--w) - 1px);width:2px;background:var(--red)}
-  #plate-3 .p3-delta{position:absolute;left:calc(var(--w) + 12px);top:50%;transform:translateY(-50%);
-    font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:.02em;color:var(--red);white-space:nowrap}
-  #plate-3 .r4 .p3-delta{font-size:19px}
-
-  #plate-3 .p3-val{padding:12px 18px;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right}
-  #plate-3 .p3-val .n{font-family:var(--black);font-size:clamp(1.35rem,2.4vw,1.8rem);letter-spacing:-0.02em;line-height:1;color:var(--ink)}
-  #plate-3 .p3-val .u{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.06em;color:var(--ink2)}
-  #plate-3 .p3-val .d{margin-top:6px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink2)}
-  #plate-3 .r4.p3-val .n{font-size:clamp(1.7rem,3.2vw,2.5rem);color:var(--red)}
-  #plate-3 .r4.p3-val .d{color:var(--ink);font-weight:700}
-
-  #plate-3 .p3-cap{grid-column:1/-1;background:var(--paper2);display:flex;justify-content:space-between;gap:10px 24px;flex-wrap:wrap;
-    padding:11px 18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink)}
-  #plate-3 .p3-cap .m{color:var(--ink2)}
-
-  /* ---- B. family scaling ---- */
-  #plate-3 .p3-famgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--ink);border:1px solid var(--ink)}
-  #plate-3 .p3-famgrid>*{background:var(--paper);min-width:0}
-  #plate-3 .p3-fam{padding:20px 22px 22px;display:flex;flex-direction:column}
-  #plate-3 .p3-fam-top{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--ink);padding-bottom:10px;margin-bottom:16px}
-  #plate-3 .p3-fam-top b{font-family:var(--black);font-size:1.1rem;letter-spacing:.01em;text-transform:uppercase}
-  #plate-3 .p3-fam-top span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ink2)}
-  #plate-3 .p3-fam-pct{font-family:var(--black);font-size:clamp(2rem,4.4vw,2.9rem);letter-spacing:-0.02em;line-height:.95;color:var(--ink)}
-  #plate-3 .p3-fam.hero .p3-fam-pct{color:var(--red)}
-  #plate-3 .p3-fam-desc{margin:14px 0 18px;font-family:var(--sans);font-weight:400;font-size:14.5px;line-height:1.55;color:var(--ink);flex:1}
-  #plate-3 .p3-fam-stamp{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
-  #plate-3 .p3-fam.hero .p3-fam-stamp{color:var(--ink);font-weight:700}
-
-  /* magnified spread detail: three reductions on a 29.0–30.5 scale */
-  #plate-3 .p3-spread{grid-column:1/-1;padding:18px 22px 22px}
-  #plate-3 .p3-sp-head{display:flex;justify-content:space-between;gap:10px 24px;flex-wrap:wrap;margin-bottom:8px}
-  #plate-3 .p3-sp-track{position:relative;height:86px}
-  #plate-3 .p3-sp-track::before{content:"";position:absolute;left:0;right:0;bottom:17px;height:1px;background:var(--ink)}
-  #plate-3 .p3-sp-min{position:absolute;bottom:11px;width:1px;height:7px;background:var(--ink2)}
-  #plate-3 .p3-sp-minlab{position:absolute;bottom:0;transform:translateX(-50%);font-family:var(--mono);font-size:9.5px;color:var(--ink2)}
-  #plate-3 .p3-sp-minlab.z{transform:none}
-  #plate-3 .p3-sp-minlab.max{transform:translateX(-100%)}
-  #plate-3 .p3-sp-mark{position:absolute;bottom:17px;width:2px;height:30px;background:var(--ink);transform:translateX(-50%)}
-  #plate-3 .p3-sp-mark.hero{background:var(--red)}
-  #plate-3 .p3-sp-marklab{position:absolute;bottom:52px;transform:translateX(-50%);text-align:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
-  #plate-3 .p3-sp-marklab b{display:block;margin-top:2px;font-size:14px;font-weight:700;letter-spacing:.02em;color:var(--ink)}
-  #plate-3 .p3-sp-marklab.hero b{color:var(--red)}
-  #plate-3 .p3-famnote{grid-column:1/-1;background:var(--paper2);padding:14px 22px}
-  #plate-3 .p3-famnote p{margin:0;max-width:62ch;font-size:15px;line-height:1.55;color:var(--ink)}
-
-  /* ---- fill choreography: default (no JS / reduced motion / noscript) = final state ---- */
-  #plate-3.p3-armed .p3-fill,#plate-3.p3-armed .p3-cut{width:0}
-  #plate-3.p3-armed .p3-delta,#plate-3.p3-armed .p3-cutline{opacity:0}
-  #plate-3.p3-run .p3-fill{width:var(--w);transition:width 1.5s cubic-bezier(.16,1,.3,1)}
-  #plate-3.p3-run .p3-cut{width:calc(100% - var(--w));transition:width 1.5s cubic-bezier(.16,1,.3,1)}
-  #plate-3.p3-run .r2 .p3-fill,#plate-3.p3-run .r2 .p3-cut{transition-delay:.15s}
-  #plate-3.p3-run .r3 .p3-fill,#plate-3.p3-run .r3 .p3-cut{transition-delay:.3s}
-  #plate-3.p3-run .r4 .p3-fill,#plate-3.p3-run .r4 .p3-cut{transition-delay:.45s}
-  #plate-3.p3-run .p3-delta,#plate-3.p3-run .p3-cutline{opacity:1;transition:opacity .5s ease 1s}
-  #plate-3.p3-run .r4 .p3-delta,#plate-3.p3-run .r4 .p3-cutline{transition-delay:1.3s}
-  @media(prefers-reduced-motion:reduce){
-    #plate-3 .p3-fill{width:var(--w)!important;transition:none!important}
-    #plate-3 .p3-cut{width:calc(100% - var(--w))!important;transition:none!important}
-    #plate-3 .p3-delta,#plate-3 .p3-cutline{opacity:1!important;transition:none!important}
-  }
-
-  @media(max-width:720px){
-    #plate-3 .p3-intro{grid-template-columns:1fr;gap:18px;margin-bottom:34px}
-    #plate-3 .p3-panel{margin-bottom:48px}
-    #plate-3 .p3-grid{grid-template-columns:1fr}
-    #plate-3 .p3-hcell.lab,#plate-3 .p3-hcell.tot{display:none}
-    #plate-3 .m-hide{display:none}
-    #plate-3 .p3-lab{padding:13px 14px 11px}
-    #plate-3 .r4.p3-lab{padding-left:11px}
-    #plate-3 .p3-rul{padding:8px 14px 0}
-    #plate-3 .p3-barcell{padding:10px 14px}
-    #plate-3 .p3-track{height:38px}
-    #plate-3 .r4 .p3-delta{font-size:15px}
-    #plate-3 .p3-delta{left:calc(var(--w) + 8px)}
-    #plate-3 .p3-val{padding:9px 14px 14px;flex-direction:row;justify-content:flex-start;align-items:baseline;gap:12px;text-align:left}
-    #plate-3 .p3-val .d{margin-top:0}
-    #plate-3 .p3-cap{padding:10px 14px}
-    #plate-3 .p3-famgrid{grid-template-columns:1fr}
-    #plate-3 .p3-fam{padding:16px 16px 18px}
-    #plate-3 .p3-spread{padding:16px 16px 18px}
-    #plate-3 .p3-famnote{padding:12px 16px}
+    #plate-0 .p0-gfill{width:30.17%!important;transition:none!important}
   }
 </style>
 <style data-plate="4">
@@ -488,7 +337,6 @@
     position:relative;background:var(--paper);
     padding:22px 26px 22px 46px;display:flex;flex-direction:column;
   }
-  #plate-4 .p4-item.reveal:nth-child(2){transition-delay:.12s}
   #plate-4 .p4-item::before{
     content:"";position:absolute;left:0;top:0;bottom:0;width:13px;
     border-right:1px solid var(--ink);
@@ -620,15 +468,33 @@
     #plate-4 .p4-run{grid-template-columns:1fr;margin-bottom:52px}
     #plate-4 .p4-run-l{padding:22px 18px}
     #plate-4 .p4-cmd{font-size:12px}
+    #plate-4 .p4-spec li{flex-wrap:wrap}
+    #plate-4 .p4-btn{display:block;text-align:center}
     #plate-4 .p4-col-grid{grid-template-columns:repeat(2,1fr)}
     #plate-4 .p4-col-note{grid-column:1/-1;grid-row:auto;padding:16px 18px}
     #plate-4 .p4-colophon::before,
     #plate-4 .p4-colophon::after{display:none}
   }
 </style>
-<noscript><style>
-  .reveal{opacity:1!important;transform:none!important}
-</style></noscript>
+<style data-plate="1">
+  /* ============ PLATE 1 — HOW IT WORKS ============ */
+  #plate-1 .p1-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  #plate-1 h2{font-family:var(--black);text-transform:uppercase;letter-spacing:-.02em;
+    line-height:.95;font-size:clamp(1.5rem,3vw,2.1rem)}
+  #plate-1 .p1-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--ink);border:1px solid var(--ink)}
+  #plate-1 .p1-cell{background:var(--paper);padding:20px 22px 22px}
+  #plate-1 .p1-cell .lbl{display:block;color:var(--red);font-weight:700;margin-bottom:10px}
+  #plate-1 .p1-cell h3{font-family:var(--black);text-transform:uppercase;letter-spacing:-.01em;
+    line-height:1.05;font-size:clamp(1.05rem,1.9vw,1.25rem);margin-bottom:10px}
+  #plate-1 .p1-cell p{margin:0;font-size:15px;line-height:1.55}
+  #plate-1 .p1-cell p+p{margin-top:10px}
+  #plate-1 .p1-cell .mono{font-size:13px}
+  @media(max-width:720px){
+    #plate-1 .p1-grid{grid-template-columns:1fr}
+    #plate-1 .p1-cell{padding:16px 16px 18px}
+  }
+</style>
 </head>
 <body>
 
@@ -636,15 +502,15 @@
   <div class="wrap">
 
     <div class="p0-top">
-      <h1 class="reveal" style="transition-delay:.1s">Model Weights,<br>Losslessly Compressed</h1>
-      <p class="p0-sub reveal" style="transition-delay:.16s">A running project on making model weights smaller without changing what they compute. Most model compression trades bits for quality; lossless avoids that trade entirely: nothing rounded, nothing pruned, the same model to the last digit. Measured on NVIDIA&rsquo;s Nemotron-3 family. Current progress:</p>
+      <h1>Model Weights,<br>Losslessly Compressed</h1>
+      <p class="p0-sub">Making model weights smaller without changing what they compute. Nothing rounded, nothing pruned, the same model to the last bit.</p>
     </div>
 
-    <div class="p0-hero reveal" id="p0-hero" style="transition-delay:.22s">
+    <div class="p0-hero" id="p0-hero">
 
       <figure class="p0-flowfig" id="p0-gauge">
         <svg class="p0-flow" id="p0-net" viewBox="0 0 740 312" role="img"
-          aria-label="A neural network drawn at its original footprint, 1,044 GB of Nemotron-3 Ultra 550B BF16 weights, compresses in place: the whole net folds to 72% of its width, and the freed zone fills with hatching marked minus 294 GB, leaving 750 GB, 28.20 percent compression, bit-exact. A dashed outline marks the full size it never re-inflates back to.">
+          aria-label="A neural network drawn at its original footprint, 1,403 GB of GLM-5.2 753B BF16 weights, compresses in place: the whole net folds to 70% of its width, and the freed zone fills with hatching marked minus 423 GB, leaving 980 GB, 30.17 percent compression, bit-exact. A dashed outline marks the full size it never re-inflates back to.">
 
           <defs>
             <pattern id="p0hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
@@ -653,7 +519,7 @@
           </defs>
 
           <!-- header labels -->
-          <text x="8" y="24" class="ttl" font-size="15">NEMOTRON-3 ULTRA 550B &#183; BF16</text>
+          <text x="8" y="24" class="ttl" font-size="15">GLM-5.2 753B &#183; BF16</text>
           <text x="732" y="24" text-anchor="end" class="ttl" font-size="15">IN VRAM</text>
 
           <!-- original footprint: dashed ghost the net never grows back into -->
@@ -667,108 +533,90 @@
           <g id="p0-edges" stroke="#57544C" stroke-opacity="0.45" stroke-width="1"></g>
           <g id="p0-nodes" fill="#141412"></g>
 
-          <!-- live size readout riding the net itself: 1,044 GB counting down to 750 GB -->
+          <!-- live size readout riding the net itself: 1,403 GB counting down to 980 GB -->
           <g id="p0-size-g">
             <rect id="p0-size-bg" x="0" y="132" width="188" height="54" fill="#F2F0EA" stroke="#141412" stroke-width="1"/>
-            <text id="p0-n-size" x="0" y="170" text-anchor="middle" class="big" font-size="34" fill="#141412">1,044 GB</text>
+            <text id="p0-n-size" x="0" y="170" text-anchor="middle" class="big" font-size="34" fill="#141412">1,403 GB</text>
           </g>
 
           <!-- readout chip inside the freed zone -->
           <g id="p0-chip" opacity="0">
             <rect x="546" y="112" width="150" height="94" fill="#F2F0EA" stroke="#141412" stroke-width="1"/>
-            <text id="p0-n-off" x="621" y="153" text-anchor="middle" class="big" font-size="30" fill="#D92B1C">&#8722;294 GB</text>
-            <text id="p0-n-pct" x="621" y="186" text-anchor="middle" class="mn" font-size="11" fill="#141412">28.20% COMPRESSION</text>
+            <text id="p0-n-off" x="621" y="153" text-anchor="middle" class="big" font-size="30" fill="#D92B1C">&#8722;423 GB</text>
+            <text id="p0-n-pct" x="621" y="186" text-anchor="middle" class="mn" font-size="11" fill="#141412">30.17% COMPRESSION</text>
           </g>
 
-          <text x="370" y="304" text-anchor="middle" class="sub" font-size="12">SAME NET, SAME MATH &#183; NEVER RE-INFLATED</text>
+          <text x="370" y="304" text-anchor="middle" class="sub" font-size="12">SAME HARDWARE -&gt; BIGGER MODEL &#183; SAME MATH</text>
         </svg>
 
-        <figcaption class="p0-fcap">[ FIG. 00 ] NEMOTRON-3 ULTRA 550B &mdash; 1,044 GB TO 750 GB, 294 GB OFF ONE CHECKPOINT. IN VRAM THE GPU READS IT IN PLACE, NEVER RE-INFLATED TO FULL WIDTH. SHA-256 BIT-EXACT.</figcaption>
+        <figcaption class="p0-fcap">[ FIG. 00 ] GLM-5.2 753B: 1,403 GB TO 980 GB, BIT-EXACT. READ IN PLACE, NEVER RE-INFLATED.</figcaption>
       </figure>
 
     </div>
   </div>
 </section>
-<section class="plate" id="plate-3">
+<section class="plate" id="plate-1">
   <div class="wrap">
-
-    <!-- B · FAMILY SCALING -->
-    <div class="p3-panel reveal">
-      <div class="p3-pbar">
-        <span class="lbl">&gt;&gt;&gt; FAMILY SCALING</span>
-        <span class="lbl">SAME CODE, NO RETUNING</span>
+    <div class="p1-head">
+      <h2>How it works</h2>
+      <span class="lbl">[ FIG. 01 ]</span>
+    </div>
+    <div class="p1-grid">
+      <div class="p1-cell">
+        <span class="lbl">01 / Where the 30% comes from</span>
+        <h3>Most weights share a few exponents</h3>
+        <p>Every BF16 weight is 16 bits: a sign, 8 exponent bits, 7 mantissa bits. In a trained model the exponents are wildly repetitive; a handful of values cover nearly every weight.</p>
+        <p>So the sign and exponent (9 bits) are swapped for a 4-bit code pointing into a 15-entry table, and the rare weight outside the table is stored in full. 16 bits becomes ~11.2, which is the 30%. The mantissa bits look random so far and are kept as-is.</p>
       </div>
-
-      <div class="p3-frame">
-        <i class="p3-cross tl" aria-hidden="true">+</i><i class="p3-cross tr" aria-hidden="true">+</i>
-        <i class="p3-cross bl" aria-hidden="true">+</i><i class="p3-cross br" aria-hidden="true">+</i>
-
-        <div class="p3-famgrid">
-          <div class="p3-fam hero">
-            <div class="p3-fam-top"><b>NANO</b><span>30B</span></div>
-            <div class="p3-fam-pct">&minus;30.03%</div>
-            <p class="p3-fam-desc">Every shard, every tensor, bit-for-bit.</p>
-            <div class="p3-fam-stamp">[ WHOLE MODEL, BIT-EXACT ]</div>
-          </div>
-
-          <div class="p3-fam">
-            <div class="p3-fam-top"><b>SUPER</b><span>120B</span></div>
-            <div class="p3-fam-pct">&minus;28.85%</div>
-            <p class="p3-fam-desc">~230 -&gt; ~164 GiB. All 42,642 tensors, all 50 shards, bit-for-bit.</p>
-            <div class="p3-fam-stamp">[ WHOLE MODEL, BIT-EXACT ]</div>
-          </div>
-
-          <div class="p3-fam">
-            <div class="p3-fam-top"><b>ULTRA</b><span>550B</span></div>
-            <div class="p3-fam-pct">&minus;28.20%</div>
-            <p class="p3-fam-desc">~1,044 -&gt; ~750 GiB: 294 GiB off one checkpoint. All 50,974 tensors, all 225 shards, bit-for-bit.</p>
-            <div class="p3-fam-stamp">[ WHOLE MODEL, BIT-EXACT ]</div>
-          </div>
-
-          <div class="p3-famnote">
-            <p>Under 2 points across an 18x size span, and now all three measured wall-to-wall &mdash; whole model, bit-for-bit: the win comes from how BF16 stores a trained network, not from any one model.</p>
-          </div>
-        </div>
+      <div class="p1-cell">
+        <span class="lbl">02 / Why it is never decompressed</span>
+        <h3>The math reads the codes directly</h3>
+        <p>Every code is the same width, so weight number N sits at a known address; no unpacking pass, no second copy.</p>
+        <p>The GPU kernel reads the compressed bytes, looks each code up in the tiny table in registers while it multiplies, and moves on. The full 16-bit form never exists in VRAM, which is why the 30% is a VRAM number and not just a disk number.</p>
+      </div>
+      <div class="p1-cell">
+        <span class="lbl">03 / What is still open</span>
+        <h3>End-to-end throughput</h3>
+        <p>The in-place read is proven at the kernel level: a single matrix-vector multiply on real weights, bit-exact.</p>
+        <p>What has not been measured yet is a full serving stack running the model this way end to end: attention, batching, every layer, tokens per second. Until that run exists, the claim stays what it is: 30% less VRAM, same math.</p>
       </div>
     </div>
-
   </div>
 </section>
 <section class="plate" id="plate-4">
   <div class="wrap">
-    <div class="p4-run reveal">
+    <div class="p4-run">
       <div class="p4-run-l">
         <span class="lbl">&gt;&gt;&gt; Reproduction protocol</span>
         <h3>Don&rsquo;t trust it. <em>Run it.</em></h3>
-        <p>One script, numpy only, no GPU. It rebuilds every tensor and checks the hashes &mdash; the sizes and the bit-exactness, the whole claim except kernel speed (that harness is in the repo too). Bring the original checkpoint from Hugging Face (~59 GiB).</p>
-        <a class="p4-btn" href="https://github.com/brianbell-x/weight-compression/blob/main/research/candidates/0009-fusible-exponent-codebook/REPRODUCE.md">Open REPRODUCE.md -&gt;</a>
+        <p>One script, no GPU. It streams the checkpoint shard by shard from Hugging Face (~1.4 TB, deleted as it goes), encodes every tensor, and verifies the reconstruction bit-for-bit: the sizes and the exactness, the whole claim.</p>
+        <a class="p4-btn" href="https://github.com/brianbell-x/weight-compression/blob/main/research/candidates/0061-glm52-standalone-transfer/REPRODUCE.md">Open REPRODUCE.md -&gt;</a>
       </div>
       <div class="p4-run-r">
         <div class="p4-cmd-head">
           <span class="lbl">One command</span>
           <button class="p4-copy" type="button" hidden>Copy</button>
         </div>
-        <pre class="p4-cmd"><code>uv run python research/candidates/0009-fusible-exponent-codebook/tools/reproduce.py --model &lt;path&gt;</code></pre>
+        <pre class="p4-cmd"><code>uv run verify.py zai-org/GLM-5.2</code></pre>
         <ul class="p4-spec">
-          <li><span class="k">Deps</span><span class="v">numpy only</span></li>
           <li><span class="k">GPU</span><span class="v">not required</span></li>
-          <li><span class="k">Input</span><span class="v">the BF16 checkpoint (~59 GiB)</span></li>
-          <li><span class="k">Method</span><span class="v">bit-exact round-trip (SHA-256)</span></li>
-          <li><span class="k">Kernel bench</span><span class="v">tests/GPU_RUN.md, same repo</span></li>
+          <li><span class="k">Input</span><span class="v">the BF16 checkpoint, streamed (~1.4 TB)</span></li>
+          <li><span class="k">Method</span><span class="v">bit-exact round-trip, all 59,509 tensors</span></li>
+          <li><span class="k">Verified</span><span class="v">blind gate, 2026-07-12</span></li>
         </ul>
       </div>
     </div>
 
-    <footer class="p4-colophon reveal">
+    <footer class="p4-colophon">
       <div class="p4-col-grid">
-        <p class="p4-col-note">All figures are measured on the NVIDIA Nemotron-3 family, anchored by <a href="https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16">nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16</a>. Methods and artifacts live in this repository under <span class="mono">research/</span>. Found something &mdash; or have a hypothesis about those 7 bits? Open an issue on the repo.</p>
+        <p class="p4-col-note">All figures are measured wall-to-wall on <a href="https://huggingface.co/zai-org/GLM-5.2">zai-org/GLM-5.2</a>, a 753B-parameter model: all 282 shards, all 59,509 BF16 tensors. Isn&rsquo;t the model already compressed? Its information is; its BF16 representation isn&rsquo;t. Every result here is a floor, not a wall. Methods and artifacts live in this repository under <span class="mono">research/</span>. Found structure in the remaining 7-bit mantissa plane? Open an issue on the repo.</p>
         <div class="p4-field">
-          <span class="lbl">Doc</span>
-          <span class="val">brianbell-x/weight-compression</span>
+          <span class="lbl">Repo</span>
+          <span class="val"><a href="https://github.com/brianbell-x/weight-compression">brianbell-x/weight-compression</a></span>
         </div>
         <div class="p4-field">
           <span class="lbl">Status</span>
-          <span class="val">Ongoing &mdash; July 2026</span>
+          <span class="val">Ongoing, July 2026</span>
         </div>
         <div class="p4-field">
           <span class="lbl">Subject</span>
@@ -776,37 +624,18 @@
         </div>
         <div class="p4-field">
           <span class="lbl">Specimen</span>
-          <span class="val">NVIDIA Nemotron-3 family (BF16)</span>
+          <span class="val">zai-org/GLM-5.2 753B (BF16)</span>
         </div>
-        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates">Candidates -&gt;</a>
-        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/blob/main/research/notes/findings-ledger.md">Findings ledger -&gt;</a>
-        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/blob/main/research/candidates/0009-fusible-exponent-codebook/REPRODUCE.md">Reproduce -&gt;</a>
-        <a class="p4-link" href="https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16">Model card -&gt;</a>
+        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates">All experiments -&gt;</a>
+        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/blob/main/research/findings-ledger.md">What&rsquo;s settled so far -&gt;</a>
+        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/blob/main/research/candidates/0061-glm52-standalone-transfer/RESULTS.md">This result -&gt;</a>
+        <a class="p4-link" href="https://huggingface.co/zai-org/GLM-5.2">Model card -&gt;</a>
         <div class="p4-end">/// End of bulletin ///</div>
       </div>
     </footer>
   </div>
 </section>
 
-<script>
-/* global reveal observer — plates only add class="reveal" */
-(function(){
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var els = document.querySelectorAll('.reveal');
-  if (!('IntersectionObserver' in window) || reduce){
-    els.forEach(function(e){ e.classList.add('in'); });
-    return;
-  }
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(en){
-      if (!en.isIntersecting) return;
-      en.target.classList.add('in');
-      io.unobserve(en.target);
-    });
-  }, {threshold:.15, rootMargin:'0px 0px -8% 0px'});
-  els.forEach(function(e){ io.observe(e); });
-})();
-</script>
 <script data-plate="0">
 (function(){
   var svg = document.getElementById('p0-net');
@@ -816,7 +645,7 @@
 
   /* net geometry inside the dashed footprint */
   var L = 40, R = 700, T = 66, B = 252;
-  var S = 750 / 1044;                       /* compressed width fraction */
+  var S = 980 / 1403;                       /* compressed width fraction */
   var COUNTS = [4, 6, 7, 6, 4];
 
   var nodes = [], edges = [], layers = [];
@@ -876,10 +705,10 @@
     var cx = mx((L + R) / 2);
     size.setAttribute('x', cx);
     sizeBg.setAttribute('x', cx - 94);
-    size.textContent = comma(Math.round(1044 - 294 * e)) + ' GB';
+    size.textContent = comma(Math.round(1403 - 423 * e)) + ' GB';
     chip.setAttribute('opacity', Math.max(0, (e - .45) / .55));
-    off.textContent = '−' + comma(Math.round(294 * e)) + ' GB';
-    pct.textContent = (28.20 * e).toFixed(2) + '% COMPRESSION';
+    off.textContent = '−' + comma(Math.round(423 * e)) + ' GB';
+    pct.textContent = (30.17 * e).toFixed(2) + '% COMPRESSION';
   }
 
   if (reduce || !('IntersectionObserver' in window)){
@@ -910,50 +739,6 @@
     }
     requestAnimationFrame(frame);
   }
-})();
-</script>
-<script data-plate="3">
-(function(){
-  var plate = document.getElementById('plate-3');
-  if (!plate) return;
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (!('IntersectionObserver' in window)) return;
-  var grid = plate.querySelector('.p3-grid');
-  if (!grid) return;
-
-  plate.classList.add('p3-armed');
-  /* show the from-values while armed so empty bars never sit beside final numbers */
-  Array.prototype.forEach.call(plate.querySelectorAll('.p3-count'), function(el){
-    var f = parseFloat(el.getAttribute('data-from'));
-    if (!isNaN(f)) el.textContent = f.toFixed(2);
-  });
-
-  var DUR = 1500;
-  function ease(t){ return 1 - Math.pow(1 - t, 4); }
-  function countTo(el){
-    var from = parseFloat(el.getAttribute('data-from'));
-    var to = parseFloat(el.getAttribute('data-to'));
-    if (isNaN(from) || isNaN(to)) return;
-    var t0 = null;
-    function step(ts){
-      if (t0 === null) t0 = ts;
-      var p = Math.min((ts - t0) / DUR, 1);
-      el.textContent = (from + (to - from) * ease(p)).toFixed(2);
-      if (p < 1) requestAnimationFrame(step);
-      else el.textContent = to.toFixed(2);
-    }
-    requestAnimationFrame(step);
-  }
-
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(en){
-      if (!en.isIntersecting) return;
-      io.disconnect();
-      plate.classList.add('p3-run');
-      Array.prototype.forEach.call(plate.querySelectorAll('.p3-count'), countTo);
-    });
-  }, {threshold:.25, rootMargin:'0px 0px -8% 0px'});
-  io.observe(grid);
 })();
 </script>
 <script data-plate="4">
