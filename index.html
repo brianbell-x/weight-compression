@@ -55,26 +55,19 @@
   /* micro label utility */
   .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
 
-  /* plate chrome: heavy top rule + shared header row */
+  /* plate chrome */
   .plate{border-top:0;padding:24px 0 64px}
   .plate:first-of-type{padding-top:36px}
-  .phead{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
-    font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--ink2);border-bottom:1px solid var(--ink);padding-bottom:10px;margin-bottom:40px}
-  .phead .fig{color:var(--ink);font-weight:700}
-  .phead .fig::before{content:"[ "}
-  .phead .fig::after{content:" ]"}
 
   @media(max-width:720px){
     .plate{padding:20px 0 36px}
-    .phead{flex-wrap:wrap;margin-bottom:28px}
   }
   @media(prefers-reduced-motion:reduce){
     html{scroll-behavior:auto}
   }
 </style>
 <style data-plate="0">
-  /* ============ PLATE 0 — GAUGE ============ */
+  /* ============ PLATE 0 — HERO ============ */
   #plate-0{padding-top:36px}
 
   /* ---- headline ---- */
@@ -86,139 +79,9 @@
     margin:20px 0 0;max-width:62ch;font-family:var(--sans);font-weight:500;
     font-size:16.5px;line-height:1.55;color:var(--ink);
   }
-
-  /* ---- score row: giant numeral + label ---- */
   #plate-0 .p0-hero{margin-top:28px}
-  #plate-0 .p0-score{display:flex;align-items:flex-end;gap:clamp(18px,3vw,40px);flex-wrap:wrap;margin-bottom:20px}
-  #plate-0 .p0-big{
-    margin:0;font-family:var(--black);color:var(--red);
-    font-size:clamp(4rem,12vw,9.5rem);line-height:.82;letter-spacing:-.03em;
-    font-variant-numeric:tabular-nums;
-  }
-  #plate-0 .p0-pct{font-size:.45em}
-  /* width-reserved counter: hidden "30.17" twin holds the box so the count-up never jitters */
-  #plate-0 .p0-cwrap{position:relative;display:inline-block}
-  #plate-0 .p0-ghost{visibility:hidden}
-  #plate-0 #p0-count{position:absolute;top:0;right:0;text-align:right;white-space:nowrap}
-  #plate-0 .p0-scorelbl{padding-bottom:6px}
-  #plate-0 .p0-slword{
-    font-family:var(--black);text-transform:uppercase;
-    font-size:clamp(1.3rem,2.6vw,2.1rem);line-height:.95;letter-spacing:-.01em;
-  }
-  #plate-0 .p0-ctx{
-    margin:12px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.07em;
-    color:var(--ink2);font-variant-numeric:tabular-nums;
-  }
 
-  /* ---- the gauge ---- */
-  #plate-0 .p0-gauge{
-    position:relative;margin:0;border:1px solid var(--ink);background:var(--paper);
-    padding:18px 20px 12px;
-  }
-  #plate-0 .p0-x{
-    position:absolute;font-family:var(--mono);font-size:13px;line-height:1;
-    color:var(--ink2);z-index:2;pointer-events:none;
-  }
-  #plate-0 .p0-xa{top:0;left:0;transform:translate(-50%,-50%)}
-  #plate-0 .p0-xb{top:0;right:0;transform:translate(50%,-50%)}
-  #plate-0 .p0-xc{bottom:0;left:0;transform:translate(-50%,50%)}
-  #plate-0 .p0-xd{bottom:0;right:0;transform:translate(50%,50%)}
-
-  /* annotation rows */
-  #plate-0 .p0-gtop{position:relative;height:46px;margin:0 1px}
-  #plate-0 .p0-gbot{position:relative;height:62px;margin:0 1px}
-  #plate-0 .p0-fl{
-    position:absolute;font-family:var(--mono);font-size:10px;letter-spacing:.05em;
-    line-height:1.5;color:var(--ink);text-transform:uppercase;white-space:nowrap;
-    font-variant-numeric:tabular-nums;
-  }
-  #plate-0 .p0-fl b{font-weight:700}
-  #plate-0 .p0-flsub{color:var(--ink2)}
-  #plate-0 .p0-fl-ach{right:69.97%;bottom:0;padding:0 9px 6px 0;border-right:2px solid var(--red);text-align:right}
-  #plate-0 .p0-fl-lim{left:34%;bottom:0;padding:0 0 6px 9px;border-left:2px solid var(--red)}
-  #plate-0 .p0-fl-zstd{right:78%;top:0;padding:4px 9px 0 0;text-align:right}
-
-  /* track */
-  #plate-0 .p0-gtrack{position:relative;height:76px;border:1px solid var(--ink);background:var(--paper)}
-  #plate-0 .p0-noise{
-    position:absolute;left:34%;right:0;top:0;bottom:0;
-    background-color:var(--paper2);
-    background-image:radial-gradient(var(--ink2) 1px,transparent 1px);
-    background-size:6px 6px;
-  }
-  /* solid red = achieved, GPU-readable (hatch is reserved for removed/storage-only zones) */
-  #plate-0 .p0-gfill{
-    position:absolute;left:0;top:0;bottom:0;width:30.17%;
-    background-color:var(--red);
-    z-index:1;
-  }
-  #plate-0 .p0-gauge.p0-armed .p0-gfill{width:0}
-  #plate-0 .p0-gauge.p0-go .p0-gfill{width:30.17%;transition:width 2.2s cubic-bezier(.16,1,.3,1)}
-  #plate-0 .p0-mark{position:absolute;top:0;bottom:0;z-index:2}
-  #plate-0 .p0-mark-zstd{left:22%;width:1px;background:var(--ink);bottom:-34px}
-  #plate-0 .p0-mark-limit{
-    left:34%;width:2px;
-    background:repeating-linear-gradient(to bottom,var(--red) 0 5px,transparent 5px 9px);
-  }
-  #plate-0 .p0-zone{
-    position:absolute;left:34%;right:0;top:0;bottom:0;z-index:3;
-    display:flex;align-items:center;justify-content:center;
-  }
-  #plate-0 .p0-zone span{
-    background:var(--paper);border:1px solid var(--ink2);padding:5px 10px;
-    font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink);
-    text-transform:uppercase;white-space:nowrap;font-variant-numeric:tabular-nums;
-  }
-
-  /* graduations */
-  #plate-0 .p0-gscale{position:relative;height:18px;margin:0 1px}
-  #plate-0 .p0-tminor{
-    position:absolute;top:0;left:0;right:0;height:9px;
-    background:repeating-linear-gradient(to right,var(--ink2) 0 1px,transparent 1px 2%);
-  }
-  #plate-0 .p0-tmajor{
-    position:absolute;top:0;left:0;right:0;height:18px;
-    background:repeating-linear-gradient(to right,var(--ink) 0 2px,transparent 2px 10%);
-  }
-  #plate-0 .p0-gscale::after{
-    content:"";position:absolute;right:0;top:0;width:2px;height:18px;background:var(--ink);
-  }
-  #plate-0 .p0-gnums{position:relative;height:16px;margin:0 1px}
-  #plate-0 .p0-n{
-    position:absolute;top:2px;transform:translateX(-50%);
-    font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--ink2);
-    font-variant-numeric:tabular-nums;
-  }
-  #plate-0 .p0-n0{transform:none}
-  #plate-0 .p0-n100{transform:translateX(-100%)}
-
-  /* mobile legend (hidden on desktop) */
-  #plate-0 .p0-glegend{display:none}
-  #plate-0 .p0-glegend div{
-    display:flex;align-items:flex-start;
-    font-family:var(--mono);font-size:10px;letter-spacing:.04em;line-height:1.5;
-    color:var(--ink);text-transform:uppercase;font-variant-numeric:tabular-nums;
-  }
-  #plate-0 .p0-sw{display:inline-block;flex-shrink:0;width:10px;height:12px;margin:1px 8px 0 0}
-  #plate-0 .p0-sw-fill{background-color:var(--red)}
-  #plate-0 .p0-sw-zstd{width:2px;background:var(--ink);margin:1px 12px 0 4px}
-  #plate-0 .p0-sw-limit{
-    width:4px;margin:1px 11px 0 3px;
-    background:repeating-linear-gradient(to bottom,var(--red) 0 3px,transparent 3px 5px);
-  }
-  #plate-0 .p0-sw-noise{
-    background-color:var(--paper2);border:1px solid var(--ink2);
-    background-image:radial-gradient(var(--ink2) 1px,transparent 1px);background-size:3px 3px;
-  }
-
-  /* figure caption */
-  #plate-0 .p0-gcap{
-    margin-top:14px;padding-top:8px;border-top:1px solid var(--ink);
-    font-family:var(--mono);font-size:10px;letter-spacing:.08em;
-    text-transform:uppercase;color:var(--ink2);
-  }
-
-  /* ---- flow diagram (Original -> Compressed -> In VRAM) ---- */
+  /* ---- flow figure (the folding net) ---- */
   #plate-0 .p0-flowfig{
     position:relative;margin:0;border:1px solid var(--ink);background:var(--paper);
     padding:22px clamp(14px,2.4vw,26px);overflow-x:auto;
@@ -237,48 +100,8 @@
     text-transform:uppercase;color:var(--ink2);
   }
 
-  /* ---- stat readouts ---- */
-  #plate-0 .p0-stats{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
-    background:var(--ink);border:1px solid var(--ink);margin-top:30px;
-  }
-  #plate-0 .p0-stat{background:var(--paper);padding:16px 18px 14px}
-  #plate-0 .p0-sid{
-    display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
-    color:var(--ink2);margin-bottom:12px;
-  }
-  #plate-0 .p0-stat strong{
-    display:block;font-family:var(--mono);font-weight:700;
-    font-size:clamp(1.4rem,2.4vw,1.9rem);line-height:1.1;letter-spacing:-.01em;
-    color:var(--ink);font-variant-numeric:tabular-nums;
-  }
-  #plate-0 .p0-scap{
-    display:block;margin-top:8px;font-family:var(--mono);font-size:10px;
-    letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);line-height:1.6;
-  }
-
-  /* ---- objections strip: the three questions every reader arrives with ---- */
-  #plate-0 .p0-qa{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
-    background:var(--ink);border:1px solid var(--ink);border-top:0;
-  }
-  #plate-0 .p0-q{background:var(--paper2);padding:15px 18px 17px}
-  #plate-0 .p0-qh{
-    display:block;font-family:var(--mono);font-weight:700;font-size:11px;
-    letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:8px;
-  }
-  #plate-0 .p0-q p{margin:0;font-size:14px;line-height:1.5;color:var(--ink)}
-
-  /* ---- annotations collapse before mobile (flags need room) ---- */
-  @media(max-width:960px){
-    #plate-0 .p0-gtop,#plate-0 .p0-gbot,#plate-0 .p0-zone{display:none}
-    #plate-0 .p0-mark-zstd{bottom:0}
-    #plate-0 .p0-glegend{display:flex;flex-direction:column;gap:7px;margin:14px 1px 0}
-    #plate-0 .p0-glegend div{white-space:normal}
-  }
-
-  /* ---- flow figure: once the viewport can't hold its 660px min-width, let the
-         SVG scale to fit instead of clipping / forcing a sideways scroll ---- */
+  /* ---- once the viewport can't hold the 660px min-width, the SVG scales
+         to fit instead of clipping / forcing a sideways scroll ---- */
   @media(max-width:760px){
     #plate-0 .p0-flowfig{overflow-x:hidden}
     #plate-0 .p0-flow{min-width:0}
@@ -290,90 +113,16 @@
     #plate-0 h1{text-wrap:balance}
     #plate-0 h1 br{display:none}
     #plate-0 .p0-hero{margin-top:24px}
-    #plate-0 .p0-score{flex-direction:column;align-items:flex-start;gap:14px}
-    #plate-0 .p0-scorelbl{padding-bottom:0}
-    #plate-0 .p0-ctx{white-space:normal}
-    #plate-0 .p0-gauge{padding:14px 12px 10px}
-    #plate-0 .p0-flowfig{padding:16px 12px}
-    #plate-0 .p0-gtrack{height:64px}
-    #plate-0 .p0-alt{display:none}
-    /* the figure scales to the screen instead of side-scrolling; in-SVG type is
-       boosted to stay legible at ~0.45 scale, and the fine print moves to the caption */
     #plate-0 .p0-flowfig{padding:14px 10px}
-    #plate-0 .p0-flow{min-width:0}
     #plate-0 .p0-flow .ttl{font-size:16px}
-    #plate-0 #p0-n-pct{display:none}
-    #plate-0 #p0-chip rect{y:130px;height:58px}
-    #plate-0 #p0-n-off{transform:translateY(16px)}
   }
-  /* below ~480px the SVG scale drops enough that the labels need a bigger boost */
+  /* below ~480px the SVG scale drops enough that the in-SVG type needs a boost */
   @media(max-width:480px){
     #plate-0 .p0-flow .ttl{font-size:24px}
-    #plate-0 .p0-stats{grid-template-columns:1fr}
-    #plate-0 .p0-stat{padding:14px 16px 12px}
-    #plate-0 .p0-qa{grid-template-columns:1fr}
-    #plate-0 .p0-q{padding:13px 16px 15px}
-  }
-
-  @media(prefers-reduced-motion:reduce){
-    #plate-0 .p0-gfill{width:30.17%!important;transition:none!important}
   }
 </style>
 <style data-plate="4">
   /* ============ PLATE 4 — OPEN ITEMS + REPRODUCTION + COLOPHON ============ */
-
-  #plate-4 .p4-intro{
-    display:grid;grid-template-columns:1fr minmax(280px,420px);
-    align-items:end;gap:24px 48px;margin-bottom:44px;
-  }
-  #plate-4 .p4-lead{
-    margin:0;font-family:var(--sans);font-size:16.5px;line-height:1.55;
-    max-width:62ch;border-left:3px solid var(--red);padding-left:16px;
-  }
-
-  /* ---- open item cards: hairline compartments, textured rails, stamps ---- */
-  #plate-4 .p4-items{
-    display:grid;grid-template-columns:1fr 1fr;gap:1px;
-    background:var(--ink);border:1px solid var(--ink);margin-bottom:64px;
-  }
-  #plate-4 .p4-item{
-    position:relative;background:var(--paper);
-    padding:22px 26px 22px 46px;display:flex;flex-direction:column;
-  }
-  #plate-4 .p4-item::before{
-    content:"";position:absolute;left:0;top:0;bottom:0;width:13px;
-    border-right:1px solid var(--ink);
-  }
-  /* item 01 rail — hatch: the storage already peeled, not yet runtime-addressable */
-  #plate-4 .p4-item--gap::before{
-    background:repeating-linear-gradient(135deg,transparent 0 4px,var(--ink2) 4px 5px);
-  }
-  /* item 02 rail — halftone: the mantissa, random to every tool so far */
-  #plate-4 .p4-item--wall::before{
-    background-image:radial-gradient(var(--ink2) 1px,transparent 1px);
-    background-size:6px 6px;
-  }
-  #plate-4 .p4-item-meta{
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    border-bottom:1px solid var(--ink);padding-bottom:10px;margin-bottom:16px;
-  }
-  #plate-4 .p4-stamp{
-    font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:.14em;
-    color:var(--red);border:2px solid var(--red);padding:2px 10px;
-    transform:rotate(-4deg);
-  }
-  #plate-4 .p4-item h3{
-    font-family:var(--black);text-transform:uppercase;letter-spacing:-0.01em;
-    line-height:1.05;font-size:clamp(1.15rem,2.2vw,1.4rem);margin-bottom:10px;
-  }
-  #plate-4 .p4-item p{
-    margin:0;font-size:15.5px;line-height:1.55;max-width:62ch;flex:1;
-  }
-  #plate-4 .p4-item-foot{
-    font-family:var(--mono);font-size:11px;letter-spacing:.07em;
-    text-transform:uppercase;color:var(--ink2);
-    border-top:1px solid var(--ink);padding-top:12px;margin-top:18px;
-  }
 
   /* ---- reproduce panel ---- */
   #plate-4 .p4-run{
@@ -465,9 +214,6 @@
   }
 
   @media(max-width:720px){
-    #plate-4 .p4-intro{grid-template-columns:1fr;gap:20px;margin-bottom:32px}
-    #plate-4 .p4-items{grid-template-columns:1fr;margin-bottom:44px}
-    #plate-4 .p4-item{padding:18px 18px 18px 40px}
     #plate-4 .p4-run{grid-template-columns:1fr;margin-bottom:52px}
     #plate-4 .p4-run-l{padding:22px 18px}
     #plate-4 .p4-cmd{font-size:12px}
@@ -511,15 +257,7 @@
 
     <div class="p0-hero" id="p0-hero">
 
-      <div class="p0-score">
-        <p class="p0-big"><span class="p0-cwrap"><span class="p0-ghost">30.17</span><span id="p0-count">30.17</span></span><span class="p0-pct">%</span></p>
-        <div class="p0-scorelbl">
-          <div class="p0-slword">Smaller.<br>Bit-exact.</div>
-          <p class="p0-ctx">1,403 GB -&gt; 980 GB &#183; IN VRAM, NOT JUST ON DISK</p>
-        </div>
-      </div>
-
-      <figure class="p0-flowfig" id="p0-gauge">
+      <figure class="p0-flowfig">
         <svg class="p0-flow" id="p0-net" viewBox="0 0 740 290" role="img"
           aria-label="A neural network drawn at its original footprint, 1,403 GB of GLM-5.2 753B BF16 weights, compresses in place: the whole net folds to 70% of its width, and the freed zone fills with hatching marked minus 423 GB, leaving 980 GB, 30.17 percent compression, bit-exact. A dashed outline marks the full size it never re-inflates back to.">
 
@@ -552,9 +290,9 @@
 
           <!-- readout chip inside the freed zone -->
           <g id="p0-chip" opacity="0">
-            <rect x="546" y="112" width="150" height="94" fill="#F2F0EA" stroke="#141412" stroke-width="1"/>
-            <text id="p0-n-off" x="621" y="153" text-anchor="middle" class="big" font-size="30" fill="#D92B1C">&#8722;423 GB</text>
-            <text id="p0-n-pct" x="621" y="186" text-anchor="middle" class="mn" font-size="11" fill="#141412">30.17% COMPRESSION</text>
+            <rect x="536" y="112" width="170" height="94" fill="#F2F0EA" stroke="#141412" stroke-width="1"/>
+            <text id="p0-n-off" x="621" y="150" text-anchor="middle" class="big" font-size="30" fill="#D92B1C">&#8722;423 GB</text>
+            <text id="p0-n-pct" x="621" y="184" text-anchor="middle" class="big" font-size="17" fill="#D92B1C">30.17% SMALLER</text>
           </g>
 
         </svg>
@@ -693,7 +431,6 @@
   var size = document.getElementById('p0-n-size');
   var sizeBg = document.getElementById('p0-size-bg');
   var pct = document.getElementById('p0-n-pct');
-  var count = document.getElementById('p0-count');
   var comma = function(n){ return n.toLocaleString('en-US'); };
 
   /* e = 0 → full-width net; e = 1 → folded to S of its width */
@@ -719,8 +456,7 @@
     size.textContent = comma(Math.round(1403 - 423 * e)) + ' GB';
     chip.setAttribute('opacity', Math.max(0, (e - .45) / .55));
     off.textContent = '−' + comma(Math.round(423 * e)) + ' GB';
-    pct.textContent = (30.17 * e).toFixed(2) + '% COMPRESSION';
-    count.textContent = (30.17 * e).toFixed(2);
+    pct.textContent = (30.17 * e).toFixed(2) + '% SMALLER';
   }
 
   if (reduce || !('IntersectionObserver' in window)){
