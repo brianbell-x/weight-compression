@@ -16,16 +16,11 @@ was not fused or timed; a complete exact serving path remains open.
 
 ```bash
 uv sync
-# verify losslessness + reduction on any BF16 model:
-uv run verify.py --model /path/to/model.safetensors
-```
-
-`bit-exact round-trip : ALL PASS` is the whole point. To validate a model too big
-for your disk, stream it shard by shard straight from Hugging Face:
-
-```bash
+# verify losslessness + reduction, streamed shard by shard from Hugging Face:
 uv run verify.py <org>/<repo>
 ```
+
+`bit-exact round-trip : ALL PASS` is the whole point.
 
 Methods, experiments, and settled findings live under `research/`.
 
