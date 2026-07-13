@@ -22,7 +22,8 @@ uv run verify.py <org>/<repo>
 
 `bit-exact round-trip : ALL PASS` is the whole point.
 
-Methods, experiments, and settled findings live under `research/`.
+The published method, reproduction instructions, and retained evidence live
+under [`method/`](method/).
 
 ## Prior work and distinction
 

@@ -41,12 +41,9 @@ Thumbs.db
 *.lock
 
 .env
-research/notebook
 
-# Per-row measurement dumps too large for GitHub (regenerable from the probe scripts)
-research/candidates/0044-door12-fractional-bit-tans/artifacts/door12_rows_*.jsonl
-research/candidates/0055-exporter-grid-normalization/tests/artifacts/b/*/per_violation.jsonl
-research/candidates/0056-super120b-transfer/tests/artifacts/fetch56/support/per_context.jsonl.gz
+# Local exploratory workspace; the published method lives under method/.
+/research/
 
 # Agent instruction files (local only)
 CLAUDE.md

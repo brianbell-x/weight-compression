@@ -333,7 +333,7 @@
         <span class="lbl">&gt;&gt;&gt; Reproduction protocol</span>
         <h3>Don&rsquo;t trust it. <em>Run it.</em></h3>
         <p>One script, no GPU. It streams the checkpoint shard by shard from Hugging Face (~1.4 TB, deleted as it goes), verifies the byte-split reconstruction bit-for-bit, and separately computes the fully charged K15 size accounting.</p>
-        <a class="p4-btn" href="https://github.com/brianbell-x/weight-compression/blob/main/research/candidates/0061-glm52-standalone-transfer/REPRODUCE.md">Open REPRODUCE.md -&gt;</a>
+        <a class="p4-btn" href="https://github.com/brianbell-x/weight-compression/blob/main/method/REPRODUCE.md">Open REPRODUCE.md -&gt;</a>
       </div>
       <div class="p4-run-r">
         <div class="p4-cmd-head">
@@ -353,7 +353,7 @@
 
     <footer class="p4-colophon">
       <div class="p4-col-grid">
-        <p class="p4-col-note">The K15 accounting and byte-split inverse check both cover all 282 shards and all 59,509 BF16 tensors of <a href="https://huggingface.co/zai-org/GLM-5.2">zai-org/GLM-5.2</a>. They are different representations and are reported separately. The GPU number is a third artifact, a dense-path microbenchmark rather than an end-to-end exact serving result. Methods and evidence live under <span class="mono">research/</span>.</p>
+        <p class="p4-col-note">The K15 accounting and byte-split inverse check both cover all 282 shards and all 59,509 BF16 tensors of <a href="https://huggingface.co/zai-org/GLM-5.2">zai-org/GLM-5.2</a>. They are different representations and are reported separately. The GPU number is a third artifact, a dense-path microbenchmark rather than an end-to-end exact serving result. The published implementation and retained evidence live under <span class="mono">method/</span>.</p>
         <div class="p4-field">
           <span class="lbl">Repo</span>
           <span class="val"><a href="https://github.com/brianbell-x/weight-compression">brianbell-x/weight-compression</a></span>
@@ -370,9 +370,9 @@
           <span class="lbl">Specimen</span>
           <span class="val">zai-org/GLM-5.2 753B (BF16)</span>
         </div>
-        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/tree/main/research/candidates">All experiments -&gt;</a>
-        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/blob/main/research/findings-ledger.md">What&rsquo;s settled so far -&gt;</a>
-        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/blob/main/research/candidates/0061-glm52-standalone-transfer/RESULTS.md">This result -&gt;</a>
+        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/tree/main/method/tools">Method source -&gt;</a>
+        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/tree/main/method/tests/artifacts">Evidence bundle -&gt;</a>
+        <a class="p4-link" href="https://github.com/brianbell-x/weight-compression/blob/main/method/RESULTS.md">Gated result -&gt;</a>
         <a class="p4-link" href="https://huggingface.co/zai-org/GLM-5.2">Model card -&gt;</a>
         <div class="p4-end">/// End of bulletin ///</div>
       </div>
