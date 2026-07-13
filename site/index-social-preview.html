@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GLM-5.2 Lossless Compression — Social Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500&family=Archivo+Black&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#f2f0ea;--ink:#141412;--ink2:#57544c;--red:#d92b1c}
+  *{box-sizing:border-box}
+  html,body{width:100%;height:100%;margin:0;background:var(--paper);overflow:hidden}
+  body{color:var(--ink);font-family:"Archivo",sans-serif;-webkit-font-smoothing:antialiased}
+  main{width:100vw;height:100vh;aspect-ratio:16/9;padding:4.5vh 5vw;display:flex;flex-direction:column}
+  h1{margin:0;font-family:"Archivo Black",sans-serif;font-size:clamp(34px,5.2vw,78px);line-height:.9;letter-spacing:-.035em;text-transform:uppercase}
+  .sub{margin:1.8vh 0 2.8vh;max-width:65ch;font-size:clamp(15px,1.45vw,22px);font-weight:500;line-height:1.35}
+  figure{flex:1;min-height:0;margin:0;border:1.5px solid var(--ink);padding:2.3vh 2vw 1.4vh;display:flex;flex-direction:column;background:var(--paper)}
+  svg{display:block;width:100%;min-height:0;flex:1}
+  .ttl{font-family:"JetBrains Mono",monospace;font-weight:500;letter-spacing:.12em;fill:var(--ink2)}
+  .big{font-family:"Archivo Black",sans-serif;letter-spacing:-.03em}
+  figcaption{border-top:1px solid var(--ink);padding-top:1vh;font-family:"JetBrains Mono",monospace;font-size:clamp(9px,.85vw,13px);letter-spacing:.075em;color:var(--ink2);text-transform:uppercase;white-space:nowrap}
+</style>
+</head>
+<body>
+<main>
+  <h1>Model Weights,<br>Losslessly Compressed</h1>
+  <p class="sub">Making model weights smaller without changing what they compute. Nothing rounded, nothing pruned—the same model to the last bit.</p>
+  <figure>
+    <svg id="net" viewBox="0 0 740 290" role="img" aria-label="GLM-5.2 compresses from 1,403 GB to 980 GB, bit-exact.">
+      <defs>
+        <pattern id="hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+          <line x1="0" y1="0" x2="0" y2="7" stroke="#d92b1c" stroke-width="1.2"/>
+        </pattern>
+      </defs>
+      <text x="8" y="24" class="ttl" font-size="15">GLM-5.2 753B · BF16</text>
+      <text x="732" y="24" text-anchor="end" class="ttl" font-size="15">IN VRAM</text>
+      <rect x="8" y="38" width="724" height="242" fill="none" stroke="#141412" stroke-width="1.5" stroke-dasharray="7 7"/>
+      <rect id="freed" x="731" y="39" width="0" height="240" fill="url(#hatch)"/>
+      <line id="front" x1="731" y1="39" x2="731" y2="279" stroke="#d92b1c" stroke-width="2.5"/>
+      <g id="edges" stroke="#57544c" stroke-opacity=".45" stroke-width="1"></g>
+      <g id="nodes" fill="#141412"></g>
+      <g>
+        <rect id="size-bg" x="0" y="132" width="188" height="54" fill="#f2f0ea" stroke="#141412"/>
+        <text id="size" x="0" y="170" text-anchor="middle" class="big" font-size="34" fill="#141412">1,403 GB</text>
+      </g>
+      <g id="chip" opacity="0">
+        <rect x="536" y="112" width="170" height="94" fill="#f2f0ea" stroke="#141412"/>
+        <text id="off" x="621" y="150" text-anchor="middle" class="big" font-size="30" fill="#d92b1c">−423 GB</text>
+        <text id="pct" x="621" y="184" text-anchor="middle" class="big" font-size="17" fill="#d92b1c">30.17% SMALLER</text>
+      </g>
+    </svg>
+    <figcaption>[ FIG. 00 ] GLM-5.2 753B: 1,403 GB TO 980 GB · 30.17% SMALLER · BIT-EXACT · READ IN PLACE</figcaption>
+  </figure>
+</main>
+<script>
+(() => {
+  const S=980/1403,L=40,R=700,T=66,B=252,counts=[4,6,7,6,4];
+  const layers=counts.map((count,i)=>Array.from({length:count},(_,j)=>({x:L+(R-L)*i/(counts.length-1),y:T+(B-T)*(j+1)/(count+1)})));
+  const edges=[],nodes=[],ns="http://www.w3.org/2000/svg";
+  for(let i=0;i<layers.length-1;i++) for(const a of layers[i]) for(const b of layers[i+1]){
+    const el=document.createElementNS(ns,"line"); document.querySelector("#edges").append(el); edges.push({el,a,b});
+  }
+  for(const layer of layers) for(const p of layer){const el=document.createElementNS(ns,"circle");document.querySelector("#nodes").append(el);nodes.push({el,p});}
+  const freed=document.querySelector("#freed"),front=document.querySelector("#front"),chip=document.querySelector("#chip"),off=document.querySelector("#off"),size=document.querySelector("#size"),sizeBg=document.querySelector("#size-bg"),pct=document.querySelector("#pct");
+  const comma=n=>n.toLocaleString("en-US");
+  function render(e){
+    const k=1-(1-S)*e,mx=x=>8+(x-8)*k;
+    for(const {el,a,b} of edges){el.setAttribute("x1",mx(a.x));el.setAttribute("y1",a.y);el.setAttribute("x2",mx(b.x));el.setAttribute("y2",b.y);}
+    for(const {el,p} of nodes){el.setAttribute("cx",mx(p.x));el.setAttribute("cy",p.y);el.setAttribute("r",7-1.2*e);}
+    const fx=mx(731),cx=mx((L+R)/2);
+    front.setAttribute("x1",fx);front.setAttribute("x2",fx);freed.setAttribute("x",fx);freed.setAttribute("width",Math.max(0,731-fx));
+    size.setAttribute("x",cx);sizeBg.setAttribute("x",cx-94);size.textContent=comma(Math.round(1403-423*e))+" GB";
+    chip.setAttribute("opacity",Math.max(0,(e-.45)/.55));off.textContent="−"+comma(Math.round(423*e))+" GB";pct.textContent=(30.17*e).toFixed(2)+"% SMALLER";
+  }
+  window.renderCompressionFrame=render;
+  render(1);
+  const preview=500,duration=2000,hold=2500,start=performance.now(),ease=t=>1-Math.pow(1-t,3);
+  function frame(now){const elapsed=now-start;if(elapsed<preview)render(1);else if(elapsed<preview+duration)render(ease((elapsed-preview)/duration));else render(1);if(elapsed<preview+duration+hold)requestAnimationFrame(frame);}
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

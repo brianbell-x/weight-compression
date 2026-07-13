@@ -6,8 +6,8 @@ Artifacts:
 - `kernel_v10_result.json` — GPU benchmark output
 - `bench.log` — benchmark stdout
 - Merge code: `../../tools/merge_glm.py`
-- Coder code: `method/tools/stream_validate.py`
-- Kernel code: `method/tools/bench_kernel_v10.py`
+- Coder code: `src/tools/stream_validate.py`
+- Kernel code: `src/tools/bench_kernel_v10.py`
 
 Claims:
 1. The 16 checkpoints' `done_shards` are pairwise disjoint and their union is
@@ -32,5 +32,5 @@ Claims:
 Brief: attempt to REFUTE each claim by recomputation from the artifacts and
 code. Report discrepancies with numbers. Do not edit any repository files.
 Write your report to
-`method/tests/artifacts/BLIND_VERIFICATION_0061.md`
+`src/tests/artifacts/BLIND_VERIFICATION_0061.md`
 and end with an overall verdict line: GATE_PASS or GATE_FAIL.

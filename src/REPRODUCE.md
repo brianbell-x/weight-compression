@@ -68,8 +68,8 @@ Then merge the 16 per-range checkpoints into the headline JSON (asserts 282
 distinct shards, no overlap, no gap):
 
 ```bash
-# collect the checkpoint_GLM-5.2.json files into method/tools/glm_ckpts/, then:
-uv run python method/tools/merge_glm.py
+# collect the checkpoint_GLM-5.2.json files into src/tools/glm_ckpts/, then:
+uv run python src/tools/merge_glm.py
 ```
 
 Expected output (recorded in `tests/artifacts/glm52_standalone_result.json`):
@@ -104,7 +104,7 @@ The retained artifacts and code paths were blind-gate checked on 2026-07-12:
 ## Where everything is
 
 ```
-method/
+src/
   RESULTS.md                                        the gated result and caveats
   tools/stream_validate.py                          the streaming validator verify.py runs
   tools/reproduce.py                                portable end-to-end decode proof for both layouts

@@ -42,7 +42,7 @@ Thumbs.db
 
 .env
 
-# Local exploratory workspace; the published method lives under method/.
+# Local exploratory workspace; the published method lives under src/.
 /research/
 
 # Agent instruction files (local only)

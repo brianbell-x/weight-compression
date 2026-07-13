@@ -23,7 +23,7 @@ uv run verify.py <org>/<repo>
 `bit-exact round-trip : ALL PASS` is the whole point.
 
 The published method, reproduction instructions, and retained evidence live
-under [`method/`](method/).
+under [`src/`](src/).
 
 ## Prior work and distinction
 

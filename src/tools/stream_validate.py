@@ -12,10 +12,10 @@ every BF16 tensor round-trips losslessly on that shard.
 Examples
 --------
   # ~5 GB probe: does the 30% transfer to Super? does it round-trip lossless?
-  uv run python method/tools/stream_validate.py nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16 --shards 1
+  uv run python src/tools/stream_validate.py nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16 --shards 1
 
   # full streamed validation (bounded disk), delete each shard as we go
-  uv run python method/tools/stream_validate.py nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16
+  uv run python src/tools/stream_validate.py nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16
 
 Auth: gated repos need a token -- run `uv run hf auth login` or set HF_TOKEN first.
 """

@@ -11,7 +11,7 @@ path runs reproduce.py: full encode + decode round-trip, SHA-256 checked.
 import runpy
 import sys
 
-TOOLS = "method/tools"
+TOOLS = "src/tools"
 script = (
     f"{TOOLS}/reproduce.py" if "--model" in sys.argv else f"{TOOLS}/stream_validate.py"
 )

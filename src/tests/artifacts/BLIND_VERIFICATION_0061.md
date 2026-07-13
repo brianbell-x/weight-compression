@@ -2,7 +2,7 @@
 
 - **Experiment:** succeeded
 - **What this means for the project:** All six claims survived independent recomputation and adversarial inspection of the supplied checkpoints, result files, log, merge code, coder code, and kernel code. No numerical contradiction was found. The evidence bundle does not contain the original GLM-5.2 shards or the GPU sample/environment, so it supports internal consistency and code-path verification rather than a fresh replay from raw weights or hardware.
-- **Reproduction file:** `method/tools/merge_glm.py` for the published aggregation formulas; independent recomputation used the 16 JSON files under `method/tests/artifacts/ckpts/` with `uv run python`.
+- **Reproduction file:** `src/tools/merge_glm.py` for the published aggregation formulas; independent recomputation used the 16 JSON files under `src/tests/artifacts/ckpts/` with `uv run python`.
 
 ## Scope and method
 

@@ -18,10 +18,10 @@ the sparse exact correction path.
   independent measurements and must not be combined into a 30% exact-runtime
   claim.
 - **Reproduction files:**
-  `method/tools/stream_validate.py`
+  `src/tools/stream_validate.py`
   (16 range-partitioned runs: `--start 18k --shards 18`, k=0..15, last range
   12), `tools/merge_glm.py` (merges the 16 checkpoints → headline JSON),
-  `method/tools/extract_glm_sample.py` + `method/tools/bench_kernel_v10.py`
+  `src/tools/extract_glm_sample.py` + `src/tools/bench_kernel_v10.py`
   (kernel benchmark).
 
 ## Prior art and distinction
