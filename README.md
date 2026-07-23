@@ -18,6 +18,7 @@ Byte-split format for BF16 weights. On the full `zai-org/GLM-5.2` scan
 - **30.168%** K15 charged-format estimate (11.173 bits/weight) — estimate only
 
 Code, verifier, and references: [`Split12/`](Split12/)
+Serving and kernel record (B300 inference tests): [`Split12/inference/`](Split12/inference/)
 
 ## Layout
 

@@ -29,6 +29,14 @@ https://brianbell-x.github.io/weight-compression/ by
 `.github/workflows/pages.yml`. It documents Split12 specifically — not the
 repo as a whole.
 
+## Inference tests
+
+`inference/` reconstructs the July 2026 serving/kernel campaign (GLM-4-9B on
+A6000/RTX 6000 Ada, full GLM-5.2 on 8× B300, production SGLang retest, and
+the B300 tensor-core kernel campaign that reached 0.80× BF16 on MoE expert
+w2). The raw artifacts and kernels were lost; the record there is rebuilt
+from the research ledgers and is documentation, not rerunnable code.
+
 ## References
 
 ```bibtex
