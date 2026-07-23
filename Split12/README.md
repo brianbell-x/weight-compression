@@ -22,6 +22,13 @@ The verifier streams the model shard by shard from Hugging Face and checks
 losslessness plus decoded reduction. `ALL_BF16_TENSORS_LOSSLESS: true` is the
 whole point. It intentionally omits accounting-only layouts it does not decode.
 
+## Writeup
+
+`site/` holds the visual writeup for this method, deployed to
+https://brianbell-x.github.io/weight-compression/ by
+`.github/workflows/pages.yml`. It documents Split12 specifically — not the
+repo as a whole.
+
 ## References
 
 ```bibtex

@@ -21,6 +21,7 @@ Code, verifier, and references: [`Split12/`](Split12/)
 
 ## Layout
 
-- `Split12/` — the current proven method and its verifier
+- `Split12/` — the current proven method: verifier, writeup (`Split12/site/`,
+  deployed to GitHub Pages), and references
 - `pyproject.toml` / `uv.lock` — shared environment (`uv sync`, then
   `uv run <method>/verify.py <org>/<repo>`)
