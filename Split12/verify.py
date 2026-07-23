@@ -10,10 +10,11 @@ path runs reproduce.py: full encode + decode round-trip, SHA-256 checked.
 
 import runpy
 import sys
+from pathlib import Path
 
-TOOLS = "src/tools"
+TOOLS = Path(__file__).resolve().parent / "tools"
 script = (
-    f"{TOOLS}/reproduce.py" if "--model" in sys.argv else f"{TOOLS}/stream_validate.py"
+    TOOLS / "reproduce.py" if "--model" in sys.argv else TOOLS / "stream_validate.py"
 )
-sys.argv[0] = script
-runpy.run_path(script, run_name="__main__")
+sys.argv[0] = str(script)
+runpy.run_path(str(script), run_name="__main__")

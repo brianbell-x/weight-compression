@@ -13,9 +13,9 @@ Full scan of `zai-org/GLM-5.2` (59,509 BF16 tensors, round-tripped bit-for-bit):
 ## Verify
 
 ```bash
-# from the repo root
+cd Split12
 uv sync
-uv run Split12/verify.py <org>/<repo>
+uv run verify.py <org>/<repo>
 ```
 
 The verifier streams the model shard by shard from Hugging Face and checks

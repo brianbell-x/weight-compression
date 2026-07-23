@@ -340,7 +340,7 @@
           <span class="lbl">One command</span>
           <button class="p4-copy" type="button" hidden>Copy</button>
         </div>
-        <pre class="p4-cmd"><code>uv run Split12/verify.py zai-org/GLM-5.2</code></pre>
+        <pre class="p4-cmd"><code>cd Split12 && uv sync && uv run verify.py zai-org/GLM-5.2</code></pre>
         <ul class="p4-spec">
           <li><span class="k">GPU</span><span class="v">not required</span></li>
           <li><span class="k">Input</span><span class="v">the BF16 checkpoint, streamed (~1.4 TB)</span></li>

@@ -22,7 +22,8 @@ Serving and kernel record (B300 inference tests): [`Split12/inference/`](Split12
 
 ## Layout
 
+Each method folder is self-contained — code, environment (`pyproject.toml`,
+`uv.lock`, `.python-version`), writeup, and references all live inside it.
+
 - `Split12/` — the current proven method: verifier, writeup (`Split12/site/`,
-  deployed to GitHub Pages), and references
-- `pyproject.toml` / `uv.lock` — shared environment (`uv sync`, then
-  `uv run <method>/verify.py <org>/<repo>`)
+  deployed to GitHub Pages at `/Split12/`), inference record, and references
