@@ -4,7 +4,7 @@
     uv run verify.py --model <path>     # verify a local .safetensors file/dir
 
 Streaming (an HF repo id) runs stream_validate.py: one shard on disk at a time,
-bit-exact check on every BF16 tensor, running bit accounting. A local --model
+bit-exact check on every BF16 tensor, decoded byte-split measurement. A local --model
 path runs reproduce.py: full encode + decode round-trip, SHA-256 checked.
 """
 
